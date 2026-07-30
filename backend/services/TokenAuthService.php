@@ -13,7 +13,7 @@ class TokenAuthService {
 
     public function __construct() {
         if (!defined('JWT_SECRET')) {
-            require_once __DIR__ . '/../../config/config.php';
+            require_once __DIR__ . '/../config/config.php';
         }
         $this->secret = JWT_SECRET;
         $this->tokenExpiration = defined('TOKEN_EXPIRATION') ? TOKEN_EXPIRATION : 3600; // 1 Hora (3600s)

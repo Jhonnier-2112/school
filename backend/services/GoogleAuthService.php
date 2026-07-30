@@ -8,7 +8,7 @@ class GoogleAuthService {
 
     public function __construct() {
         if (!defined('GOOGLE_CLIENT_ID')) {
-            require_once __DIR__ . '/../../config/config.php';
+            require_once __DIR__ . '/../config/config.php';
         }
         $this->clientId = GOOGLE_CLIENT_ID;
         $this->clientSecret = GOOGLE_CLIENT_SECRET;

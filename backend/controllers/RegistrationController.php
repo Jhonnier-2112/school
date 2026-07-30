@@ -6,14 +6,15 @@ use App\Services\EmailService;
 use Exception;
 
 // Incluir la configuración de inscripciones
-require_once __DIR__ . '/../../config/RegistrationConfig.php';
+require_once __DIR__ . '/../config/RegistrationConfig.php';
 use RegistrationConfig;
+use App\Core\Controller;
 
-class RegistrationController {
+class RegistrationController extends Controller {
     // Muestra el formulario de inscripción con etapas dinámicas
     public function create() {
         if (!RegistrationConfig::inscripcionesAbiertas()) {
-            require __DIR__ . '/../views/registration_closed.php';
+            $this->view('registration_closed');
             return;
         }
 
@@ -24,7 +25,7 @@ class RegistrationController {
         }
 
         $stages = Registration::getRaceStages();
-        require __DIR__ . '/../views/registration_form.php';
+        $this->view('registration_form', ['currentUser' => $currentUser, 'stages' => $stages]);
     }
 
     // Guarda la inscripción en la BD y muestra la pantalla de éxito
@@ -38,7 +39,7 @@ class RegistrationController {
                 ]);
                 exit;
             } else {
-                require __DIR__ . '/../views/registration_closed.php';
+                $this->view('registration_closed');
                 return;
             }
         }
@@ -143,10 +144,8 @@ class RegistrationController {
             
             echo json_encode(['success' => false, 'message' => $errorMessage]);
             exit;
-        } else {
-            $title = 'Error en el registro';
             $errors = is_array($errors) ? $errors : [$errors];
-            include __DIR__ . '/../views/error.php';
+            $this->view('error', ['title' => $title, 'errors' => $errors]);
         }
     }
 
@@ -158,18 +157,16 @@ class RegistrationController {
         $participantData = $_SESSION['participant_data'] ?? [];
         unset($_SESSION['registration_success']);
         unset($_SESSION['participant_data']);
-        require __DIR__ . '/../views/registration_success.php';
+        $this->view('registration_success', ['participantData' => $participantData]);
     }
 
     public function createWithData($data = [], $errors = []) {
-        $formData = $data;
-        $formErrors = $errors;
         $stages = Registration::getRaceStages();
-        require __DIR__ . '/../views/registration_form.php';
+        $this->view('registration_form', ['formData' => $formData, 'formErrors' => $formErrors, 'stages' => $stages]);
     }
 
     public function consultaForm() {
-        require __DIR__ . '/../views/consulta_inscripcion.php';
+        $this->view('consulta_inscripcion');
     }
 
     public function consultarInscripcion() {

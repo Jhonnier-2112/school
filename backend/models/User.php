@@ -35,11 +35,11 @@ class User {
             $sql = "INSERT INTO users (
                 nombres, apellidos, tipo_documento, numero_documento,
                 email, password, telefono, direccion, municipio, departamento,
-                fecha_nacimiento, genero, eps, grupo_sanguineo, rh, role, role_id, google_id, avatar, status, created_at
+                fecha_nacimiento, genero, eps, grupo_sanguineo, rh, role_id, google_id, avatar, status, created_at
             ) VALUES (
                 :nombres, :apellidos, :tipo_documento, :numero_documento,
                 :email, :password, :telefono, :direccion, :municipio, :departamento,
-                :fecha_nacimiento, :genero, :eps, :grupo_sanguineo, :rh, :role, :role_id, :google_id, :avatar, 1, NOW()
+                :fecha_nacimiento, :genero, :eps, :grupo_sanguineo, :rh, :role_id, :google_id, :avatar, 1, NOW()
             )";
 
             $hashedPassword = !empty($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);

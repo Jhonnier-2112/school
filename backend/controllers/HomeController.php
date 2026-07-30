@@ -1,20 +1,22 @@
 <?php
 namespace App\Controllers;
 
-class HomeController {
+use App\Core\Controller;
+
+class HomeController extends Controller {
     public function index() {
-        require __DIR__ . '/../views/home.php';
+        $this->view('home');
     }
     
     public function nosotros() {
-        require __DIR__ . '/../views/nosotros.php';
+        $this->view('nosotros');
     }
     
     public function productos() {
-        require __DIR__ . '/../views/productos.php';
+        $this->view('productos');
     }
     
     public function blog() {
-        require __DIR__ . '/../views/blog.php';
+        $this->view('blog');
     }
 }

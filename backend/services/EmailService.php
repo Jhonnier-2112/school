@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-require_once __DIR__ . '/../../config/EmailConfig.php';
+require_once __DIR__ . '/../config/EmailConfig.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;

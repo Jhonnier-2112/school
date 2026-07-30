@@ -3,7 +3,9 @@ namespace App\Controllers;
 
 use App\Models\Product;
 
-class ProductController {
+use App\Core\Controller;
+
+class ProductController extends Controller {
     public function index() {
         $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
         $perPage = isset($_GET['per_page']) ? max(1, (int)$_GET['per_page']) : 12;
@@ -37,10 +39,7 @@ class ProductController {
         $model = new Product();
         $result = $model->paginate($page, $perPage, $filters, $order);
 
-        $products = $result['items'];
-        $pagination = $result['pagination'];
-
-        require __DIR__ . '/../views/productos.php';
+        $this->view('productos', ['products' => $products, 'pagination' => $pagination, 'filters' => $filters]);
     }
 
     public function show() {
@@ -62,6 +61,6 @@ class ProductController {
 
         // Pasar a la vista de detalle
         $p = $product; // Usamos $p para mantener consistencia simple en la vista
-        require __DIR__ . '/../views/producto_detalle.php';
+        $this->view('producto_detalle', ['p' => $p, 'product' => $product]);
     }
 }

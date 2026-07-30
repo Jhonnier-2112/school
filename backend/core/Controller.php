@@ -9,7 +9,7 @@ class Controller {
      */
     protected function view(string $viewPath, array $data = []) {
         extract($data);
-        $file = __DIR__ . '/../views/' . $viewPath . '.php';
+        $file = __DIR__ . '/../../frontend/views/' . $viewPath . '.php';
         if (file_exists($file)) {
             require $file;
         } else {
@@ -52,6 +52,7 @@ class Controller {
                 'apellidos' => $_SESSION['user_apellidos'] ?? '',
                 'email' => $_SESSION['user_email'] ?? '',
                 'role' => $_SESSION['user_role'] ?? 'runner',
+                'role_id' => $_SESSION['user_role_id'] ?? null,
                 'numero_documento' => $_SESSION['user_documento'] ?? ''
             ];
         }
@@ -61,9 +62,9 @@ class Controller {
         if (!empty($_COOKIE['access_token'])) {
             $token = $_COOKIE['access_token'];
         } else {
-            $headers = getallheaders();
+            $headers = function_exists('getallheaders') ? getallheaders() : [];
             $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
-            if (str_starts_with($authHeader, 'Bearer ')) {
+            if (is_string($authHeader) && str_starts_with($authHeader, 'Bearer ')) {
                 $token = substr($authHeader, 7);
             }
         }
@@ -77,6 +78,7 @@ class Controller {
                 $_SESSION['user_apellidos'] = $decodedPayload['apellidos'];
                 $_SESSION['user_email'] = $decodedPayload['email'];
                 $_SESSION['user_role'] = $decodedPayload['role'];
+                $_SESSION['user_role_id'] = $decodedPayload['role_id'] ?? null;
 
                 return [
                     'id' => $decodedPayload['user_id'],
@@ -84,6 +86,7 @@ class Controller {
                     'apellidos' => $decodedPayload['apellidos'],
                     'email' => $decodedPayload['email'],
                     'role' => $decodedPayload['role'],
+                    'role_id' => $decodedPayload['role_id'] ?? null,
                     'numero_documento' => ''
                 ];
             }
@@ -119,7 +122,12 @@ class Controller {
     protected function requireAdmin() {
         $this->requireAuth();
         $user = $this->currentUser();
-        if ($user['role'] !== 'admin') {
+        
+        $roleName = strtolower($user['role'] ?? '');
+        $isAdminRole = ($roleName === 'admin' || $roleName === 'administrador');
+        $isAdminUuid = isset($user['role_id']) && \App\Models\Role::isAdmin($user['role_id']);
+
+        if (!$isAdminRole && !$isAdminUuid) {
             http_response_code(403);
             echo "Acceso denegado. Se requieren permisos de administrador.";
             exit;

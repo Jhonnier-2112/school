@@ -103,7 +103,7 @@
 
 ---
 
-## 4. Base de Datos (`runner_db` en desarrollo, `u266057107_femtribe_bd` en producción)
+## 4. Base de Datos (`fentribe` en desarrollo local con MAMP Pro, `u266057107_femtribe_bd` en producción)
 
 ### Tabla `users`
 - `id` INT AUTO_INCREMENT PK
@@ -111,8 +111,10 @@
 - `email` UNIQUE, `password` (BCRYPT)
 - `telefono`, `direccion`, `municipio`, `departamento`
 - `eps`, `grupo_sanguineo`, `rh`
-- `google_id`, `avatar_url`
+- `google_id`, `avatar` (avatar_url)
+- `role` ENUM('runner', 'admin')
 - `role_id` CHAR(36) NULL FK → `roles.id`
+- `status` TINYINT
 - `created_at`, `updated_at`
 
 ### Tabla `roles` (RBAC — UUID)
@@ -121,8 +123,14 @@
   - `a1b2c3d4-0001-0001-0001-000000000001` → `Cliente`
   - `a1b2c3d4-0002-0002-0002-000000000002` → `Administrador`
 
-### Tabla `user_tokens` (Access + Refresh Tokens)
-- `id`, `user_id` FK, `token` (Access Token HMAC-SHA256), `refresh_token`, `expires_at` (1 hora), `created_at`
+### Tabla `user_tokens` (Refresh Tokens)
+- `id` INT AUTO_INCREMENT PK
+- `user_id` INT FK
+- `token_type` VARCHAR(30) ('refresh_token')
+- `token_hash` VARCHAR(255) UNIQUE (SHA-256)
+- `expires_at` DATETIME (1 hora)
+- `is_revoked` TINYINT (0 o 1)
+- `created_at` DATETIME
 
 ### Tabla `user_access_logs`
 - `id`, `user_id` NULL FK, `ip_address`, `page_url`, `method`, `user_agent`, `referer`, `created_at`

@@ -1,18 +1,595 @@
 <?php
 namespace App\Controllers;
 
+use App\Core\Controller;
 use App\Config\Database;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Order;
 use PDO;
 use PDOException;
 
-class AdminController {
+class AdminController extends Controller {
+
+    private $db;
+
+    public function __construct() {
+        $database = new Database();
+        $this->db = $database->getConnection();
+    }
+
+    /**
+     * Dashboard principal del módulo administrador
+     */
+    public function dashboard() {
+        $this->requireAdmin();
+
+        try {
+            // 1. Usuarios totales
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM users WHERE status = 1");
+            $totalUsers = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+
+            // 2. Ventas totales (aprobadas/pagadas)
+            $stmt = $this->db->query("SELECT COUNT(*) AS total, SUM(total) AS total_sales FROM orders WHERE status = 'paid'");
+            $salesData = $stmt->fetch(PDO::FETCH_ASSOC);
+            $totalOrders = (int)($salesData['total'] ?? 0);
+            $totalSales = (float)($salesData['total_sales'] ?? 0.00);
+
+            // 3. Inscripciones totales
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM registrations");
+            $totalRegistrations = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+
+            // 4. Visitas totales (logs)
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM user_access_logs");
+            $totalVisits = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+
+            // 5. Últimas 5 Compras
+            $stmt = $this->db->query("SELECT id, order_number, customer_name, total, status, created_at FROM orders ORDER BY created_at DESC LIMIT 5");
+            $recentOrders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            // 6. Últimos 5 Accesos
+            $stmt = $this->db->query("SELECT l.ip_address, l.page_url, l.method, l.created_at, u.email 
+                                      FROM user_access_logs l 
+                                      LEFT JOIN users u ON l.user_id = u.id 
+                                      ORDER BY l.created_at DESC LIMIT 5");
+            $recentLogs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $totalUsers = $totalOrders = $totalRegistrations = $totalVisits = 0;
+            $totalSales = 0.00;
+            $recentOrders = $recentLogs = [];
+        }
+
+        $this->view('admin/dashboard', [
+            'activeTab' => 'dashboard',
+            'totalUsers' => $totalUsers,
+            'totalOrders' => $totalOrders,
+            'totalSales' => $totalSales,
+            'totalRegistrations' => $totalRegistrations,
+            'totalVisits' => $totalVisits,
+            'recentOrders' => $recentOrders,
+            'recentLogs' => $recentLogs
+        ]);
+    }
+
+    /**
+     * Listado y filtros de productos (Catálogo Admin)
+     */
+    public function products() {
+        $this->requireAdmin();
+
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $search = $_GET['search'] ?? '';
+
+        $params = [];
+        $whereClause = "WHERE is_active = 1";
+        if ($search !== '') {
+            $whereClause .= " AND (name LIKE :search OR sku LIKE :search)";
+            $params[':search'] = "%{$search}%";
+        }
+
+        try {
+            // Count total
+            $stmt = $this->db->prepare("SELECT COUNT(*) AS total FROM products {$whereClause}");
+            $stmt->execute($params);
+            $totalProducts = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+            $totalPages = (int)ceil($totalProducts / $perPage);
+
+            // Fetch items
+            $offset = ($page - 1) * $perPage;
+            $stmt = $this->db->prepare("SELECT p.*, c.name AS category_name 
+                                        FROM products p 
+                                        LEFT JOIN categories c ON p.category_id = c.id 
+                                        {$whereClause} 
+                                        ORDER BY p.created_at DESC 
+                                        LIMIT :limit OFFSET :offset");
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $products = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $products = [];
+            $totalProducts = $totalPages = 0;
+        }
+
+        $this->view('admin/products', [
+            'activeTab' => 'products',
+            'products' => $products,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalProducts' => $totalProducts,
+            'search' => $search
+        ]);
+    }
+
+    /**
+     * Formulario de creación de producto
+     */
+    public function createProductForm() {
+        $this->requireAdmin();
+
+        $categoryModel = new Category();
+        $categories = $categoryModel->getAll();
+
+        $this->view('admin/product_form', [
+            'activeTab' => 'products',
+            'mode' => 'create',
+            'categories' => $categories,
+            'product' => null
+        ]);
+    }
+
+    /**
+     * Guardar nuevo producto en base de datos
+     */
+    public function saveProduct() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/productos');
+        }
+
+        $name = trim($_POST['name'] ?? '');
+        $sku = trim($_POST['sku'] ?? '');
+        $price = floatval($_POST['price'] ?? 0);
+        $stock = intval($_POST['stock'] ?? 0);
+        $categoryId = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+        $gender = $_POST['gender'] ?? 'unisex';
+        $type = $_POST['type'] ?? 'camisetas';
+        $description = trim($_POST['description'] ?? '');
+        $image = trim($_POST['image'] ?? 'assets/img/products/placeholder.png');
+        $isNew = isset($_POST['is_new']) ? 1 : 0;
+        $isOffer = isset($_POST['is_offer']) ? 1 : 0;
+
+        // Validaciones básicas
+        if ($name === '' || $sku === '') {
+            $_SESSION['admin_error'] = 'El nombre y SKU son obligatorios.';
+            $this->redirect('/admin/productos/nuevo');
+        }
+
+        // Generar slug
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+        try {
+            // Resolver nombre de la categoría para guardar en la columna redundante `category`
+            $categoryName = '';
+            if ($categoryId) {
+                $stmt = $this->db->prepare("SELECT name FROM categories WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $categoryId]);
+                $categoryName = $stmt->fetch(PDO::FETCH_COLUMN) ?: '';
+            }
+
+            $sql = "INSERT INTO products (sku, name, slug, description, price, stock, category, category_id, gender, type, image, is_new, is_offer, is_active, created_at)
+                    VALUES (:sku, :name, :slug, :description, :price, :stock, :category, :category_id, :gender, :type, :image, :is_new, :is_offer, 1, NOW())";
+            
+            $stmt = $this->db->prepare($sql);
+            $ok = $stmt->execute([
+                ':sku' => $sku,
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description,
+                ':price' => $price,
+                ':stock' => $stock,
+                ':category' => $categoryName,
+                ':category_id' => $categoryId,
+                ':gender' => $gender,
+                ':type' => $type,
+                ':image' => $image,
+                ':is_new' => $isNew,
+                ':is_offer' => $isOffer
+            ]);
+
+            if ($ok) {
+                $_SESSION['admin_success'] = 'Producto creado exitosamente.';
+            } else {
+                $_SESSION['admin_error'] = 'No se pudo guardar el producto.';
+            }
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
+        }
+
+        $this->redirect('/admin/productos');
+    }
+
+    /**
+     * Formulario de edición de producto
+     */
+    public function editProductForm() {
+        $this->requireAdmin();
+
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if ($id === 0) {
+            $this->redirect('/admin/productos');
+        }
+
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM products WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$product) {
+                $_SESSION['admin_error'] = 'Producto no encontrado.';
+                $this->redirect('/admin/productos');
+            }
+
+            $categoryModel = new Category();
+            $categories = $categoryModel->getAll();
+
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error al cargar el producto.';
+            $this->redirect('/admin/productos');
+        }
+
+        $this->view('admin/product_form', [
+            'activeTab' => 'products',
+            'mode' => 'edit',
+            'categories' => $categories,
+            'product' => $product
+        ]);
+    }
+
+    /**
+     * Actualizar datos del producto en base de datos
+     */
+    public function updateProduct() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/productos');
+        }
+
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $name = trim($_POST['name'] ?? '');
+        $sku = trim($_POST['sku'] ?? '');
+        $price = floatval($_POST['price'] ?? 0);
+        $stock = intval($_POST['stock'] ?? 0);
+        $categoryId = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+        $gender = $_POST['gender'] ?? 'unisex';
+        $type = $_POST['type'] ?? 'camisetas';
+        $description = trim($_POST['description'] ?? '');
+        $image = trim($_POST['image'] ?? '');
+        $isNew = isset($_POST['is_new']) ? 1 : 0;
+        $isOffer = isset($_POST['is_offer']) ? 1 : 0;
+
+        if ($id === 0 || $name === '' || $sku === '') {
+            $_SESSION['admin_error'] = 'Nombre, SKU y ID son campos obligatorios.';
+            $this->redirect('/admin/productos');
+        }
+
+        // Generar slug
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+        try {
+            $categoryName = '';
+            if ($categoryId) {
+                $stmt = $this->db->prepare("SELECT name FROM categories WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $categoryId]);
+                $categoryName = $stmt->fetch(PDO::FETCH_COLUMN) ?: '';
+            }
+
+            $sql = "UPDATE products SET 
+                        sku = :sku, 
+                        name = :name, 
+                        slug = :slug, 
+                        description = :description, 
+                        price = :price, 
+                        stock = :stock, 
+                        category = :category, 
+                        category_id = :category_id, 
+                        gender = :gender, 
+                        type = :type, 
+                        image = :image, 
+                        is_new = :is_new, 
+                        is_offer = :is_offer 
+                    WHERE id = :id";
+            
+            $stmt = $this->db->prepare($sql);
+            $ok = $stmt->execute([
+                ':sku' => $sku,
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description,
+                ':price' => $price,
+                ':stock' => $stock,
+                ':category' => $categoryName,
+                ':category_id' => $categoryId,
+                ':gender' => $gender,
+                ':type' => $type,
+                ':image' => $image,
+                ':is_new' => $isNew,
+                ':is_offer' => $isOffer,
+                ':id' => $id
+            ]);
+
+            if ($ok) {
+                $_SESSION['admin_success'] = 'Producto actualizado exitosamente.';
+            } else {
+                $_SESSION['admin_error'] = 'No se pudo actualizar el producto.';
+            }
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
+        }
+
+        $this->redirect('/admin/productos');
+    }
+
+    /**
+     * Desactivar (eliminar suavemente) producto
+     */
+    public function deleteProduct() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/productos');
+        }
+
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        if ($id > 0) {
+            try {
+                $stmt = $this->db->prepare("UPDATE products SET is_active = 0 WHERE id = :id");
+                $stmt->execute([':id' => $id]);
+                $_SESSION['admin_success'] = 'Producto eliminado (desactivado) exitosamente.';
+            } catch (PDOException $e) {
+                $_SESSION['admin_error'] = 'Error de Base de Datos.';
+            }
+        }
+
+        $this->redirect('/admin/productos');
+    }
+
+    /**
+     * Listado y CRUD de Categorías
+     */
+    public function categories() {
+        $this->requireAdmin();
+
+        $categoryModel = new Category();
+        $categories = $categoryModel->getAll();
+
+        $this->view('admin/categories', [
+            'activeTab' => 'categories',
+            'categories' => $categories
+        ]);
+    }
+
+    /**
+     * Registrar nueva categoría
+     */
+    public function saveCategory() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/categorias');
+        }
+
+        $name = trim($_POST['name'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+
+        if ($name === '') {
+            $_SESSION['admin_error'] = 'El nombre de la categoría es obligatorio.';
+            $this->redirect('/admin/categorias');
+        }
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+        try {
+            $sql = "INSERT INTO categories (name, slug, description, is_active, created_at) 
+                    VALUES (:name, :slug, :description, 1, NOW())";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description
+            ]);
+            $_SESSION['admin_success'] = 'Categoría creada exitosamente.';
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
+        }
+
+        $this->redirect('/admin/categorias');
+    }
+
+    /**
+     * Actualizar categoría existente
+     */
+    public function updateCategory() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/categorias');
+        }
+
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $name = trim($_POST['name'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+
+        if ($id === 0 || $name === '') {
+            $_SESSION['admin_error'] = 'ID y Nombre de categoría obligatorios.';
+            $this->redirect('/admin/categorias');
+        }
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+        try {
+            $sql = "UPDATE categories SET name = :name, slug = :slug, description = :description WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                ':name' => $name,
+                ':slug' => $slug,
+                ':description' => $description,
+                ':id' => $id
+            ]);
+            $_SESSION['admin_success'] = 'Categoría actualizada exitosamente.';
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
+        }
+
+        $this->redirect('/admin/categorias');
+    }
+
+    /**
+     * Listado de Compras / Pedidos
+     */
+    public function orders() {
+        $this->requireAdmin();
+
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 10;
+        $offset = ($page - 1) * $perPage;
+        $status = $_GET['status'] ?? '';
+
+        $params = [];
+        $whereClause = "";
+        if ($status !== '') {
+            $whereClause = "WHERE status = :status";
+            $params[':status'] = $status;
+        }
+
+        try {
+            $stmt = $this->db->prepare("SELECT COUNT(*) AS total FROM orders {$whereClause}");
+            $stmt->execute($params);
+            $totalOrders = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+            $totalPages = (int)ceil($totalOrders / $perPage);
+
+            $stmt = $this->db->prepare("SELECT * FROM orders {$whereClause} ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $orders = [];
+            $totalOrders = $totalPages = 0;
+        }
+
+        $this->view('admin/orders', [
+            'activeTab' => 'orders',
+            'orders' => $orders,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalOrders' => $totalOrders,
+            'status' => $status
+        ]);
+    }
+
+    /**
+     * Ver el detalle de una compra específica
+     */
+    public function orderDetail() {
+        $this->requireAdmin();
+
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if ($id === 0) {
+            $this->redirect('/admin/compras');
+        }
+
+        try {
+            // Fetch order
+            $stmt = $this->db->prepare("SELECT * FROM orders WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$order) {
+                $_SESSION['admin_error'] = 'Orden no encontrada.';
+                $this->redirect('/admin/compras');
+            }
+
+            // Fetch items
+            $stmt = $this->db->prepare("SELECT * FROM order_items WHERE order_id = :id");
+            $stmt->execute([':id' => $id]);
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            // Fetch payment logs
+            $stmt = $this->db->prepare("SELECT * FROM payments WHERE order_id = :id ORDER BY created_at DESC");
+            $stmt->execute([':id' => $id]);
+            $payments = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $_SESSION['admin_error'] = 'Error al consultar la orden.';
+            $this->redirect('/admin/compras');
+        }
+
+        $this->view('admin/order_detail', [
+            'activeTab' => 'orders',
+            'order' => $order,
+            'items' => $items,
+            'payments' => $payments
+        ]);
+    }
+
+    /**
+     * Bitácora de accesos y visitas
+     */
+    public function accessLogs() {
+        $this->requireAdmin();
+
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM user_access_logs");
+            $totalLogs = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+            $totalPages = (int)ceil($totalLogs / $perPage);
+
+            $stmt = $this->db->prepare("SELECT l.*, u.nombres, u.apellidos, u.email 
+                                        FROM user_access_logs l 
+                                        LEFT JOIN users u ON l.user_id = u.id 
+                                        ORDER BY l.created_at DESC 
+                                        LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $logs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $logs = [];
+            $totalLogs = $totalPages = 0;
+        }
+
+        $this->view('admin/access_logs', [
+            'activeTab' => 'access_logs',
+            'logs' => $logs,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalLogs' => $totalLogs
+        ]);
+    }
+
     private function execSqlFile(string $path, PDO $db): array {
         $results = [];
         if (!is_file($path)) {
             return [[false, "Archivo no encontrado: $path"]];
         }
         $sql = file_get_contents($path);
-        // Quitar comentarios y normalizar
         $lines = explode("\n", $sql);
         $clean = [];
         foreach ($lines as $line) {
@@ -21,7 +598,6 @@ class AdminController {
             $clean[] = $line;
         }
         $sql = implode("\n", $clean);
-        // Separar por punto y coma en sentencias individuales
         $stmts = array_filter(array_map('trim', explode(';', $sql)));
         foreach ($stmts as $stmtSql) {
             try {
@@ -36,33 +612,23 @@ class AdminController {
         return $results;
     }
 
-    // Ejecuta migraciones y seed de productos
     public function runDb() {
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $base = __DIR__ . '/../../sql/';
+        $base = __DIR__ . '/../sql/';
         $tasks = [
             'create_users_table.sql',
             'create_auth_tokens_and_google.sql',
-            'create_roles_and_seeds.sql',          // tabla roles (UUID) + semillas cliente/admin + FK en users
+            'create_roles_and_seeds.sql',
             'create_ecommerce_and_payments.sql',
             'create_access_logs_cart_and_stages.sql',
-            'add_type_column.sql',
-            'migrate_official_product.sql',
-            'seed_products.sql',
-            'update_product_descriptions.sql',
-            'add_soft_flask.sql',
         ];
 
         $output = [];
         foreach ($tasks as $file) {
             $path = $base . $file;
-            $result = $this->execSqlFile($path, $db);
+            $result = $this->execSqlFile($path, $this->db);
             $output[$file] = $result;
         }
 
-        // Render respuesta simple
         header('Content-Type: text/html; charset=utf-8');
         echo '<html><head><title>Admin DB Runner</title></head><body style="font-family: system-ui, sans-serif; padding: 20px;">';
         echo '<h2>Ejecución de SQL</h2>';
@@ -77,7 +643,7 @@ class AdminController {
             echo '</ul></li>';
         }
         echo '</ul>';
-        echo '<p><a href="/productos?category=textil&type=camisetas">Ver productos: Ropa → Camisetas</a></p>';
+        echo '<p><a href="/admin/dashboard">Ir al Dashboard Administrador</a></p>';
         echo '</body></html>';
     }
 }

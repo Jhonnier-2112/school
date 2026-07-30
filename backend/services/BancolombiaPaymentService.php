@@ -11,7 +11,7 @@ class BancolombiaPaymentService {
 
     public function __construct() {
         if (!defined('BANCOLOMBIA_WOMPI_PUBLIC_KEY')) {
-            require_once __DIR__ . '/../../config/config.php';
+            require_once __DIR__ . '/../config/config.php';
         }
 
         $this->publicKey = BANCOLOMBIA_WOMPI_PUBLIC_KEY;

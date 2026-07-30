@@ -55,6 +55,7 @@ class AuthController extends Controller {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_documento'] = $user['numero_documento'];
             $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user_role_id'] = $user['role_id'] ?? null;
 
             // Generar Access Token y Refresh Token con vencimiento de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
@@ -156,6 +157,7 @@ class AuthController extends Controller {
             $_SESSION['user_email'] = $data['email'];
             $_SESSION['user_documento'] = $data['numero_documento'];
             $_SESSION['user_role'] = 'runner';
+            $_SESSION['user_role_id'] = \App\Models\Role::CLIENTE_ID;
 
             // Generar Access Token y Refresh Token de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
@@ -229,6 +231,7 @@ class AuthController extends Controller {
             $_SESSION['user_email'] = $user['email'];
             $_SESSION['user_documento'] = $user['numero_documento'];
             $_SESSION['user_role'] = $user['role'];
+            $_SESSION['user_role_id'] = $user['role_id'] ?? null;
 
             // Emitir Access Token y Refresh Token de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
