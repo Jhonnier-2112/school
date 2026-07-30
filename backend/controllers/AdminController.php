@@ -171,65 +171,7 @@ class AdminController extends Controller {
         $image = trim($_POST['image'] ?? 'assets/img/products/placeholder.png');
         $video = trim($_POST['video'] ?? '');
         $images = trim($_POST['images'] ?? '');
-        $isNew = isset($_POST['is_new']) ? 1 : 0;
-        $isOffer = isset($_POST['is_offer']) ? 1 : 0;
 
-        // Validaciones básicas
-        if ($name === '' || $sku === '') {
-            $_SESSION['admin_error'] = 'El nombre y SKU son obligatorios.';
-            $this->redirect('/admin/productos/nuevo');
-        }
-
-        // Generar slug
-        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
-
-        try {
-            // Resolver nombre de la categoría para guardar en la columna redundante `category`
-            $categoryName = '';
-            if ($categoryId) {
-                $stmt = $this->db->prepare("SELECT name FROM categories WHERE id = :id LIMIT 1");
-                $stmt->execute([':id' => $categoryId]);
-                $categoryName = $stmt->fetch(PDO::FETCH_COLUMN) ?: '';
-            }
-
-            $sql = "INSERT INTO products (sku, name, slug, description, price, stock, category, category_id, gender, type, image, video, images, is_new, is_offer, is_active, created_at)
-                    VALUES (:sku, :name, :slug, :description, :price, :stock, :category, :category_id, :gender, :type, :image, :video, :images, :is_new, :is_offer, 1, NOW())";
-            
-            $stmt = $this->db->prepare($sql);
-            $ok = $stmt->execute([
-                ':sku' => $sku,
-                ':name' => $name,
-                ':slug' => $slug,
-                ':description' => $description,
-                ':price' => $price,
-                ':stock' => $stock,
-                ':category' => $categoryName,
-                ':category_id' => $categoryId,
-                ':gender' => $gender,
-                ':type' => $type,
-                ':image' => $image,
-                ':video' => $video !== '' ? $video : null,
-                ':images' => $images !== '' ? $images : null,
-                ':is_new' => $isNew,
-                ':is_offer' => $isOffer
-            ]);
-
-            if ($ok) {
-                $_SESSION['admin_success'] = 'Producto creado exitosamente.';
-            } else {
-                $_SESSION['admin_error'] = 'No se pudo guardar el producto.';
-            }
-        } catch (PDOException $e) {
-            $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
-        }
-
-        $this->redirect('/admin/productos');
-    }
-
-    /**
-     * Formulario de edición de producto
-     */
-    public function editProductForm() {
         $this->requireAdmin();
 
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -646,6 +588,7 @@ class AdminController extends Controller {
             'create_access_logs_cart_and_stages.sql',
             'create_admin_and_seed_products.sql',
             'alter_products_media_and_reviews.sql',
+            'create_product_media_table.sql',
         ];
 
         $output = [];
@@ -653,6 +596,54 @@ class AdminController extends Controller {
             $path = $base . $file;
             $result = $this->execSqlFile($path, $this->db);
             $output[$file] = $result;
+        }
+
+        // Migración de datos heredados a la tabla product_media
+        try {
+            $stmt = $this->db->query("SELECT id, video, images FROM products");
+            $prods = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            
+            $checkStmt = $this->db->prepare("SELECT COUNT(*) AS total FROM product_media WHERE product_id = :p_id");
+            $insertStmt = $this->db->prepare("INSERT INTO product_media (product_id, type, url, sort_order) VALUES (:p_id, :type, :url, :sort)");
+            
+            foreach ($prods as $p) {
+                $checkStmt->execute([':p_id' => $p['id']]);
+                $hasMedia = (int)($checkStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0) > 0;
+                
+                if (!$hasMedia) {
+                    $order = 0;
+                    if (!empty($p['images'])) {
+                        $imgs = explode(',', $p['images']);
+                        foreach ($imgs as $img) {
+                            $img = trim($img);
+                            if ($img !== '') {
+                                $insertStmt->execute([
+                                    ':p_id' => $p['id'],
+                                    ':type' => 'image',
+                                    ':url' => $img,
+                                    ':sort' => $order++
+                                ]);
+                            }
+                        }
+                    }
+                    if (!empty($p['video'])) {
+                        $vids = explode(',', $p['video']);
+                        foreach ($vids as $vid) {
+                            $vid = trim($vid);
+                            if ($vid !== '') {
+                                $insertStmt->execute([
+                                    ':p_id' => $p['id'],
+                                    ':type' => 'video',
+                                    ':url' => $vid,
+                                    ':sort' => $order++
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Error migrando datos de media heredados: " . $e->getMessage());
         }
 
         header('Content-Type: text/html; charset=utf-8');

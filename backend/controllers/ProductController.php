@@ -68,6 +68,10 @@ class ProductController extends Controller {
         $avgRating = $reviewModel->getAverageRating((int)$product['id']);
         $totalReviews = $reviewModel->getCountByProductId((int)$product['id']);
 
+        // Cargar imágenes y videos de la tabla product_media
+        $mediaModel = new \App\Models\ProductMedia();
+        $media = $mediaModel->getByProductId((int)$product['id']);
+
         // Pasar a la vista de detalle
         $p = $product; // Usamos $p para mantener consistencia simple en la vista
         $this->view('producto_detalle', [
@@ -75,7 +79,8 @@ class ProductController extends Controller {
             'product' => $product,
             'reviews' => $reviews,
             'avgRating' => $avgRating,
-            'totalReviews' => $totalReviews
+            'totalReviews' => $totalReviews,
+            'media' => $media
         ]);
     }
 
