@@ -193,6 +193,64 @@ class User {
     }
 
     /**
+     * Paginación y búsqueda de usuarios con filtros para administración
+     */
+    public function paginateUsers(int $page = 1, int $perPage = 20, array $filters = []): array {
+        $offset = max(0, ($page - 1) * $perPage);
+        $where = [];
+        $params = [];
+
+        if (!empty($filters['search'])) {
+            $s = "%{$filters['search']}%";
+            $where[] = "(nombres LIKE :search OR apellidos LIKE :search OR email LIKE :search OR numero_documento LIKE :search)";
+            $params[':search'] = $s;
+        }
+
+        if (!empty($filters['role'])) {
+            if ($filters['role'] === 'admin') {
+                $where[] = "(role = 'admin' OR role_id = 'a1b2c3d4-0002-0002-0002-000000000002')";
+            } elseif ($filters['role'] === 'client') {
+                $where[] = "(role = 'runner' OR role = 'cliente' OR role_id = 'a1b2c3d4-0001-0001-0001-000000000001' OR role_id IS NULL)";
+            }
+        }
+
+        $whereSql = count($where) ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+        try {
+            // Total
+            $countSql = "SELECT COUNT(*) as total FROM users $whereSql";
+            $stmt = $this->conn->prepare($countSql);
+            $stmt->execute($params);
+            $total = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+
+            // Fetch
+            $sql = "SELECT id, nombres, apellidos, tipo_documento, numero_documento, email, telefono, direccion, municipio, departamento, eps, grupo_sanguineo, rh, role, role_id, status, created_at 
+                    FROM users $whereSql ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+            
+            $stmt = $this->conn->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            return [
+                'items' => $items,
+                'total' => $total,
+                'pages' => $perPage ? (int)ceil($total / $perPage) : 1
+            ];
+        } catch (PDOException $e) {
+            return [
+                'items' => [],
+                'total' => 0,
+                'pages' => 1
+            ];
+        }
+    }
+
+    /**
      * Obtiene el listado completo de usuarios paginado (para panel admin)
      */
     public function getAll(int $limit = 20, int $offset = 0) {
@@ -216,6 +274,52 @@ class User {
             return (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
         } catch (PDOException $e) {
             return 0;
+        }
+    }
+
+    /**
+     * Actualiza la información de un usuario por parte de un administrador
+     */
+    public function adminUpdateUser(int $id, array $data): bool {
+        try {
+            $sql = "UPDATE users SET 
+                nombres = :nombres,
+                apellidos = :apellidos,
+                tipo_documento = :tipo_documento,
+                numero_documento = :numero_documento,
+                email = :email,
+                telefono = :telefono,
+                direccion = :direccion,
+                municipio = :municipio,
+                departamento = :departamento,
+                eps = :eps,
+                grupo_sanguineo = :grupo_sanguineo,
+                rh = :rh,
+                role = :role,
+                role_id = :role_id
+            WHERE id = :id";
+            
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                ':nombres' => $data['nombres'],
+                ':apellidos' => $data['apellidos'],
+                ':tipo_documento' => $data['tipo_documento'],
+                ':numero_documento' => $data['numero_documento'],
+                ':email' => strtolower(trim($data['email'])),
+                ':telefono' => $data['telefono'],
+                ':direccion' => $data['direccion'],
+                ':municipio' => $data['municipio'],
+                ':departamento' => $data['departamento'],
+                ':eps' => $data['eps'] ?? null,
+                ':grupo_sanguineo' => $data['grupo_sanguineo'] ?? null,
+                ':rh' => $data['rh'] ?? null,
+                ':role' => $data['role'],
+                ':role_id' => $data['role_id'],
+                ':id' => $id
+            ]);
+        } catch (PDOException $e) {
+            error_log("User::adminUpdateUser Error: " . $e->getMessage());
+            return false;
         }
     }
 

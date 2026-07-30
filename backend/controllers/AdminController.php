@@ -25,8 +25,8 @@ class AdminController extends Controller {
         $this->requireAdmin();
 
         try {
-            // 1. Usuarios totales
-            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM users WHERE status = 1");
+            // 1. Usuarios totales (Corredores creados con rol de usuario, excluyendo administradores)
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM users WHERE status = 1 AND (role_id != 'a1b2c3d4-0002-0002-0002-000000000002' AND role != 'admin' AND role != 'administrador')");
             $totalUsers = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
             // 2. Ventas totales (aprobadas/pagadas)
@@ -39,18 +39,24 @@ class AdminController extends Controller {
             $stmt = $this->db->query("SELECT COUNT(*) AS total FROM registrations");
             $totalRegistrations = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
-            // 4. Visitas totales (logs)
-            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM user_access_logs");
+            // 4. Visitas totales (logs únicos por ip/correo)
+            $stmt = $this->db->query("SELECT COUNT(DISTINCT COALESCE(u.email, l.ip_address)) AS total FROM user_access_logs l LEFT JOIN users u ON l.user_id = u.id");
             $totalVisits = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
             // 5. Últimas 5 Compras
             $stmt = $this->db->query("SELECT id, order_number, customer_name, total, status, created_at FROM orders ORDER BY created_at DESC LIMIT 5");
             $recentOrders = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-            // 6. Últimos 5 Accesos
+            // 6. Últimos 5 Accesos únicos por ip/correo
             $stmt = $this->db->query("SELECT l.ip_address, l.page_url, l.method, l.created_at, u.email 
                                       FROM user_access_logs l 
                                       LEFT JOIN users u ON l.user_id = u.id 
+                                      INNER JOIN (
+                                          SELECT MAX(logs.id) as max_id 
+                                          FROM user_access_logs logs
+                                          LEFT JOIN users us ON logs.user_id = us.id
+                                          GROUP BY COALESCE(us.email, logs.ip_address)
+                                      ) latest ON l.id = latest.max_id
                                       ORDER BY l.created_at DESC LIMIT 5");
             $recentLogs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -83,15 +89,15 @@ class AdminController extends Controller {
         $search = $_GET['search'] ?? '';
 
         $params = [];
-        $whereClause = "WHERE is_active = 1";
+        $whereClause = "WHERE p.is_active = 1";
         if ($search !== '') {
-            $whereClause .= " AND (name LIKE :search OR sku LIKE :search)";
+            $whereClause .= " AND (p.name LIKE :search OR p.sku LIKE :search)";
             $params[':search'] = "%{$search}%";
         }
 
         try {
             // Count total
-            $stmt = $this->db->prepare("SELECT COUNT(*) AS total FROM products {$whereClause}");
+            $stmt = $this->db->prepare("SELECT COUNT(*) AS total FROM products p {$whereClause}");
             $stmt->execute($params);
             $totalProducts = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
             $totalPages = (int)ceil($totalProducts / $perPage);
@@ -163,6 +169,8 @@ class AdminController extends Controller {
         $type = $_POST['type'] ?? 'camisetas';
         $description = trim($_POST['description'] ?? '');
         $image = trim($_POST['image'] ?? 'assets/img/products/placeholder.png');
+        $video = trim($_POST['video'] ?? '');
+        $images = trim($_POST['images'] ?? '');
         $isNew = isset($_POST['is_new']) ? 1 : 0;
         $isOffer = isset($_POST['is_offer']) ? 1 : 0;
 
@@ -184,8 +192,8 @@ class AdminController extends Controller {
                 $categoryName = $stmt->fetch(PDO::FETCH_COLUMN) ?: '';
             }
 
-            $sql = "INSERT INTO products (sku, name, slug, description, price, stock, category, category_id, gender, type, image, is_new, is_offer, is_active, created_at)
-                    VALUES (:sku, :name, :slug, :description, :price, :stock, :category, :category_id, :gender, :type, :image, :is_new, :is_offer, 1, NOW())";
+            $sql = "INSERT INTO products (sku, name, slug, description, price, stock, category, category_id, gender, type, image, video, images, is_new, is_offer, is_active, created_at)
+                    VALUES (:sku, :name, :slug, :description, :price, :stock, :category, :category_id, :gender, :type, :image, :video, :images, :is_new, :is_offer, 1, NOW())";
             
             $stmt = $this->db->prepare($sql);
             $ok = $stmt->execute([
@@ -200,6 +208,8 @@ class AdminController extends Controller {
                 ':gender' => $gender,
                 ':type' => $type,
                 ':image' => $image,
+                ':video' => $video !== '' ? $video : null,
+                ':images' => $images !== '' ? $images : null,
                 ':is_new' => $isNew,
                 ':is_offer' => $isOffer
             ]);
@@ -273,6 +283,8 @@ class AdminController extends Controller {
         $type = $_POST['type'] ?? 'camisetas';
         $description = trim($_POST['description'] ?? '');
         $image = trim($_POST['image'] ?? '');
+        $video = trim($_POST['video'] ?? '');
+        $images = trim($_POST['images'] ?? '');
         $isNew = isset($_POST['is_new']) ? 1 : 0;
         $isOffer = isset($_POST['is_offer']) ? 1 : 0;
 
@@ -304,6 +316,8 @@ class AdminController extends Controller {
                         gender = :gender, 
                         type = :type, 
                         image = :image, 
+                        video = :video, 
+                        images = :images, 
                         is_new = :is_new, 
                         is_offer = :is_offer 
                     WHERE id = :id";
@@ -321,6 +335,8 @@ class AdminController extends Controller {
                 ':gender' => $gender,
                 ':type' => $type,
                 ':image' => $image,
+                ':video' => $video !== '' ? $video : null,
+                ':images' => $images !== '' ? $images : null,
                 ':is_new' => $isNew,
                 ':is_offer' => $isOffer,
                 ':id' => $id
@@ -556,13 +572,21 @@ class AdminController extends Controller {
         $offset = ($page - 1) * $perPage;
 
         try {
-            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM user_access_logs");
+            $stmt = $this->db->query("SELECT COUNT(DISTINCT COALESCE(us.email, logs.ip_address)) AS total 
+                                      FROM user_access_logs logs 
+                                      LEFT JOIN users us ON logs.user_id = us.id");
             $totalLogs = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
             $totalPages = (int)ceil($totalLogs / $perPage);
 
             $stmt = $this->db->prepare("SELECT l.*, u.nombres, u.apellidos, u.email 
                                         FROM user_access_logs l 
                                         LEFT JOIN users u ON l.user_id = u.id 
+                                        INNER JOIN (
+                                            SELECT MAX(logs.id) as max_id 
+                                            FROM user_access_logs logs
+                                            LEFT JOIN users us ON logs.user_id = us.id
+                                            GROUP BY COALESCE(us.email, logs.ip_address)
+                                        ) latest ON l.id = latest.max_id
                                         ORDER BY l.created_at DESC 
                                         LIMIT :limit OFFSET :offset");
             $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
@@ -620,6 +644,8 @@ class AdminController extends Controller {
             'create_roles_and_seeds.sql',
             'create_ecommerce_and_payments.sql',
             'create_access_logs_cart_and_stages.sql',
+            'create_admin_and_seed_products.sql',
+            'alter_products_media_and_reviews.sql',
         ];
 
         $output = [];

@@ -39,6 +39,9 @@ class ProductController extends Controller {
         $model = new Product();
         $result = $model->paginate($page, $perPage, $filters, $order);
 
+        $products = $result['items'];
+        $pagination = $result['pagination'];
+
         $this->view('productos', ['products' => $products, 'pagination' => $pagination, 'filters' => $filters]);
     }
 
@@ -59,8 +62,68 @@ class ProductController extends Controller {
             return;
         }
 
+        // Cargar comentarios y calificaciones
+        $reviewModel = new \App\Models\Review();
+        $reviews = $reviewModel->getByProductId((int)$product['id']);
+        $avgRating = $reviewModel->getAverageRating((int)$product['id']);
+        $totalReviews = $reviewModel->getCountByProductId((int)$product['id']);
+
         // Pasar a la vista de detalle
         $p = $product; // Usamos $p para mantener consistencia simple en la vista
-        $this->view('producto_detalle', ['p' => $p, 'product' => $product]);
+        $this->view('producto_detalle', [
+            'p' => $p, 
+            'product' => $product,
+            'reviews' => $reviews,
+            'avgRating' => $avgRating,
+            'totalReviews' => $totalReviews
+        ]);
+    }
+
+    /**
+     * Procesa la inserción de un comentario y calificación sobre un producto
+     */
+    public function addReview() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['user_id'])) {
+            $_SESSION['review_error'] = 'Debe iniciar sesión para calificar este producto.';
+            $this->redirect('/login');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/productos');
+        }
+
+        $productId = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+        $slug = isset($_POST['slug']) ? trim((string)$_POST['slug']) : '';
+        $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
+        $comment = isset($_POST['comment']) ? trim((string)$_POST['comment']) : '';
+
+        if ($productId === 0 || $slug === '') {
+            $this->redirect('/productos');
+        }
+
+        if ($rating < 1 || $rating > 5 || $comment === '') {
+            $_SESSION['review_error'] = 'Por favor, selecciona una calificación (estrellas) y escribe tu comentario.';
+            $this->redirect("/producto?slug={$slug}#reviews-section");
+        }
+
+        $reviewModel = new \App\Models\Review();
+        $ok = $reviewModel->create([
+            'product_id' => $productId,
+            'user_id' => $_SESSION['user_id'],
+            'rating' => $rating,
+            'comment' => $comment
+        ]);
+
+        if ($ok) {
+            $_SESSION['review_success'] = 'Comentario agregado exitosamente. ¡Gracias por tu opinión!';
+        } else {
+            $_SESSION['review_error'] = 'Error al guardar el comentario. Inténtalo de nuevo.';
+        }
+
+        $this->redirect("/producto?slug={$slug}#reviews-section");
     }
 }
