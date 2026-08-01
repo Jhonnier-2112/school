@@ -20,8 +20,15 @@ class Product {
         $params = [];
 
         if (!empty($filters['category'])) {
-            $where[] = '(category = :category OR category_id IN (SELECT id FROM categories WHERE slug = :category OR name = :category))';
-            $params[':category'] = $filters['category'];
+            $cat = strtolower(trim((string)$filters['category']));
+            if ($cat === 'textil' || $cat === 'ropa') {
+                $where[] = "(LOWER(category) = 'textil' OR LOWER(type) IN ('camisetas', 'esqueletos', 'licras', 'medias'))";
+            } elseif ($cat === 'accesorios') {
+                $where[] = "(LOWER(category) = 'accesorios' OR LOWER(type) IN ('botella_plegable', 'accesorios'))";
+            } else {
+                $where[] = '(category = :category OR category_id IN (SELECT id FROM categories WHERE slug = :category OR name = :category))';
+                $params[':category'] = $filters['category'];
+            }
         }
         if (!empty($filters['category_id'])) {
             $where[] = 'category_id = :category_id';
@@ -29,7 +36,7 @@ class Product {
         }
         if (!empty($filters['gender'])) {
             $g = strtolower((string)$filters['gender']);
-            $where[] = 'gender = :gender';
+            $where[] = 'LOWER(gender) = :gender';
             $params[':gender'] = $g;
         }
         // Filtro por categoría de prenda (type): soporta uno o varios valores
@@ -43,10 +50,10 @@ class Product {
                         $phs[] = $ph;
                         $params[$ph] = $t;
                     }
-                    $where[] = 'type IN (' . implode(', ', $phs) . ')';
+                    $where[] = 'LOWER(type) IN (' . implode(', ', $phs) . ')';
                 }
             } else {
-                $where[] = 'type = :type';
+                $where[] = 'LOWER(type) = :type';
                 $params[':type'] = strtolower((string)$filters['type']);
             }
         }
@@ -87,7 +94,7 @@ class Product {
             END, created_at DESC";
         }
 
-        $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, price, image, video, images, is_new, is_offer
+        $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, colors, sizes, price, image, video, images, is_new, is_offer
                 FROM products $whereSql ORDER BY $orderSql LIMIT :limit OFFSET :offset";
         $stmt = $this->conn->prepare($sql);
         foreach ($params as $k => $v) {
@@ -111,7 +118,7 @@ class Product {
 
     public function findBySlug(string $slug): ?array {
         try {
-            $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, price, image, video, images, is_new, is_offer
+            $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, colors, sizes, price, image, video, images, is_new, is_offer
                     FROM products WHERE slug = :slug AND is_active = 1 LIMIT 1";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindValue(':slug', $slug);
@@ -125,7 +132,7 @@ class Product {
 
     public function findById(int $id): ?array {
         try {
-            $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, price, image, video, images, is_new, is_offer
+            $sql = "SELECT id, sku, name, slug, description, category, category_id, gender, type, colors, sizes, price, image, video, images, is_new, is_offer
                     FROM products WHERE id = :id AND is_active = 1 LIMIT 1";
             $stmt = $this->conn->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);

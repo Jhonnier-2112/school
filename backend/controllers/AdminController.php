@@ -142,40 +142,26 @@ class AdminController extends Controller {
         $categoryModel = new Category();
         $categories = $categoryModel->getAll();
 
+        $product = $_SESSION['old_product'] ?? null;
+        unset($_SESSION['old_product']);
+
         $this->view('admin/product_form', [
             'activeTab' => 'products',
             'mode' => 'create',
             'categories' => $categories,
-            'product' => null
+            'product' => $product
         ]);
     }
 
     /**
-     * Guardar nuevo producto en base de datos
+     * Formulario de edición de producto existente
      */
-    public function saveProduct() {
-        $this->requireAdmin();
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/admin/productos');
-        }
-
-        $name = trim($_POST['name'] ?? '');
-        $sku = trim($_POST['sku'] ?? '');
-        $price = floatval($_POST['price'] ?? 0);
-        $stock = intval($_POST['stock'] ?? 0);
-        $categoryId = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
-        $gender = $_POST['gender'] ?? 'unisex';
-        $type = $_POST['type'] ?? 'camisetas';
-        $description = trim($_POST['description'] ?? '');
-        $image = trim($_POST['image'] ?? 'assets/img/products/placeholder.png');
-        $video = trim($_POST['video'] ?? '');
-        $images = trim($_POST['images'] ?? '');
-
+    public function editProductForm() {
         $this->requireAdmin();
 
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         if ($id === 0) {
+            $_SESSION['admin_error'] = 'ID de producto no especificado.';
             $this->redirect('/admin/productos');
         }
 
@@ -206,6 +192,240 @@ class AdminController extends Controller {
     }
 
     /**
+     * Upload AJAX de archivos de medios (imágenes/videos) para un producto.
+     * Devuelve JSON con las URLs de los archivos guardados.
+     */
+    public function uploadMedia() {
+        $this->requireAdmin();
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        $allowedImages = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        $allowedVideos = ['mp4', 'webm', 'mov'];
+        $maxSize       = 20 * 1024 * 1024; // 20 MB
+
+        $basePublic = realpath(__DIR__ . '/../../frontend/public_html');
+        $imgDir     = $basePublic . '/assets/img/products/uploads/';
+        $vidDir     = $basePublic . '/assets/videos/uploads/';
+
+        if (!is_dir($imgDir)) mkdir($imgDir, 0755, true);
+        if (!is_dir($vidDir)) mkdir($vidDir, 0755, true);
+
+        if (empty($_FILES['files'])) {
+            echo json_encode(['success' => false, 'error' => 'No se recibieron archivos.']);
+            return;
+        }
+
+        // Normalizar estructura de $_FILES cuando se suben múltiples archivos
+        $files = [];
+        if (is_array($_FILES['files']['name'])) {
+            foreach ($_FILES['files']['name'] as $i => $name) {
+                $files[] = [
+                    'name'     => $name,
+                    'type'     => $_FILES['files']['type'][$i],
+                    'tmp_name' => $_FILES['files']['tmp_name'][$i],
+                    'error'    => $_FILES['files']['error'][$i],
+                    'size'     => $_FILES['files']['size'][$i],
+                ];
+            }
+        } else {
+            $files[] = $_FILES['files'];
+        }
+
+        $uploaded = [];
+        $errors   = [];
+
+        foreach ($files as $file) {
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = "Error al subir: {$file['name']}";
+                continue;
+            }
+            if ($file['size'] > $maxSize) {
+                $errors[] = "{$file['name']} supera el límite de 20MB.";
+                continue;
+            }
+
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+            if (in_array($ext, $allowedImages)) {
+                $mediaType = 'image';
+                $destDir   = $imgDir;
+                $urlBase   = 'assets/img/products/uploads/';
+            } elseif (in_array($ext, $allowedVideos)) {
+                $mediaType = 'video';
+                $destDir   = $vidDir;
+                $urlBase   = 'assets/videos/uploads/';
+            } else {
+                $errors[] = "{$file['name']}: tipo de archivo no permitido.";
+                continue;
+            }
+
+            $safeName = uniqid('media_', true) . '.' . $ext;
+            $destPath = $destDir . $safeName;
+
+            if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                $uploaded[] = [
+                    'url'  => $urlBase . $safeName,
+                    'type' => $mediaType,
+                    'name' => $file['name'],
+                ];
+            } else {
+                $errors[] = "No se pudo guardar: {$file['name']}";
+            }
+        }
+
+        echo json_encode([
+            'success' => count($uploaded) > 0,
+            'files'   => $uploaded,
+            'errors'  => $errors,
+        ]);
+    }
+
+    /**
+     * Guardar nuevo producto en base de datos
+     */
+    public function saveProduct() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/productos');
+        }
+
+        $name        = trim($_POST['name'] ?? '');
+        $sku         = trim($_POST['sku'] ?? '');
+        $price       = floatval($_POST['price'] ?? 0);
+        $stock       = intval($_POST['stock'] ?? 0);
+        $categoryId  = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+        $gender      = $_POST['gender'] ?? 'unisex';
+        $type        = $_POST['type'] ?? 'camisetas';
+        $description = trim($_POST['description'] ?? '');
+        $isNew       = isset($_POST['is_new']) ? 1 : 0;
+        $isOffer     = isset($_POST['is_offer']) ? 1 : 0;
+
+        // Procesar colores (array o string)
+        $rawColors   = $_POST['colors'] ?? [];
+        $colorsStr   = is_array($rawColors) ? implode(', ', array_filter(array_map('trim', $rawColors))) : trim((string)$rawColors);
+
+        // Procesar tallas (array o string)
+        $rawSizes    = $_POST['sizes'] ?? [];
+        $sizesStr    = is_array($rawSizes) ? implode(', ', array_filter(array_map('trim', $rawSizes))) : trim((string)$rawSizes);
+
+        // Medios: leer JSON del campo oculto
+        $mediaJson = trim($_POST['media_json'] ?? '[]');
+        $mediaList = json_decode($mediaJson, true) ?: [];
+
+        // Guardar estado actual del formulario para mantenerlo si falla
+        $oldProductData = [
+            'name'        => $name,
+            'sku'         => $sku,
+            'price'       => $price,
+            'stock'       => $stock,
+            'category_id' => $categoryId,
+            'gender'      => $gender,
+            'type'        => $type,
+            'colors'      => $colorsStr,
+            'sizes'       => $sizesStr,
+            'description' => $description,
+            'is_new'      => $isNew,
+            'is_offer'    => $isOffer,
+            'media'       => $mediaList
+        ];
+
+        // Imagen principal: primera imagen del listado, o placeholder
+        $firstImage = 'assets/img/products/placeholder.png';
+        $firstVideo = null;
+        $imageUrls  = [];
+        foreach ($mediaList as $m) {
+            if ($m['type'] === 'image' && $firstImage === 'assets/img/products/placeholder.png') {
+                $firstImage = $m['url'];
+            }
+            if ($m['type'] === 'video' && $firstVideo === null) {
+                $firstVideo = $m['url'];
+            }
+            if ($m['type'] === 'image') {
+                $imageUrls[] = $m['url'];
+            }
+        }
+        $imagesStr = implode(',', $imageUrls);
+
+        if ($name === '' || $sku === '') {
+            $_SESSION['old_product'] = $oldProductData;
+            $_SESSION['admin_error'] = 'Nombre y SKU son campos obligatorios.';
+            $this->redirect('/admin/productos/nuevo');
+        }
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+
+        // Verificación previa de existencia (por SKU, slug o nombre)
+        try {
+            $checkStmt = $this->db->prepare("SELECT id FROM products WHERE (sku = :sku OR slug = :slug OR name = :name) AND is_active = 1 LIMIT 1");
+            $checkStmt->execute([':sku' => $sku, ':slug' => $slug, ':name' => $name]);
+            if ($checkStmt->fetch()) {
+                $_SESSION['old_product'] = $oldProductData;
+                $_SESSION['admin_error'] = 'No se puede agregar este producto';
+                $this->redirect('/admin/productos/nuevo');
+            }
+        } catch (PDOException $e) {
+            // Se continua al bloque principal
+        }
+
+        try {
+            $categoryName = '';
+            if ($categoryId) {
+                $stmt = $this->db->prepare("SELECT name FROM categories WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $categoryId]);
+                $categoryName = $stmt->fetch(PDO::FETCH_COLUMN) ?: '';
+            }
+
+            $sql = "INSERT INTO products 
+                        (sku, name, slug, description, price, stock, category, category_id, gender, type, colors, sizes, image, video, images, is_new, is_offer, is_active, created_at)
+                    VALUES 
+                        (:sku, :name, :slug, :description, :price, :stock, :category, :category_id, :gender, :type, :colors, :sizes, :image, :video, :images, :is_new, :is_offer, 1, NOW())";
+
+            $stmt = $this->db->prepare($sql);
+            $ok = $stmt->execute([
+                ':sku'         => $sku,
+                ':name'        => $name,
+                ':slug'        => $slug,
+                ':description' => $description,
+                ':price'       => $price,
+                ':stock'       => $stock,
+                ':category'    => $categoryName,
+                ':category_id' => $categoryId,
+                ':gender'      => $gender,
+                ':type'        => $type,
+                ':colors'      => $colorsStr !== '' ? $colorsStr : null,
+                ':sizes'       => $sizesStr !== '' ? $sizesStr : null,
+                ':image'       => $firstImage,
+                ':video'       => $firstVideo,
+                ':images'      => $imagesStr !== '' ? $imagesStr : null,
+                ':is_new'      => $isNew,
+                ':is_offer'    => $isOffer,
+            ]);
+
+            if ($ok) {
+                $newId = (int)$this->db->lastInsertId();
+                // Guardar medios en product_media
+                if ($newId > 0 && !empty($mediaList)) {
+                    $mediaModel = new \App\Models\ProductMedia();
+                    $mediaModel->saveMedia($newId, $mediaList);
+                }
+                $_SESSION['admin_success'] = 'Producto creado exitosamente.';
+                $this->redirect('/admin/productos');
+            } else {
+                $_SESSION['old_product'] = $oldProductData;
+                $_SESSION['admin_error'] = 'No se puede agregar este producto';
+                $this->redirect('/admin/productos/nuevo');
+            }
+        } catch (PDOException $e) {
+            error_log("Error guardando producto: " . $e->getMessage());
+            $_SESSION['old_product'] = $oldProductData;
+            $_SESSION['admin_error'] = 'No se puede agregar este producto';
+            $this->redirect('/admin/productos/nuevo');
+        }
+    }
+
+    /**
      * Actualizar datos del producto en base de datos
      */
     public function updateProduct() {
@@ -215,27 +435,52 @@ class AdminController extends Controller {
             $this->redirect('/admin/productos');
         }
 
-        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
-        $name = trim($_POST['name'] ?? '');
-        $sku = trim($_POST['sku'] ?? '');
-        $price = floatval($_POST['price'] ?? 0);
-        $stock = intval($_POST['stock'] ?? 0);
-        $categoryId = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
-        $gender = $_POST['gender'] ?? 'unisex';
-        $type = $_POST['type'] ?? 'camisetas';
+        $id          = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $name        = trim($_POST['name'] ?? '');
+        $sku         = trim($_POST['sku'] ?? '');
+        $price       = floatval($_POST['price'] ?? 0);
+        $stock       = intval($_POST['stock'] ?? 0);
+        $categoryId  = !empty($_POST['category_id']) ? intval($_POST['category_id']) : null;
+        $gender      = $_POST['gender'] ?? 'unisex';
+        $type        = $_POST['type'] ?? 'camisetas';
         $description = trim($_POST['description'] ?? '');
-        $image = trim($_POST['image'] ?? '');
-        $video = trim($_POST['video'] ?? '');
-        $images = trim($_POST['images'] ?? '');
-        $isNew = isset($_POST['is_new']) ? 1 : 0;
-        $isOffer = isset($_POST['is_offer']) ? 1 : 0;
+        $isNew       = isset($_POST['is_new']) ? 1 : 0;
+        $isOffer     = isset($_POST['is_offer']) ? 1 : 0;
+
+        // Procesar colores (array o string)
+        $rawColors   = $_POST['colors'] ?? [];
+        $colorsStr   = is_array($rawColors) ? implode(', ', array_filter(array_map('trim', $rawColors))) : trim((string)$rawColors);
+
+        // Procesar tallas (array o string)
+        $rawSizes    = $_POST['sizes'] ?? [];
+        $sizesStr    = is_array($rawSizes) ? implode(', ', array_filter(array_map('trim', $rawSizes))) : trim((string)$rawSizes);
+
+        // Medios: leer JSON del campo oculto
+        $mediaJson = trim($_POST['media_json'] ?? '[]');
+        $mediaList = json_decode($mediaJson, true) ?: [];
+
+        // Imagen principal: primera imagen del listado
+        $firstImage = 'assets/img/products/placeholder.png';
+        $firstVideo = null;
+        $imageUrls  = [];
+        foreach ($mediaList as $m) {
+            if ($m['type'] === 'image' && $firstImage === 'assets/img/products/placeholder.png') {
+                $firstImage = $m['url'];
+            }
+            if ($m['type'] === 'video' && $firstVideo === null) {
+                $firstVideo = $m['url'];
+            }
+            if ($m['type'] === 'image') {
+                $imageUrls[] = $m['url'];
+            }
+        }
+        $imagesStr = implode(',', $imageUrls);
 
         if ($id === 0 || $name === '' || $sku === '') {
             $_SESSION['admin_error'] = 'Nombre, SKU y ID son campos obligatorios.';
             $this->redirect('/admin/productos');
         }
 
-        // Generar slug
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
 
         try {
@@ -257,34 +502,41 @@ class AdminController extends Controller {
                         category_id = :category_id, 
                         gender = :gender, 
                         type = :type, 
+                        colors = :colors, 
+                        sizes = :sizes, 
                         image = :image, 
                         video = :video, 
                         images = :images, 
                         is_new = :is_new, 
                         is_offer = :is_offer 
                     WHERE id = :id";
-            
+
             $stmt = $this->db->prepare($sql);
             $ok = $stmt->execute([
-                ':sku' => $sku,
-                ':name' => $name,
-                ':slug' => $slug,
+                ':sku'         => $sku,
+                ':name'        => $name,
+                ':slug'        => $slug,
                 ':description' => $description,
-                ':price' => $price,
-                ':stock' => $stock,
-                ':category' => $categoryName,
+                ':price'       => $price,
+                ':stock'       => $stock,
+                ':category'    => $categoryName,
                 ':category_id' => $categoryId,
-                ':gender' => $gender,
-                ':type' => $type,
-                ':image' => $image,
-                ':video' => $video !== '' ? $video : null,
-                ':images' => $images !== '' ? $images : null,
-                ':is_new' => $isNew,
-                ':is_offer' => $isOffer,
-                ':id' => $id
+                ':gender'      => $gender,
+                ':type'        => $type,
+                ':colors'      => $colorsStr !== '' ? $colorsStr : null,
+                ':sizes'       => $sizesStr !== '' ? $sizesStr : null,
+                ':image'       => $firstImage,
+                ':video'       => $firstVideo,
+                ':images'      => $imagesStr !== '' ? $imagesStr : null,
+                ':is_new'      => $isNew,
+                ':is_offer'    => $isOffer,
+                ':id'          => $id
             ]);
 
             if ($ok) {
+                // Actualizar medios en product_media
+                $mediaModel = new \App\Models\ProductMedia();
+                $mediaModel->saveMedia($id, $mediaList);
                 $_SESSION['admin_success'] = 'Producto actualizado exitosamente.';
             } else {
                 $_SESSION['admin_error'] = 'No se pudo actualizar el producto.';

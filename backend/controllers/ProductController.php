@@ -26,7 +26,7 @@ class ProductController extends Controller {
             $types = is_array($t) ? $t : [$t];
             $types = array_map(function($x){ return strtolower((string)$x); }, $types);
             $ropa = ['camisetas','esqueletos','licras','medias'];
-            $acc = ['botella_plegable'];
+            $acc = ['botella_plegable','accesorios'];
             $hasRopa = count(array_intersect($types, $ropa)) > 0;
             $hasAcc = count(array_intersect($types, $acc)) > 0;
             if ($hasRopa && !$hasAcc) {
