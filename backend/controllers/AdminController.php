@@ -6,6 +6,8 @@ use App\Config\Database;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Event;
+use App\Models\Registration;
 use PDO;
 use PDOException;
 
@@ -802,6 +804,158 @@ class AdminController extends Controller {
         ]);
     }
 
+    /**
+     * Muestra la vista de configuración del evento, fechas, cupos y costos por kilometraje
+     */
+    public function eventConfig() {
+        $this->requireAdmin();
+
+        $eventModel = new Event();
+        $event = Event::getPrimaryEvent() ?: [
+            'id' => 1,
+            'title' => 'Carrera Corre Con FemTribe',
+            'location' => 'Cali, Valle del Cauca',
+            'total_slots' => 600,
+            'registered_count' => 0,
+            'available_slots' => 600,
+            'presale_start_date' => null,
+            'presale_end_date' => null,
+            'event_end_date' => null,
+            'is_presale_active' => false
+        ];
+
+        $stages = Event::getStages((int)($event['id'] ?? 1));
+
+        $registrationModel = new Registration();
+        $registrations = $registrationModel->getAll() ?: [];
+
+        $this->view('admin/event_config', [
+            'activeTab' => 'event',
+            'event' => $event,
+            'stages' => $stages,
+            'registrations' => $registrations
+        ]);
+    }
+
+    /**
+     * Procesa la actualización de fechas, cupos totales y costos por kilometraje
+     */
+    public function updateEventConfig() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/evento');
+        }
+
+        $eventId = (int)($_POST['event_id'] ?? 1);
+        $eventData = [
+            'title'               => trim($_POST['event_title'] ?? 'Carrera Corre Con FemTribe'),
+            'location'            => trim($_POST['event_location'] ?? 'Cali, Valle del Cauca'),
+            'total_slots'         => max(1, (int)($_POST['total_slots'] ?? 600)),
+            // Fechas son OPCIONALES: null si viene vacío
+            'presale_start_date'  => !empty($_POST['presale_start_date']) ? $_POST['presale_start_date'] : null,
+            'presale_end_date'    => !empty($_POST['presale_end_date'])   ? $_POST['presale_end_date']   : null,
+            'event_end_date'      => !empty($_POST['event_end_date'])     ? $_POST['event_end_date']     : null,
+        ];
+
+        $eventModel = new Event();
+        $okEvent = $eventModel->updateEvent($eventId, $eventData);
+
+        // Cupos por kilometraje (stage_slots[stage_id] => cantidad o vacío)
+        $stageSlotsData = $_POST['stage_slots'] ?? [];
+
+        // Actualizar etapas/kilometrajes con precios y cupos
+        $stagesData = $_POST['stages'] ?? [];
+        if (is_array($stagesData)) {
+            foreach ($stagesData as $stgId => $stg) {
+                // Cupo de esta etapa (obligatorio en UI, puede ser 0 = sin límite explícito)
+                $rawSlot = $stageSlotsData[$stgId] ?? null;
+                $slotsLimit = ($rawSlot !== null && $rawSlot !== '') ? max(1, (int)$rawSlot) : null;
+
+                $eventModel->updateStage((int)$stgId, [
+                    'name'          => trim($stg['name'] ?? ''),
+                    'distance'      => trim($stg['distance'] ?? '3K'),
+                    'category_type' => trim($stg['category_type'] ?? 'adulto'),
+                    'presale_price' => floatval($stg['presale_price'] ?? 0),
+                    'price'         => floatval($stg['price'] ?? 0),
+                    'is_active'     => isset($stg['is_active']) ? 1 : 0,
+                    'slots_limit'   => $slotsLimit,
+                ]);
+            }
+        }
+
+        // También actualizar cupos de stages que no vienen en stages[] (stages inactivos que no se envían)
+        if (is_array($stageSlotsData)) {
+            foreach ($stageSlotsData as $stgId => $rawSlot) {
+                if (!isset($stagesData[$stgId])) {
+                    $slotsLimit = ($rawSlot !== '') ? max(1, (int)$rawSlot) : null;
+                    $eventModel->updateStageSlots((int)$stgId, $slotsLimit);
+                }
+            }
+        }
+
+        if ($okEvent) {
+            $_SESSION['admin_success'] = 'Información del evento, cupos y costos actualizados exitosamente.';
+        } else {
+            $_SESSION['admin_error'] = 'Ocurrió un error al actualizar los datos del evento.';
+        }
+
+        $this->redirect('/admin/evento');
+    }
+
+    /**
+     * Guarda / Crea un nuevo kilometraje para el evento
+     */
+    public function saveStage() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/evento');
+        }
+
+        $eventModel = new Event();
+        $ok = $eventModel->createStage([
+            'event_id' => (int)($_POST['event_id'] ?? 1),
+            'name' => trim($_POST['name'] ?? ''),
+            'distance' => trim($_POST['distance'] ?? '5K'),
+            'category_type' => trim($_POST['category_type'] ?? 'adulto'),
+            'presale_price' => floatval($_POST['presale_price'] ?? 0),
+            'price' => floatval($_POST['price'] ?? 0),
+            'description' => trim($_POST['description'] ?? '')
+        ]);
+
+        if ($ok) {
+            $_SESSION['admin_success'] = 'Nuevo kilometraje creado exitosamente.';
+        } else {
+            $_SESSION['admin_error'] = 'No se pudo crear el kilometraje. Verifica el nombre.';
+        }
+
+        $this->redirect('/admin/evento');
+    }
+
+    /**
+     * Elimina un kilometraje del evento
+     */
+    public function deleteStage() {
+        $this->requireAdmin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/evento');
+        }
+
+        $stageId = (int)($_POST['stage_id'] ?? 0);
+        if ($stageId > 0) {
+            $eventModel = new Event();
+            if ($eventModel->deleteStage($stageId)) {
+                $_SESSION['admin_success'] = 'Kilometraje eliminado exitosamente.';
+            } else {
+                $_SESSION['admin_error'] = 'No se pudo eliminar el kilometraje.';
+            }
+        }
+
+        $this->redirect('/admin/evento');
+    }
+
     private function execSqlFile(string $path, PDO $db): array {
         $results = [];
         if (!is_file($path)) {
@@ -841,6 +995,7 @@ class AdminController extends Controller {
             'create_admin_and_seed_products.sql',
             'alter_products_media_and_reviews.sql',
             'create_product_media_table.sql',
+            'create_events_table.sql',
         ];
 
         $output = [];

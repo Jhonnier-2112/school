@@ -4,6 +4,14 @@ namespace App\Services;
 
 require_once __DIR__ . '/../config/EmailConfig.php';
 
+// Cargar autoloader de vendor si es necesario
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $vendorPath = realpath(__DIR__ . '/../../frontend/vendor/autoload.php');
+    if ($vendorPath && file_exists($vendorPath)) {
+        require_once $vendorPath;
+    }
+}
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;

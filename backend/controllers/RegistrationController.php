@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\Registration;
+use App\Models\Event;
 use App\Services\EmailService;
 use Exception;
 
@@ -13,8 +14,11 @@ use App\Core\Controller;
 class RegistrationController extends Controller {
     // Muestra el formulario de inscripción con etapas dinámicas
     public function create() {
-        if (!RegistrationConfig::inscripcionesAbiertas()) {
-            $this->view('registration_closed');
+        $event = Event::getPrimaryEvent();
+        $availableSlots = $event['available_slots'] ?? 600;
+
+        if (!RegistrationConfig::inscripcionesAbiertas() || $availableSlots <= 0) {
+            $this->view('registration_closed', ['event' => $event]);
             return;
         }
 
@@ -25,21 +29,24 @@ class RegistrationController extends Controller {
         }
 
         $stages = Registration::getRaceStages();
-        $this->view('registration_form', ['currentUser' => $currentUser, 'stages' => $stages]);
+        $this->view('registration_form', ['currentUser' => $currentUser, 'stages' => $stages, 'event' => $event]);
     }
 
     // Guarda la inscripción en la BD y muestra la pantalla de éxito
     public function store() {
-        if (!RegistrationConfig::inscripcionesAbiertas()) {
+        $event = Event::getPrimaryEvent();
+        $availableSlots = $event['available_slots'] ?? 600;
+
+        if (!RegistrationConfig::inscripcionesAbiertas() || $availableSlots <= 0) {
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 header('Content-Type: application/json');
                 echo json_encode([
                     'success' => false, 
-                    'message' => 'Las inscripciones están temporalmente cerradas.'
+                    'message' => 'Las inscripciones están temporalmente cerradas o los cupos se han agotado.'
                 ]);
                 exit;
             } else {
-                $this->view('registration_closed');
+                $this->view('registration_closed', ['event' => $event]);
                 return;
             }
         }
@@ -71,6 +78,8 @@ class RegistrationController extends Controller {
                 'eps' => $_POST['eps'] ?? '',
                 'grupo_sanguineo' => $_POST['grupo_sanguineo'] ?? '',
                 'rh' => $_POST['rh'] ?? '',
+                'talla_camiseta_adulto' => $_POST['talla_camiseta_adulto'] ?? '',
+                'talla_camiseta_nino' => $_POST['talla_camiseta_nino'] ?? '',
                 'direccion' => $_POST['direccion'] ?? '',
                 'municipio' => $_POST['municipio'] ?? '',
                 'departamento' => $_POST['departamento'] ?? '',

@@ -9,7 +9,7 @@ class RegistrationConfig {
      * - true: Inscripciones ABIERTAS
      * - false: Inscripciones CERRADAS
      */
-    const INSCRIPCIONES_ABIERTAS = false;
+    const INSCRIPCIONES_ABIERTAS = true;
     
     /**
      * Mensaje personalizado cuando las inscripciones están cerradas

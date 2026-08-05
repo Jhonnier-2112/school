@@ -14,13 +14,19 @@ class Registration {
     }
 
     /**
-     * Obtiene el catálogo de etapas de carrera activas
+     * Obtiene el catálogo de etapas de carrera activas con precios vigentes (preventa/normal)
      */
     public static function getRaceStages(): array {
+        if (class_exists('App\Models\Event')) {
+            $stages = \App\Models\Event::getStages(1);
+            if (!empty($stages)) {
+                return $stages;
+            }
+        }
         try {
             $database = new Database();
             $db = $database->getConnection();
-            $stmt = $db->query("SELECT id, name, slug, category_type, distance, price, description, is_active FROM race_stages WHERE is_active = 1 ORDER BY category_type ASC, id ASC");
+            $stmt = $db->query("SELECT id, name, slug, category_type, distance, presale_price, price, description, is_active FROM race_stages WHERE is_active = 1 ORDER BY category_type ASC, id ASC");
             return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             return [];
@@ -38,14 +44,14 @@ class Registration {
             $sql = "INSERT INTO registrations (
                 user_id, categoria_participante, etapas_seleccionadas, nombre_mascota, raza_mascota,
                 acudiente_nombre, acudiente_documento, nombres, apellidos, tipo_documento, numero_documento, 
-                fecha_nacimiento, edad, genero, eps, grupo_sanguineo, rh, 
+                fecha_nacimiento, edad, genero, eps, grupo_sanguineo, rh, talla_camiseta_adulto, talla_camiseta_nino,
                 direccion, municipio, departamento, email, telefono, 
                 parentesco_emergencia, otro_parentesco, nombre_emergencia, 
                 nombre_emergencia_alt, celular_emergencia, acepta_autorizacion, created_at
             ) VALUES (
                 :user_id, :categoria_participante, :etapas_seleccionadas, :nombre_mascota, :raza_mascota,
                 :acudiente_nombre, :acudiente_documento, :nombres, :apellidos, :tipo_documento, :numero_documento, 
-                :fecha_nacimiento, :edad, :genero, :eps, :grupo_sanguineo, :rh, 
+                :fecha_nacimiento, :edad, :genero, :eps, :grupo_sanguineo, :rh, :talla_camiseta_adulto, :talla_camiseta_nino,
                 :direccion, :municipio, :departamento, :email, :telefono, 
                 :parentesco_emergencia, :otro_parentesco, :nombre_emergencia, 
                 :nombre_emergencia_alt, :celular_emergencia, :acepta_autorizacion, NOW()
@@ -71,6 +77,8 @@ class Registration {
                 ':eps' => $data['eps'] ?? null,
                 ':grupo_sanguineo' => $data['grupo_sanguineo'] ?? null,
                 ':rh' => $data['rh'] ?? null,
+                ':talla_camiseta_adulto' => $data['talla_camiseta_adulto'] ?? null,
+                ':talla_camiseta_nino' => $data['talla_camiseta_nino'] ?? null,
                 ':direccion' => $data['direccion'] ?? '',
                 ':municipio' => $data['municipio'] ?? 'Cali',
                 ':departamento' => $data['departamento'] ?? 'Valle del Cauca',
@@ -108,10 +116,13 @@ class Registration {
 
     public function getAll() {
         try {
-            $query = "SELECT r.*, e.name AS event_name FROM registrations r LEFT JOIN events e ON r.event_id = e.id ORDER BY r.created_at DESC, r.id DESC";
+            // No se hace JOIN con events para evitar fallos cuando event_id es NULL
+            $query = "SELECT r.* FROM registrations r ORDER BY r.created_at DESC, r.id DESC";
             $stmt = $this->conn->query($query);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $rows ?: [];
         } catch (PDOException $e) {
+            error_log("Registration::getAll() Error: " . $e->getMessage());
             return [];
         }
     }
@@ -163,6 +174,12 @@ class Registration {
         $categoria = $data['categoria_participante'] ?? 'adulto';
         if ($categoria === 'nino' && empty($data['acudiente_nombre'])) {
             $errors[] = 'El nombre del acudiente es obligatorio para la inscripción infantil';
+        }
+        if ($categoria === 'nino' && empty($data['talla_camiseta_nino'])) {
+            $errors[] = 'La talla de camiseta para el niño es obligatoria';
+        }
+        if ($categoria !== 'nino' && empty($data['talla_camiseta_adulto'])) {
+            $errors[] = 'La talla de camiseta de adulto es obligatoria';
         }
         if ($categoria === 'mascota' && empty($data['nombre_mascota'])) {
             $errors[] = 'El nombre de la mascota es obligatorio para la categoría Pet Run';
