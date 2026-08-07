@@ -222,4 +222,61 @@ class RegistrationController extends Controller {
             echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
         }
     }
+
+    public function checkDocumentStages() {
+        try {
+            $numeroDocumento = $_POST['numero_documento'] ?? '';
+            if (empty($numeroDocumento)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Número de documento requerido']);
+                exit;
+            }
+
+            $existingRegistrations = Registration::findAllByDocument($numeroDocumento);
+            $existingStageIds = [];
+            foreach ($existingRegistrations as $reg) {
+                $etapas = $reg['etapas_seleccionadas'];
+                if (!empty($etapas)) {
+                    if (is_string($etapas)) {
+                        $decoded = json_decode($etapas, true);
+                        if (is_array($decoded)) {
+                            foreach ($decoded as $id) {
+                                $existingStageIds[] = (int)$id;
+                            }
+                        } else {
+                            $existingStageIds[] = (int)$etapas;
+                        }
+                    } elseif (is_array($etapas)) {
+                        foreach ($etapas as $id) {
+                            $existingStageIds[] = (int)$id;
+                        }
+                    }
+                }
+            }
+
+            // Get stages info to know name and distance for each registered stage
+            $allStages = Registration::getRaceStages();
+            $stagesInfo = [];
+            foreach ($allStages as $stg) {
+                if (in_array((int)$stg['id'], $existingStageIds)) {
+                    $stagesInfo[] = [
+                        'id' => (int)$stg['id'],
+                        'name' => $stg['name'],
+                        'distance' => $stg['distance']
+                    ];
+                }
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'registered_stages' => $stagesInfo
+            ]);
+            exit;
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
+            exit;
+        }
+    }
 }

@@ -810,6 +810,14 @@ class AdminController extends Controller {
     public function eventConfig() {
         $this->requireAdmin();
 
+        // Auto-migración para agregar columnas necesarias si no existen
+        try {
+            $this->db->exec("ALTER TABLE race_stages ADD COLUMN presale_slots_limit INT(11) DEFAULT NULL");
+        } catch (\PDOException $e) {}
+        try {
+            $this->db->exec("ALTER TABLE registrations ADD COLUMN etapas_preventa TEXT DEFAULT NULL");
+        } catch (\PDOException $e) {}
+
         $eventModel = new Event();
         $event = Event::getPrimaryEvent() ?: [
             'id' => 1,
@@ -848,10 +856,28 @@ class AdminController extends Controller {
         }
 
         $eventId = (int)($_POST['event_id'] ?? 1);
+        
+        // Cupos por kilometraje (stage_slots[stage_id] => normal, stage_presale_slots[stage_id] => preventa)
+        $stageSlotsData = $_POST['stage_slots'] ?? [];
+        $stagePresaleSlotsData = $_POST['stage_presale_slots'] ?? [];
+        $stagesData = $_POST['stages'] ?? [];
+
+        // Calcular el límite de cupos totales como la suma de los cupos (preventa + normal) de las etapas activas
+        $calculatedTotalSlots = 0;
+        if (is_array($stagesData)) {
+            foreach ($stagesData as $stgId => $stg) {
+                if (isset($stg['is_active'])) {
+                    $rawSlot = $stageSlotsData[$stgId] ?? 0;
+                    $rawPresaleSlot = $stagePresaleSlotsData[$stgId] ?? 0;
+                    $calculatedTotalSlots += max(1, (int)$rawSlot) + max(1, (int)$rawPresaleSlot);
+                }
+            }
+        }
+
         $eventData = [
             'title'               => trim($_POST['event_title'] ?? 'Carrera Corre Con FemTribe'),
             'location'            => trim($_POST['event_location'] ?? 'Cali, Valle del Cauca'),
-            'total_slots'         => max(1, (int)($_POST['total_slots'] ?? 600)),
+            'total_slots'         => max(1, $calculatedTotalSlots),
             // Fechas son OPCIONALES: null si viene vacío
             'presale_start_date'  => !empty($_POST['presale_start_date']) ? $_POST['presale_start_date'] : null,
             'presale_end_date'    => !empty($_POST['presale_end_date'])   ? $_POST['presale_end_date']   : null,
@@ -861,16 +887,14 @@ class AdminController extends Controller {
         $eventModel = new Event();
         $okEvent = $eventModel->updateEvent($eventId, $eventData);
 
-        // Cupos por kilometraje (stage_slots[stage_id] => cantidad o vacío)
-        $stageSlotsData = $_POST['stage_slots'] ?? [];
-
         // Actualizar etapas/kilometrajes con precios y cupos
-        $stagesData = $_POST['stages'] ?? [];
         if (is_array($stagesData)) {
             foreach ($stagesData as $stgId => $stg) {
-                // Cupo de esta etapa (obligatorio en UI, puede ser 0 = sin límite explícito)
                 $rawSlot = $stageSlotsData[$stgId] ?? null;
                 $slotsLimit = ($rawSlot !== null && $rawSlot !== '') ? max(1, (int)$rawSlot) : null;
+                
+                $rawPresaleSlot = $stagePresaleSlotsData[$stgId] ?? null;
+                $presaleSlotsLimit = ($rawPresaleSlot !== null && $rawPresaleSlot !== '') ? max(1, (int)$rawPresaleSlot) : null;
 
                 $eventModel->updateStage((int)$stgId, [
                     'name'          => trim($stg['name'] ?? ''),
@@ -880,6 +904,7 @@ class AdminController extends Controller {
                     'price'         => floatval($stg['price'] ?? 0),
                     'is_active'     => isset($stg['is_active']) ? 1 : 0,
                     'slots_limit'   => $slotsLimit,
+                    'presale_slots_limit' => $presaleSlotsLimit,
                 ]);
             }
         }
@@ -889,7 +914,9 @@ class AdminController extends Controller {
             foreach ($stageSlotsData as $stgId => $rawSlot) {
                 if (!isset($stagesData[$stgId])) {
                     $slotsLimit = ($rawSlot !== '') ? max(1, (int)$rawSlot) : null;
-                    $eventModel->updateStageSlots((int)$stgId, $slotsLimit);
+                    $rawPresaleSlot = $stagePresaleSlotsData[$stgId] ?? '';
+                    $presaleSlotsLimit = ($rawPresaleSlot !== '') ? max(1, (int)$rawPresaleSlot) : null;
+                    $eventModel->updateStageSlots((int)$stgId, $slotsLimit, $presaleSlotsLimit);
                 }
             }
         }
@@ -996,6 +1023,7 @@ class AdminController extends Controller {
             'alter_products_media_and_reviews.sql',
             'create_product_media_table.sql',
             'create_events_table.sql',
+            'alter_race_stages_presale_slots.sql',
         ];
 
         $output = [];
@@ -1069,5 +1097,81 @@ class AdminController extends Controller {
         echo '</ul>';
         echo '<p><a href="/admin/dashboard">Ir al Dashboard Administrador</a></p>';
         echo '</body></html>';
+    }
+
+    public function exportRegistrations() {
+        $this->requireAdmin();
+
+        $registrationModel = new Registration();
+        $registrations = $registrationModel->getAll() ?: [];
+        $stages = Event::getStages(1);
+
+        $stagesMap = [];
+        foreach ($stages as $s) {
+            $stagesMap[$s['id']] = $s;
+        }
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="usuarios_inscritos.csv"');
+        
+        echo "\xEF\xBB\xBF";
+
+        $output = fopen('php://output', 'w');
+        
+        fputcsv($output, [
+            'ID',
+            'Nombres',
+            'Apellidos',
+            'Email',
+            'Tipo Documento',
+            'Número Documento',
+            'Categoría',
+            'Nombre Mascota',
+            'Nombre Acudiente',
+            'Etapas / Kilometraje',
+            'Talla Camiseta Adulto',
+            'Talla Camiseta Niño',
+            'Fecha Inscripción'
+        ], ';');
+
+        foreach ($registrations as $idx => $reg) {
+            $stgIds = !empty($reg['etapas_seleccionadas']) ? (is_array($reg['etapas_seleccionadas']) ? $reg['etapas_seleccionadas'] : json_decode($reg['etapas_seleccionadas'], true)) : [];
+            $selectedStageNames = [];
+            if (is_array($stgIds)) {
+                foreach ($stgIds as $sid) {
+                    if (isset($stagesMap[$sid])) {
+                        $selectedStageNames[] = $stagesMap[$sid]['name'] . ' (' . $stagesMap[$sid]['distance'] . ')';
+                    }
+                }
+            }
+            $etapasStr = implode(', ', $selectedStageNames);
+
+            $categoria = $reg['categoria_participante'] ?? 'adulto';
+            $categoriaText = 'Adulto';
+            if ($categoria === 'mascota') {
+                $categoriaText = 'Pet Run';
+            } elseif ($categoria === 'nino') {
+                $categoriaText = 'Infantil';
+            }
+
+            fputcsv($output, [
+                $idx + 1,
+                $reg['nombres'] ?? '',
+                $reg['apellidos'] ?? '',
+                $reg['email'] ?? '',
+                $reg['tipo_documento'] ?? 'CC',
+                $reg['numero_documento'] ?? '',
+                $categoriaText,
+                $reg['nombre_mascota'] ?? '',
+                $reg['acudiente_nombre'] ?? '',
+                $etapasStr,
+                $reg['talla_camiseta_adulto'] ?? 'N/A',
+                $reg['talla_camiseta_nino'] ?? 'N/A',
+                !empty($reg['created_at']) ? date('d/m/Y g:i A', strtotime($reg['created_at'])) : ''
+            ], ';');
+        }
+
+        fclose($output);
+        exit;
     }
 }
