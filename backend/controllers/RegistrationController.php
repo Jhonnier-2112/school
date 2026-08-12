@@ -32,7 +32,7 @@ class RegistrationController extends Controller {
         $this->view('registration_form', ['currentUser' => $currentUser, 'stages' => $stages, 'event' => $event]);
     }
 
-    // Guarda la inscripción en la BD y muestra la pantalla de éxito
+    // Guarda la inscripción en la BD y redirecciona al pago
     public function store() {
         $event = Event::getPrimaryEvent();
         $availableSlots = $event['available_slots'] ?? 600;
@@ -100,28 +100,93 @@ class RegistrationController extends Controller {
                 return $this->showError($errors);
             }
 
-            // Crear la inscripción
+            // Calcular el total a pagar por las etapas seleccionadas
+            $total = 0;
+            $allStages = Event::getStages(1);
+            $stagesMap = [];
+            foreach ($allStages as $stg) {
+                $stagesMap[(int)$stg['id']] = $stg;
+            }
+            foreach ($etapas as $sid) {
+                if (isset($stagesMap[(int)$sid])) {
+                    $total += $stagesMap[(int)$sid]['active_price'];
+                }
+            }
+
+            // Generar número de orden único
+            $orderNumber = \App\Models\Order::generateOrderNumber();
+            $data['payment_status'] = 'pending';
+            $data['payment_amount'] = $total;
+            $data['order_number'] = $orderNumber;
+
+            // Crear la inscripción en BD
             $registration = Registration::create($data);
             if ($registration) {
-                try {
-                    $emailService = new EmailService();
-                    $emailService->sendWelcomeEmail($data);
-                } catch (Exception $e) {
-                    error_log("Error al enviar email de bienvenida: " . $e->getMessage());
+                // Registrar log de auditoría
+                \App\Services\AuditLogService::log('REGISTRATION_CREATE', 'Inscripción pre-registrada (Pendiente de pago) para ' . $data['nombres'] . ' ' . $data['apellidos'] . ' - Orden: ' . $orderNumber, ['order_number' => $orderNumber, 'total' => $total], $user_id);
+
+                // Crear la orden de compra asociada
+                $orderModel = new \App\Models\Order();
+                
+                $orderData = [
+                    'order_number' => $orderNumber,
+                    'user_id' => $user_id,
+                    'customer_name' => $data['nombres'] . ' ' . $data['apellidos'],
+                    'customer_email' => $data['email'],
+                    'customer_phone' => $data['telefono'],
+                    'customer_document' => $data['numero_documento'],
+                    'shipping_address' => $data['direccion'],
+                    'city' => $data['municipio'],
+                    'department' => $data['departamento'],
+                    'subtotal' => $total,
+                    'total' => $total,
+                    'payment_method' => 'bancolombia_wompi'
+                ];
+                
+                $orderItems = [];
+                foreach ($etapas as $sid) {
+                    if (isset($stagesMap[(int)$sid])) {
+                        $orderItems[] = [
+                            'product_id' => null,
+                            'name' => 'Inscripción Carrera - ' . $stagesMap[(int)$sid]['name'],
+                            'price' => $stagesMap[(int)$sid]['active_price'],
+                            'quantity' => 1
+                        ];
+                    }
                 }
                 
+                $createdOrder = $orderModel->createOrder($orderData, $orderItems);
+                
+                if ($createdOrder) {
+                    // Guardar registro inicial de pago en estado PENDING
+                    $orderModel->addPayment([
+                        'order_id' => $createdOrder['id'],
+                        'payment_gateway' => 'bancolombia_wompi',
+                        'transaction_reference' => $orderNumber,
+                        'amount' => $total,
+                        'currency' => 'COP',
+                        'status' => 'PENDING',
+                        'raw_response' => json_encode(['registration_id' => $registration])
+                    ]);
+                }
+
+                // Redireccionar al usuario a la página de pago seguro
                 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                     $_SESSION['registration_success'] = true;
                     $_SESSION['participant_data'] = $data;
                     
                     header('Content-Type: application/json');
-                    echo json_encode(['success' => true, 'message' => 'Inscripción registrada exitosamente']);
+                    echo json_encode([
+                        'success' => true, 
+                        'message' => 'Inscripción registrada exitosamente. Redirigiendo al pago...',
+                        'redirect' => '/payment/pay?order=' . $orderNumber
+                    ]);
                     exit;
                 } else {
                     $_SESSION['registration_success'] = true;
                     $_SESSION['participant_data'] = $data;
                     
-                    header('Location: /registration_success');
+                    header('Location: /payment/pay?order=' . $orderNumber);
                     exit;
                 }
             } else {
@@ -192,20 +257,53 @@ class RegistrationController extends Controller {
                 return;
             }
 
-            $participant = Registration::findByDocument($numeroDocumento);
+            $registrations = Registration::findAllByDocument($numeroDocumento);
 
-            if ($participant) {
+            if (!empty($registrations)) {
+                $allStages = Registration::getRaceStages();
+                $stagesMap = [];
+                foreach ($allStages as $stg) {
+                    $stagesMap[(int)$stg['id']] = $stg['name'] . ' (' . $stg['distance'] . ')';
+                }
+
+                $formattedList = [];
+                foreach ($registrations as $reg) {
+                    $stgIds = [];
+                    $sel = $reg['etapas_seleccionadas'];
+                    if (!empty($sel)) {
+                        if (is_string($sel)) {
+                            $decoded = json_decode($sel, true);
+                            $stgIds = is_array($decoded) ? $decoded : [(int)$sel];
+                        } elseif (is_array($sel)) {
+                            $stgIds = $sel;
+                        }
+                    }
+
+                    $stageNames = [];
+                    foreach ($stgIds as $sid) {
+                        if (isset($stagesMap[(int)$sid])) {
+                            $stageNames[] = $stagesMap[(int)$sid];
+                        }
+                    }
+
+                    $formattedList[] = [
+                        'nombres' => $reg['nombres'],
+                        'apellidos' => $reg['apellidos'],
+                        'tipo_documento' => $reg['tipo_documento'],
+                        'numero_documento' => $reg['numero_documento'],
+                        'email' => $reg['email'],
+                        'telefono' => $reg['telefono'],
+                        'created_at' => $reg['created_at'],
+                        'payment_status' => $reg['payment_status'] ?? 'pending',
+                        'order_number' => $reg['order_number'] ?? '',
+                        'payment_amount' => $reg['payment_amount'] ?? 0,
+                        'etapas' => implode(', ', $stageNames)
+                    ];
+                }
+
                 $response = [
                     'success' => true,
-                    'participant' => [
-                        'nombres' => $participant['nombres'],
-                        'apellidos' => $participant['apellidos'],
-                        'tipo_documento' => $participant['tipo_documento'],
-                        'numero_documento' => $participant['numero_documento'],
-                        'email' => $participant['email'],
-                        'telefono' => $participant['telefono'],
-                        'created_at' => $participant['created_at']
-                    ]
+                    'registrations' => $formattedList
                 ];
             } else {
                 $response = [
@@ -214,11 +312,11 @@ class RegistrationController extends Controller {
                 ];
             }
 
-            header('Content-Type: application/json');
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode($response);
             
         } catch (Exception $e) {
-            header('Content-Type: application/json');
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['success' => false, 'message' => 'Error interno del servidor']);
         }
     }
@@ -235,20 +333,22 @@ class RegistrationController extends Controller {
             $existingRegistrations = Registration::findAllByDocument($numeroDocumento);
             $existingStageIds = [];
             foreach ($existingRegistrations as $reg) {
-                $etapas = $reg['etapas_seleccionadas'];
-                if (!empty($etapas)) {
-                    if (is_string($etapas)) {
-                        $decoded = json_decode($etapas, true);
-                        if (is_array($decoded)) {
-                            foreach ($decoded as $id) {
+                if (($reg['payment_status'] ?? 'pending') === 'paid') {
+                    $etapas = $reg['etapas_seleccionadas'];
+                    if (!empty($etapas)) {
+                        if (is_string($etapas)) {
+                            $decoded = json_decode($etapas, true);
+                            if (is_array($decoded)) {
+                                foreach ($decoded as $id) {
+                                    $existingStageIds[] = (int)$id;
+                                }
+                            } else {
+                                $existingStageIds[] = (int)$etapas;
+                            }
+                        } elseif (is_array($etapas)) {
+                            foreach ($etapas as $id) {
                                 $existingStageIds[] = (int)$id;
                             }
-                        } else {
-                            $existingStageIds[] = (int)$etapas;
-                        }
-                    } elseif (is_array($etapas)) {
-                        foreach ($etapas as $id) {
-                            $existingStageIds[] = (int)$id;
                         }
                     }
                 }

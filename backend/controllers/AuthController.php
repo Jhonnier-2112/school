@@ -57,6 +57,9 @@ class AuthController extends Controller {
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_role_id'] = $user['role_id'] ?? null;
 
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('USER_LOGIN', 'Inicio de sesión exitoso por credenciales tradicionales para ' . $user['email'], null, (int)$user['id']);
+
             // Generar Access Token y Refresh Token con vencimiento de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
             $tokenData = $tokenService->issueTokenPair($user);
@@ -74,6 +77,9 @@ class AuthController extends Controller {
             }
             $this->redirect($redirectTo);
         } else {
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('USER_LOGIN_FAILED', 'Intento fallido de inicio de sesión para el identificador: ' . $loginInput);
+
             $msg = 'Credenciales incorrectas. Verifica tu correo/documento y contraseña.';
             if ($isAjax) {
                 $this->json(['success' => false, 'message' => $msg], 401);
@@ -159,6 +165,9 @@ class AuthController extends Controller {
             $_SESSION['user_role'] = 'runner';
             $_SESSION['user_role_id'] = \App\Models\Role::CLIENTE_ID;
 
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('USER_REGISTER', 'Nuevo usuario registrado en la plataforma: ' . $data['email'], ['nombres' => $data['nombres'], 'apellidos' => $data['apellidos']], (int)$userId);
+
             // Generar Access Token y Refresh Token de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
             $userRecord = array_merge(['id' => $userId], $data);
@@ -233,6 +242,9 @@ class AuthController extends Controller {
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_role_id'] = $user['role_id'] ?? null;
 
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('USER_LOGIN_GOOGLE', 'Inicio de sesión exitoso vía Google OAuth para ' . $user['email'], null, (int)$user['id']);
+
             // Emitir Access Token y Refresh Token de 1 Hora (3600s)
             $tokenService = new TokenAuthService();
             $tokenService->issueTokenPair($user);
@@ -285,6 +297,13 @@ class AuthController extends Controller {
     public function logout() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+        }
+
+        $userId = $_SESSION['user_id'] ?? null;
+        $userEmail = $_SESSION['user_email'] ?? 'desconocido';
+
+        if ($userId) {
+            \App\Services\AuditLogService::log('USER_LOGOUT', 'Cierre de sesión para ' . $userEmail, null, (int)$userId);
         }
 
         $tokenService = new TokenAuthService();

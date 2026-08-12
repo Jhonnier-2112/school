@@ -11,6 +11,7 @@ class Registration {
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
+        self::checkPaymentColumns();
     }
 
     /**
@@ -47,14 +48,16 @@ class Registration {
                 fecha_nacimiento, edad, genero, eps, grupo_sanguineo, rh, talla_camiseta_adulto, talla_camiseta_nino,
                 direccion, municipio, departamento, email, telefono, 
                 parentesco_emergencia, otro_parentesco, nombre_emergencia, 
-                nombre_emergencia_alt, celular_emergencia, acepta_autorizacion, created_at
+                nombre_emergencia_alt, celular_emergencia, acepta_autorizacion, created_at,
+                payment_status, payment_amount, order_number
             ) VALUES (
                 :user_id, :categoria_participante, :etapas_seleccionadas, :etapas_preventa, :nombre_mascota, :raza_mascota,
                 :acudiente_nombre, :acudiente_documento, :nombres, :apellidos, :tipo_documento, :numero_documento, 
                 :fecha_nacimiento, :edad, :genero, :eps, :grupo_sanguineo, :rh, :talla_camiseta_adulto, :talla_camiseta_nino,
                 :direccion, :municipio, :departamento, :email, :telefono, 
                 :parentesco_emergencia, :otro_parentesco, :nombre_emergencia, 
-                :nombre_emergencia_alt, :celular_emergencia, :acepta_autorizacion, NOW()
+                :nombre_emergencia_alt, :celular_emergencia, :acepta_autorizacion, NOW(),
+                :payment_status, :payment_amount, :order_number
             )";
 
             $etapas = is_array($data['etapas_seleccionadas'] ?? null) ? json_encode($data['etapas_seleccionadas']) : ($data['etapas_seleccionadas'] ?? null);
@@ -110,7 +113,10 @@ class Registration {
                 ':nombre_emergencia' => $data['nombre_emergencia'] ?? null,
                 ':nombre_emergencia_alt' => $data['nombre_emergencia_alt'] ?? null,
                 ':celular_emergencia' => $data['celular_emergencia'] ?? null,
-                ':acepta_autorizacion' => $data['acepta_autorizacion'] ?? 'si'
+                ':acepta_autorizacion' => $data['acepta_autorizacion'] ?? 'si',
+                ':payment_status' => $data['payment_status'] ?? 'pending',
+                ':payment_amount' => $data['payment_amount'] ?? 0.00,
+                ':order_number' => $data['order_number'] ?? null
             ];
 
             $stmt = $db->prepare($sql);
@@ -269,20 +275,22 @@ class Registration {
             $existingRegistrations = self::findAllByDocument($data['numero_documento']);
             $existingStageIds = [];
             foreach ($existingRegistrations as $reg) {
-                $etapas = $reg['etapas_seleccionadas'];
-                if (!empty($etapas)) {
-                    if (is_string($etapas)) {
-                        $decoded = json_decode($etapas, true);
-                        if (is_array($decoded)) {
-                            foreach ($decoded as $id) {
+                if (($reg['payment_status'] ?? 'pending') === 'paid') {
+                    $etapas = $reg['etapas_seleccionadas'];
+                    if (!empty($etapas)) {
+                        if (is_string($etapas)) {
+                            $decoded = json_decode($etapas, true);
+                            if (is_array($decoded)) {
+                                foreach ($decoded as $id) {
+                                    $existingStageIds[] = (int)$id;
+                                }
+                            } else {
+                                $existingStageIds[] = (int)$etapas;
+                            }
+                        } elseif (is_array($etapas)) {
+                            foreach ($etapas as $id) {
                                 $existingStageIds[] = (int)$id;
                             }
-                        } else {
-                            $existingStageIds[] = (int)$etapas;
-                        }
-                    } elseif (is_array($etapas)) {
-                        foreach ($etapas as $id) {
-                            $existingStageIds[] = (int)$id;
                         }
                     }
                 }
@@ -374,5 +382,59 @@ class Registration {
         }
 
         return $errors;
+    }
+
+    /**
+     * Asegura que existan las columnas de pago en la tabla registrations
+     */
+    public static function checkPaymentColumns() {
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            
+            // Comprobar si existe la columna order_number
+            $dbname = defined('DB_NAME') ? DB_NAME : 'runner_db';
+            $check = $db->query("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{$dbname}' AND TABLE_NAME = 'registrations' AND COLUMN_NAME = 'order_number'");
+            $exists = (int)$check->fetchColumn() > 0;
+            
+            if (!$exists) {
+                $db->exec("ALTER TABLE registrations ADD COLUMN payment_status VARCHAR(30) NOT NULL DEFAULT 'pending', ADD COLUMN payment_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00, ADD COLUMN order_number VARCHAR(50) NULL");
+            }
+        } catch (PDOException $e) {
+            error_log("Registration::checkPaymentColumns() Error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualiza el estado de pago de una inscripción por su número de orden
+     */
+    public static function updatePaymentStatusByOrder(string $orderNumber, string $paymentStatus): bool {
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            $stmt = $db->prepare("UPDATE registrations SET payment_status = :status WHERE order_number = :order_num");
+            return $stmt->execute([
+                ':status' => $paymentStatus,
+                ':order_num' => $orderNumber
+            ]);
+        } catch (PDOException $e) {
+            error_log("Registration::updatePaymentStatusByOrder() Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Busca la inscripción asociada a un número de orden
+     */
+    public static function findByOrderNumber(string $orderNumber): ?array {
+        try {
+            $database = new Database();
+            $db = $database->getConnection();
+            $stmt = $db->prepare("SELECT * FROM registrations WHERE order_number = :order_number LIMIT 1");
+            $stmt->execute([':order_number' => $orderNumber]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 }

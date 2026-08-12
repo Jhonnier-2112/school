@@ -28,8 +28,8 @@ class Event {
                 return null;
             }
 
-            // Contar inscripciones totales
-            $countStmt = $db->query("SELECT COUNT(*) AS total FROM registrations");
+            // Contar inscripciones totales (solo las pagadas)
+            $countStmt = $db->query("SELECT COUNT(*) AS total FROM registrations WHERE payment_status = 'paid'");
             $registeredCount = (int)($countStmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
 
             $event['registered_count'] = $registeredCount;
@@ -94,7 +94,8 @@ class Event {
             $database = new Database();
             $db = $database->getConnection();
             
-            $stmt = $db->query("SELECT etapas_seleccionadas, etapas_preventa FROM registrations");
+            // Solo contar las inscripciones que estén confirmadas (pagadas)
+            $stmt = $db->query("SELECT etapas_seleccionadas, etapas_preventa FROM registrations WHERE payment_status = 'paid'");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
             
             $totalCount = 0;

@@ -412,6 +412,9 @@ class AdminController extends Controller {
                     $mediaModel = new \App\Models\ProductMedia();
                     $mediaModel->saveMedia($newId, $mediaList);
                 }
+                // Registrar log de auditoría
+                \App\Services\AuditLogService::log('ADMIN_PRODUCT_CREATE', 'Creado producto: ' . $name . ' (SKU: ' . $sku . ')');
+
                 $_SESSION['admin_success'] = 'Producto creado exitosamente.';
                 $this->redirect('/admin/productos');
             } else {
@@ -539,6 +542,9 @@ class AdminController extends Controller {
                 // Actualizar medios en product_media
                 $mediaModel = new \App\Models\ProductMedia();
                 $mediaModel->saveMedia($id, $mediaList);
+                // Registrar log de auditoría
+                \App\Services\AuditLogService::log('ADMIN_PRODUCT_UPDATE', 'Actualizado producto: ' . $name . ' (ID: ' . $id . ', SKU: ' . $sku . ')');
+
                 $_SESSION['admin_success'] = 'Producto actualizado exitosamente.';
             } else {
                 $_SESSION['admin_error'] = 'No se pudo actualizar el producto.';
@@ -565,6 +571,9 @@ class AdminController extends Controller {
             try {
                 $stmt = $this->db->prepare("UPDATE products SET is_active = 0 WHERE id = :id");
                 $stmt->execute([':id' => $id]);
+                // Registrar log de auditoría
+                \App\Services\AuditLogService::log('ADMIN_PRODUCT_DELETE', 'Desactivado (eliminado suave) producto ID: ' . $id);
+
                 $_SESSION['admin_success'] = 'Producto eliminado (desactivado) exitosamente.';
             } catch (PDOException $e) {
                 $_SESSION['admin_error'] = 'Error de Base de Datos.';
@@ -618,6 +627,9 @@ class AdminController extends Controller {
                 ':slug' => $slug,
                 ':description' => $description
             ]);
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('ADMIN_CATEGORY_CREATE', 'Creada categoría: ' . $name);
+
             $_SESSION['admin_success'] = 'Categoría creada exitosamente.';
         } catch (PDOException $e) {
             $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
@@ -656,6 +668,9 @@ class AdminController extends Controller {
                 ':description' => $description,
                 ':id' => $id
             ]);
+            // Registrar log de auditoría
+            \App\Services\AuditLogService::log('ADMIN_CATEGORY_UPDATE', 'Actualizada categoría: ' . $name . ' (ID: ' . $id . ')');
+
             $_SESSION['admin_success'] = 'Categoría actualizada exitosamente.';
         } catch (PDOException $e) {
             $_SESSION['admin_error'] = 'Error de Base de Datos: ' . $e->getMessage();
@@ -887,6 +902,9 @@ class AdminController extends Controller {
         $eventModel = new Event();
         $okEvent = $eventModel->updateEvent($eventId, $eventData);
 
+        // Registrar log de auditoría
+        \App\Services\AuditLogService::log('ADMIN_EVENT_UPDATE', 'El administrador actualizó la configuración del evento y sus kilometrajes/precios/cupos.');
+
         // Actualizar etapas/kilometrajes con precios y cupos
         if (is_array($stagesData)) {
             foreach ($stagesData as $stgId => $stg) {
@@ -1024,6 +1042,7 @@ class AdminController extends Controller {
             'create_product_media_table.sql',
             'create_events_table.sql',
             'alter_race_stages_presale_slots.sql',
+            'create_audit_logs.sql',
         ];
 
         $output = [];
@@ -1131,6 +1150,9 @@ class AdminController extends Controller {
             'Etapas / Kilometraje',
             'Talla Camiseta Adulto',
             'Talla Camiseta Niño',
+            'Estado Pago',
+            'Número Orden',
+            'Total Pago',
             'Fecha Inscripción'
         ], ';');
 
@@ -1167,11 +1189,65 @@ class AdminController extends Controller {
                 $etapasStr,
                 $reg['talla_camiseta_adulto'] ?? 'N/A',
                 $reg['talla_camiseta_nino'] ?? 'N/A',
+                $reg['payment_status'] ?? 'pending',
+                $reg['order_number'] ?? '',
+                $reg['payment_amount'] ?? 0.00,
                 !empty($reg['created_at']) ? date('d/m/Y g:i A', strtotime($reg['created_at'])) : ''
             ], ';');
         }
 
         fclose($output);
         exit;
+    }
+
+    /**
+     * Bitácora de auditoría de transacciones y operaciones del sistema
+     */
+    public function auditLogs() {
+        $this->requireAdmin();
+
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+
+        try {
+            // Auto-creación de tabla por seguridad si no existe
+            $this->db->exec("CREATE TABLE IF NOT EXISTS `audit_logs` (
+              `id` INT AUTO_INCREMENT PRIMARY KEY,
+              `user_id` INT NULL,
+              `action` VARCHAR(100) NOT NULL,
+              `description` TEXT NOT NULL,
+              `ip_address` VARCHAR(45) NULL,
+              `user_agent` VARCHAR(255) NULL,
+              `metadata` TEXT NULL,
+              `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+            $stmt = $this->db->query("SELECT COUNT(*) AS total FROM audit_logs");
+            $totalLogs = (int)($stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0);
+            $totalPages = (int)ceil($totalLogs / $perPage);
+
+            $stmt = $this->db->prepare("SELECT l.*, u.nombres, u.apellidos, u.email 
+                                        FROM audit_logs l 
+                                        LEFT JOIN users u ON l.user_id = u.id 
+                                        ORDER BY l.created_at DESC 
+                                        LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $logs = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        } catch (PDOException $e) {
+            $logs = [];
+            $totalLogs = $totalPages = 0;
+        }
+
+        $this->view('admin/audit_logs', [
+            'activeTab' => 'audit_logs',
+            'logs' => $logs,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalLogs' => $totalLogs
+        ]);
     }
 }

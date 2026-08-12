@@ -213,4 +213,36 @@ class Order {
             return false;
         }
     }
+
+    /**
+     * Registra un log de webhook de pago en la base de datos para auditorías
+     */
+    public function logWebhookAttempt(array $logData): bool {
+        try {
+            // Asegurar que la tabla existe
+            $this->conn->exec("CREATE TABLE IF NOT EXISTS `payment_webhook_logs` (
+              `id` INT AUTO_INCREMENT PRIMARY KEY,
+              `ip_address` VARCHAR(45) NOT NULL,
+              `payload` TEXT NOT NULL,
+              `checksum_received` VARCHAR(255) NULL,
+              `is_valid` TINYINT(1) NOT NULL DEFAULT 0,
+              `error_message` VARCHAR(255) NULL,
+              `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+            $sql = "INSERT INTO payment_webhook_logs (ip_address, payload, checksum_received, is_valid, error_message, created_at)
+                    VALUES (:ip_address, :payload, :checksum_received, :is_valid, :error_message, NOW())";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                ':ip_address' => $logData['ip_address'],
+                ':payload' => is_array($logData['payload']) ? json_encode($logData['payload']) : $logData['payload'],
+                ':checksum_received' => $logData['checksum_received'] ?? null,
+                ':is_valid' => $logData['is_valid'] ? 1 : 0,
+                ':error_message' => $logData['error_message'] ?? null
+            ]);
+        } catch (PDOException $e) {
+            error_log("Order::logWebhookAttempt() Error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
