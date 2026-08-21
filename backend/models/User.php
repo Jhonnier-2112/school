@@ -388,4 +388,69 @@ class User {
 
         return $errors;
     }
+
+    /**
+     * Genera un token único de restauración de contraseña con validez de 1 hora
+     */
+    public function createPasswordResetToken(string $email): string|false {
+        try {
+            $user = $this->findByEmail($email);
+            if (!$user) {
+                return false;
+            }
+
+            $token = bin2hex(random_bytes(32));
+            $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+            $stmt = $this->conn->prepare("UPDATE users SET reset_token = :token, reset_token_expires = :expires WHERE id = :id");
+            $result = $stmt->execute([
+                ':token' => $token,
+                ':expires' => $expires,
+                ':id' => $user['id']
+            ]);
+
+            return $result ? $token : false;
+        } catch (PDOException $e) {
+            error_log("User::createPasswordResetToken() Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Verifica la validez de un token de restauración de contraseña
+     */
+    public function verifyPasswordResetToken(string $token): array|false {
+        try {
+            if (empty($token)) return false;
+
+            $stmt = $this->conn->prepare("SELECT * FROM users WHERE reset_token = :token AND reset_token_expires > NOW() AND status = 1 LIMIT 1");
+            $stmt->execute([':token' => trim($token)]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: false;
+        } catch (PDOException $e) {
+            error_log("User::verifyPasswordResetToken() Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza la contraseña mediante un token válido y limpia las credenciales temporales
+     */
+    public function updatePasswordByToken(string $token, string $newPassword): bool {
+        try {
+            $user = $this->verifyPasswordResetToken($token);
+            if (!$user) {
+                return false;
+            }
+
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $this->conn->prepare("UPDATE users SET password = :password, reset_token = NULL, reset_token_expires = NULL WHERE id = :id");
+            return $stmt->execute([
+                ':password' => $hashedPassword,
+                ':id' => $user['id']
+            ]);
+        } catch (PDOException $e) {
+            error_log("User::updatePasswordByToken() Error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

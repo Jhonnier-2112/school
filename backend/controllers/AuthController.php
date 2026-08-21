@@ -376,4 +376,119 @@ class AuthController extends Controller {
 
         $this->redirect('/perfil');
     }
+
+    /**
+     * Muestra la vista de solicitud de recuperación de contraseña
+     */
+    public function showForgotPassword() {
+        if ($this->isLoggedIn()) {
+            $this->redirect('/perfil');
+        }
+        $this->view('auth/forgot_password');
+    }
+
+    /**
+     * Procesa la solicitud de recuperación de contraseña y envía el correo
+     */
+    public function processForgotPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/forgot-password');
+        }
+
+        $email = strtolower(trim($_POST['email'] ?? ''));
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->view('auth/forgot_password', ['error' => 'Ingresa un correo electrónico válido.']);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+
+        if ($user) {
+            $token = $userModel->createPasswordResetToken($email);
+            if ($token) {
+                try {
+                    $appUrl = getenv('APP_URL') ?: (($_SERVER['REQUEST_SCHEME'] ?? 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+                    $resetUrl = rtrim($appUrl, '/') . '/reset-password?token=' . urlencode($token);
+
+                    $emailService = new \App\Services\EmailService();
+                    $emailService->sendPasswordResetEmail($user, $resetUrl);
+                    
+                    \App\Services\AuditLogService::log('PASSWORD_RESET_REQUESTED', 'Solicitud de recuperación para ' . $email, null, (int)$user['id']);
+                } catch (\Exception $e) {
+                    error_log("Error enviando email de recuperación: " . $e->getMessage());
+                }
+            }
+        }
+
+        // Mensaje neutro por seguridad contra enumeración de usuarios
+        $this->view('auth/forgot_password', [
+            'success' => 'Si tu correo electrónico se encuentra registrado en nuestra plataforma, recibirás en breve un enlace para restablecer tu contraseña.'
+        ]);
+    }
+
+    /**
+     * Muestra el formulario para ingresar la nueva contraseña mediante el token
+     */
+    public function showResetPassword() {
+        $token = trim($_GET['token'] ?? '');
+        if (empty($token)) {
+            $this->view('auth/forgot_password', ['error' => 'Enlace de restauración no válido o expirado. Por favor solicita uno nuevo.']);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->verifyPasswordResetToken($token);
+        if (!$user) {
+            $this->view('auth/forgot_password', ['error' => 'El enlace de restauración ha expirado o es inválido. Solicita un nuevo enlace.']);
+            return;
+        }
+
+        $this->view('auth/reset_password', ['token' => $token, 'email' => $user['email']]);
+    }
+
+    /**
+     * Procesa la actualización de la contraseña con el token de verificación
+     */
+    public function processResetPassword() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/forgot-password');
+        }
+
+        $token = trim($_POST['token'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($token)) {
+            $this->view('auth/forgot_password', ['error' => 'Token no proporcionado.']);
+            return;
+        }
+
+        $userModel = new User();
+        $user = $userModel->verifyPasswordResetToken($token);
+        if (!$user) {
+            $this->view('auth/forgot_password', ['error' => 'El enlace de restauración ha expirado. Por favor solicita uno nuevo.']);
+            return;
+        }
+
+        if (strlen($password) < 6) {
+            $this->view('auth/reset_password', ['token' => $token, 'email' => $user['email'], 'error' => 'La nueva contraseña debe tener al menos 6 caracteres.']);
+            return;
+        }
+
+        if ($password !== $confirmPassword) {
+            $this->view('auth/reset_password', ['token' => $token, 'email' => $user['email'], 'error' => 'Las contraseñas ingresadas no coinciden.']);
+            return;
+        }
+
+        $success = $userModel->updatePasswordByToken($token, $password);
+        if ($success) {
+            \App\Services\AuditLogService::log('PASSWORD_RESET_SUCCESS', 'Contraseña restablecida exitosamente para ' . $user['email'], null, (int)$user['id']);
+            $this->view('auth/login', [
+                'success' => '¡Tu contraseña ha sido restablecida exitosamente! Ya puedes iniciar sesión con tu nueva clave.'
+            ]);
+        } else {
+            $this->view('auth/reset_password', ['token' => $token, 'email' => $user['email'], 'error' => 'No se pudo actualizar la contraseña. Inténtalo nuevamente.']);
+        }
+    }
 }

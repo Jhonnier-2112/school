@@ -43,17 +43,17 @@ class Order {
             $stmt->execute([
                 ':order_number' => $orderNumber,
                 ':user_id' => $data['user_id'] ?? null,
-                ':customer_name' => $data['customer_name'],
-                ':customer_email' => $data['customer_email'],
-                ':customer_phone' => $data['customer_phone'],
-                ':customer_document' => $data['customer_document'],
-                ':shipping_address' => $data['shipping_address'],
+                ':customer_name' => $data['customer_name'] ?? '',
+                ':customer_email' => $data['customer_email'] ?? '',
+                ':customer_phone' => $data['customer_phone'] ?? '',
+                ':customer_document' => $data['customer_document'] ?? '',
+                ':shipping_address' => $data['shipping_address'] ?? '',
                 ':city' => $data['city'] ?? 'Cali',
                 ':department' => $data['department'] ?? 'Valle del Cauca',
-                ':subtotal' => $data['subtotal'],
+                ':subtotal' => $data['subtotal'] ?? 0.00,
                 ':tax' => $data['tax'] ?? 0.00,
                 ':shipping_fee' => $data['shipping_fee'] ?? 0.00,
-                ':total' => $data['total'],
+                ':total' => $data['total'] ?? 0.00,
                 ':payment_method' => $data['payment_method'] ?? 'bancolombia_wompi',
                 ':transaction_reference' => $orderNumber
             ]);
@@ -66,13 +66,15 @@ class Order {
             $itemStmt = $this->conn->prepare($itemSql);
 
             foreach ($items as $item) {
-                $subtotal = floatval($item['price']) * intval($item['quantity']);
+                $quantity = intval($item['quantity'] ?? $item['qty'] ?? $item['cantidad'] ?? 1);
+                $price = floatval($item['price'] ?? 0);
+                $subtotal = $price * $quantity;
                 $itemStmt->execute([
                     ':order_id' => $orderId,
                     ':product_id' => $item['product_id'] ?? null,
-                    ':product_name' => $item['name'] ?? $item['product_name'],
-                    ':price' => $item['price'],
-                    ':quantity' => $item['quantity'],
+                    ':product_name' => $item['name'] ?? $item['product_name'] ?? 'Producto',
+                    ':price' => $price,
+                    ':quantity' => $quantity,
                     ':subtotal' => $subtotal
                 ]);
             }

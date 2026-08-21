@@ -88,7 +88,9 @@ class PaymentController extends Controller {
         // Calcular totales
         $subtotal = 0;
         foreach ($items as $item) {
-            $subtotal += floatval($item['price']) * intval($item['quantity'] ?? 1);
+            $qty = intval($item['quantity'] ?? $item['qty'] ?? $item['cantidad'] ?? 1);
+            $price = floatval($item['price'] ?? 0);
+            $subtotal += $price * $qty;
         }
         $shippingFee = $subtotal > 150000 ? 0 : 12000;
         $total = $subtotal + $shippingFee;
@@ -225,6 +227,13 @@ class PaymentController extends Controller {
      * Endpoint de Webhook asíncrono para notificaciones de Bancolombia / Wompi
      */
     public function webhook() {
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            http_response_code(200);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'ok', 'message' => 'Wompi Webhook Endpoint Active']);
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['error' => 'Método no permitido']);
