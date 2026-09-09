@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrato de Prestación de Servicios Educativos 2026 - {{ENROLLMENT_CODE}}</title>
+    <style>
+        @page {
+            margin: 18mm 14mm 18mm 14mm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 8.5px;
+                color: #555;
+            }
+        }
+        body {
+            font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            line-height: 1.45;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            text-align: justify;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 6px;
+        }
+        .header-logo {
+            width: 80px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-logo img {
+            max-width: 75px;
+            max-height: 55px;
+        }
+        .header-title {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-title h1 {
+            font-size: 13px;
+            color: #003366;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-title h2 {
+            font-size: 11px;
+            color: #15803d;
+            margin: 2px 0;
+            text-transform: uppercase;
+        }
+        .header-title p {
+            font-size: 8px;
+            color: #444;
+            margin: 2px 0;
+        }
+        .clause-title {
+            font-weight: bold;
+            color: #003366;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+        p {
+            margin: 4px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #0f172a;
+        }
+        ul, ol {
+            margin: 4px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 3px;
+        }
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            page-break-inside: avoid;
+        }
+        .signature-cell {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px;
+        }
+        .signature-box {
+            min-height: 50px;
+            margin-bottom: 4px;
+        }
+        .signature-box img {
+            max-height: 48px;
+            max-width: 140px;
+        }
+        .signature-line {
+            border-top: 1px solid #334155;
+            padding-top: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .signature-sub {
+            font-size: 8.5px;
+            color: #475569;
+            line-height: 1.3;
+        }
+        .audit-footer {
+            margin-top: 15px;
+            padding: 6px 8px;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            font-size: 8px;
+            color: #64748b;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Institucional -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo" style="width: 70px;">
+                <img src="{{LOGO_BASE64}}" alt="Escudo Jean Piaget" style="max-height: 65px; max-width: 65px;">
+            </td>
+            <td class="header-title">
+                <h1>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</h1>
+                <h2>CONTRATO DE PRESTACIÓN DE SERVICIOS EDUCATIVOS</h2>
+                <p><strong>AÑO ESCOLAR {{SCHOOL_YEAR}}</strong> &bull; CÓDIGO DE MATRÍCULA: <strong>{{ENROLLMENT_CODE}}</strong></p>
+                <p>Resolución No. 644 de Agosto 13 de 2015 &bull; No. 1187 de Diciembre 16 de 2019 &bull; Secretaría de Educación de Girardot &bull; Nit: 39582498-2</p>
+            </td>
+            <td style="width: 75px; text-align: right; vertical-align: middle;">
+                <img src="{{FLAG_BASE64}}" alt="Bandera Jean Piaget" style="max-height: 32px;">
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        En la ciudad de Girardot, Departamento de Cundinamarca, República de Colombia, a los <span class="highlight">{{SIGNATURE_DAY}}</span> días del mes de <span class="highlight">{{SIGNATURE_MONTH}}</span> del año <span class="highlight">{{SIGNATURE_YEAR}}</span>, entre los suscritos a saber: <strong>YENIH CAROLINA GÓMEZ HERNÁNDEZ</strong>, mayor de edad, vecina y residente en Girardot, identificada con Cédula de Ciudadanía N° 39.582.498 expedida en Girardot, obrando en calidad de Rectora y Representante Legal de la <strong>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</strong> con Nit: <strong>39582498-2</strong>, entidad domiciliada en la Ciudad de Girardot - Cundinamarca, con Resoluciones de aprobación de estudios N° 644 de Agosto 13 de 2015 y N° 1187 de Diciembre 16 de 2019 expedidas por la Secretaría de Educación de Girardot, para los niveles de Preescolar, Básica Primaria, Bachillerato semiescolarizado, Modalidad presencial, Regular Virtual, Modalidad Ciclos Virtual, jornada única y fines de semana semipresencial, de naturaleza privado, carácter mixto, calendario "A", quien para los efectos del presente contrato se denominará <strong>EL COLEGIO</strong>; y de otra parte:
+    </p>
+
+    <p>
+        <strong>{{GUARDIAN_NAME}}</strong>, mayor de edad, identificado(a) con {{GUARDIAN_DOC_TYPE}} N° <span class="highlight">{{GUARDIAN_DOC_NUMBER}}</span> expedida en {{GUARDIAN_DOC_PLACE}}, domiciliado(a) en la dirección <span class="highlight">{{GUARDIAN_ADDRESS}}</span>, con teléfono/celular <span class="highlight">{{GUARDIAN_PHONE}}</span> y correo electrónico <span class="highlight">{{GUARDIAN_EMAIL}}</span>, quien actúa en calidad de PADRE / MADRE / ACUDIENTE Y REPRESENTANTE RESPONSABLE del (la) estudiante beneficiario(a) <span class="highlight">{{STUDENT_NAME}}</span>, identificado(a) con {{STUDENT_DOC_TYPE}} N° <span class="highlight">{{STUDENT_DOC_NUMBER}}</span>; en cumplimiento de los artículos 26, 27, 67, 68, 69 y 70 de la Constitución Política Nacional con el fin de asegurar el derecho a la educación, han convenido en celebrar el presente <strong>CONTRATO DE PRESTACIÓN DE SERVICIOS EDUCATIVOS</strong>, el cual se regirá por las normas del Derecho Privado y en especial por las siguientes cláusulas:
+    </p>
+
+    <div class="clause-title">PRIMERA. - DEFINICIÓN DEL CONTRATO</div>
+    <p>
+        El presente contrato formaliza la vinculación del (la) ESTUDIANTE al servicio educativo que ofrece el COLEGIO dentro de la autonomía prevista por la ley, y por tanto el (la) ESTUDIANTE, sus PADRES DE FAMILIA Y/O ACUDIENTES aceptan y formalizan tal vinculación en los términos de los artículos 26, 27, 67, 68, 69 y 70 de la Constitución Nacional, los artículos 95 y 201 de la Ley 115 de 1994, la Ley 1098 de 2006 (Código de Infancia y Adolescencia), el Decreto 1075 de 2015 Único Reglamentario del Sector Educativo, demás normas concordantes y complementarias, y compromete a las partes y al (la) ESTUDIANTE en las obligaciones legales y pedagógicas tendientes a hacer efectiva la prestación del servicio público educativo, obligaciones que son correlativas y esenciales para la consecución del objeto y de los fines comunes ya que el derecho a la educación se considera un derecho-deber según la jurisprudencia constitucional. <em>PARÁGRAFO:</em> La naturaleza jurídica del presente contrato es de carácter civil según lo estipulado en los artículos 95 y 201 de la Ley 115 de 1994, por lo tanto, se rige por las normas del derecho privado.
+    </p>
+
+    <div class="clause-title">SEGUNDA. - OBJETO DEL CONTRATO</div>
+    <p>
+        El objeto del presente contrato es procurar la formación integral del beneficiario(a) mediante la recíproca complementación de esfuerzos del mismo(a), de los Padres de Familia y/o Acudientes y del COLEGIO con la búsqueda del pleno desarrollo de su personalidad y un rendimiento académico satisfactorio en el ejercicio del programa curricular correspondiente al grado <strong>{{TARGET_GRADE}}</strong> (Nivel: <strong>{{ENROLLMENT_TYPE_LABEL}}</strong>), aprobado por el Ministerio de Educación Nacional y que será desarrollado mediante el Proyecto Educativo Institucional (PEI) y el cumplimiento de su Manual de Convivencia. <em>PARÁGRAFO:</em> El lugar y la modalidad de prestación del servicio educativo atenderá a las normatividades derivadas o de cualquier otro carácter excepcional decretado por el Gobierno Nacional, el Ministerio de Educación Nacional y la Secretaría de Educación correspondiente.
+    </p>
+
+    <div class="clause-title">TERCERA. - DURACIÓN Y RENOVACIÓN</div>
+    <p>
+        El presente contrato tiene vigencia de un (1) año lectivo correspondiente al año escolar <strong>{{SCHOOL_YEAR}}</strong>; su ejecución será sucesiva por períodos mensuales y podrá renovarse en cada respectivo año escolar previa la firma de un nuevo contrato, siempre y cuando el ESTUDIANTE y los PADRES DE FAMILIA Y/O ACUDIENTES hayan cumplido estrictamente con las obligaciones estipuladas en el presente contrato y en el Manual de Convivencia del Colegio.
+    </p>
+
+    <div class="clause-title">CUARTA. - COSTO DEL SERVICIO EDUCATIVO</div>
+    <p>
+        El presente contrato tiene una tarifa educativa anual para el grado <strong>{{TARGET_GRADE}}</strong> de <strong>{{TOTAL_FEE_WORDS}} (${{TOTAL_FEE_FORMATTED}} M/CTE)</strong>, los cuales serán cancelados por los padres de familia o acudientes de la siguiente manera:
+    </p>
+    <ul>
+        <li><strong>a) Por concepto de matrícula:</strong> La suma de <strong>{{ENROLLMENT_FEE_WORDS}} (${{ENROLLMENT_FEE_FORMATTED}} M/CTE)</strong>, la que será cancelada al momento de formalizar la matrícula.</li>
+        <li><strong>b) Por concepto de pensión escolar:</strong> La suma de <strong>{{TOTAL_PENSION_WORDS}} (${{TOTAL_PENSION_FORMATTED}} M/CTE)</strong>, pagadera en diez (10) cuotas mensuales y sucesivas de <strong>{{MONTHLY_FEE_WORDS}} (${{MONTHLY_FEE_FORMATTED}} M/CTE)</strong> cada una, las cuales serán canceladas dentro de los primeros cinco (5) días calendario de cada mes.</li>
+    </ul>
+    <p>
+        <em>PARÁGRAFO PRIMERO. RETARDO EN PAGOS O INCUMPLIMIENTO:</em> En caso de mora en los pagos, los padres o acudientes reconocerán intereses mensuales sobre el valor del saldo insoluto de acuerdo con lo establecido en las políticas de cartera y el pagaré adjunto. En caso de incumplimiento en una o más cuotas, el COLEGIO podrá declarar insubsistentes los plazos pactados y hacer exigible el total de la obligación por vía judicial o extrajudicial con los correspondientes gastos de cobranza y honorarios de abogado.<br>
+        <em>PARÁGRAFO SEGUNDO. AUSENCIAS TEMPORALES O DEFINITIVAS:</em> La ausencia del estudiante beneficiario, en forma temporal o total dentro del mes por enfermedad, fuerza mayor o retiro voluntario, no dará derecho a descontar suma alguna de lo debido pagar ni a reintegros de dinero ya cancelado salvo disposición expresa y escrita de la Rectoría.
+    </p>
+
+    <div class="clause-title">QUINTA. - RESPONSABILIDAD PERSONAL Y CAPACIDAD DE PAGO</div>
+    <p>
+        Los Padres de Familia y/o Acudientes autorizados declaran que conocen y aceptan que las obligaciones económicas que adquieren con EL COLEGIO las asumen a título personal y solidario como responsables de la educación del estudiante, en libre ejercicio de su derecho a elegir y que cuentan con los ingresos económicos suficientes para asumir oportunamente el pago de las mensualidades y costos acordados.
+    </p>
+
+    <div class="clause-title">SEXTA. - DERECHOS Y OBLIGACIONES DE LAS PARTES</div>
+    <p>
+        Las partes se comprometen a respetar los derechos y cumplir integralmente los deberes estipulados en la Constitución Política, la Ley General de Educación (Ley 115 de 1994), el Código de Infancia y Adolescencia (Ley 1098 de 2006), el Decreto 1075 de 2015 y el Manual de Convivencia Escolar del Colegio, garantizando la asistencia, respeto mutuo, apoyo académico y cumplimiento de compromisos formativos.
+    </p>
+
+    <div class="clause-title">SÉPTIMA. - CAUSALES DE TERMINACIÓN DEL CONTRATO</div>
+    <p>
+        El contrato terminará por: a) Expiración del término fijado (año lectivo); b) Mutuo consentimiento por escrito; c) Muerte, fuerza mayor o caso fortuito; d) Suspensión definitiva de actividades del Colegio; e) Falsificación o adulteración comprobada de documentos suministrados; f) Sanción disciplinaria o bajo rendimiento según el Manual de Convivencia; g) Incumplimiento reiterado de las obligaciones contractuales o económicas; h) Inconformidad manifiesta o agresiones verbales/físicas de acudientes hacia el personal educativo.
+    </p>
+
+    <div class="clause-title">OCTAVA. - PRÓRROGA</div>
+    <p>
+        Para el presente contrato no operará prórroga automática. La matrícula para cada año lectivo subsiguiente requiere la celebración de un nuevo contrato y estará sujeta al cumplimiento académico, disciplinario y financiero del período previo.
+    </p>
+
+    <div class="clause-title">NOVENA. - DECLARACIONES, PROTECCIÓN DE DATOS Y AUTORIZACIONES</div>
+    <p>
+        <strong>1. Centrales de Riesgo:</strong> Los padres y/o acudientes autorizan expresamente al COLEGIO a consultar, reportar, procesar y divulgar en centrales de riesgo crediticio y financiero su comportamiento en relación con el cumplimiento de las obligaciones económicas de este contrato.<br>
+        <strong>2. Protección y Tratamiento de Datos (Ley 1581 de 2012 y Dec. 1377 de 2013):</strong> Se autoriza libre e informadamente al COLEGIO el tratamiento de datos personales y sensibles del estudiante y su familia para el cumplimiento de fines académicos, de registro, facturación y bienestar institucional.<br>
+        <strong>3. Uso de Imagen Institucional:</strong> Se autoriza al COLEGIO el uso de fotografías, videos y audios del estudiante en actividades escolares con fines exclusivamente educativos e institucionales.<br>
+        <strong>4. Notificación Electrónica:</strong> Se autoriza el envío de circulares, citaciones, boletines y facturación a través de WhatsApp web y los correos electrónicos registrados.
+    </p>
+
+    <div class="clause-title">DÉCIMA. - CERTIFICADOS Y CONSTANCIAS</div>
+    <p>
+        Los certificados de estudio y constancias se expedirán dentro de los cinco (5) días hábiles siguientes a la solicitud, previo pago de derechos y estando a paz y salvo con la institución, conforme a la jurisprudencia constitucional (Sentencia SU-624 de 1999).
+    </p>
+
+    <div class="clause-title">DÉCIMA PRIMERA. - MÉRITO EJECUTIVO</div>
+    <p>
+        Las partes acuerdan expresamente que el presente contrato, conjuntamente con el pagaré suscrito, presta <strong>MÉRITO EJECUTIVO</strong> conforme al artículo 422 del Código General del Proceso (C.G.P.), por contener obligaciones claras, expresas y exigibles a cargo de los deudores solidarios, quienes renuncian a cualquier requerimiento judicial o privado para ser constituidos en mora.
+    </p>
+
+    <div class="clause-title">DÉCIMA SEGUNDA. - NOTIFICACIONES Y DOCUMENTOS INTEGRALES</div>
+    <p>
+        Para notificaciones judiciales y extrajudiciales se tendrán en cuenta las direcciones físicas y electrónicas consignadas al pie de las firmas. Hacen parte integral de este contrato el Pagaré en blanco, la Carta de Instrucciones, la Ficha de Matrícula, el Manual de Convivencia y el PEI de la institución.
+    </p>
+
+    <p style="margin-top: 10px;">
+        Para constancia se suscribe en la ciudad de Girardot, a los <span class="highlight">{{SIGNATURE_DAY}}</span> días del mes de <span class="highlight">{{SIGNATURE_MONTH}}</span> del año <span class="highlight">{{SIGNATURE_YEAR}}</span>.
+    </p>
+
+    <p style="font-size: 8.5px; color: #475569; font-style: italic; margin-top: 8px;">
+        “Las partes conocemos y consentimos sobre la validez de nuestras firmas electrónicas, y sobre todo el contenido del documento que suscribimos, de acuerdo a lo establecido en la Ley 527 de 1999, la cual DEFINE Y REGLAMENTA EL ACCESO Y USO DE LOS MENSAJES DE DATOS, DEL COMERCIO ELECTRÓNICO Y DE LAS FIRMAS DIGITALES”.
+    </p>
+
+    <!-- Firmas -->
+    <table class="signature-table">
+        <tr>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    {{GUARDIAN_SIGNATURE_HTML}}
+                </div>
+                <div class="signature-line">{{GUARDIAN_NAME}}</div>
+                <div class="signature-sub">
+                    <strong>PADRE DE FAMILIA / ACUDIENTE RESPONSABLE</strong><br>
+                    {{GUARDIAN_DOC_TYPE}} N° {{GUARDIAN_DOC_NUMBER}} de {{GUARDIAN_DOC_PLACE}}<br>
+                    Dirección: {{GUARDIAN_ADDRESS}}<br>
+                    Teléfono: {{GUARDIAN_PHONE}} &bull; Correo: {{GUARDIAN_EMAIL}}
+                </div>
+            </td>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    <div style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; color: #003366; padding-top: 15px;">
+                        Yenih C. Gómez H.
+                    </div>
+                </div>
+                <div class="signature-line">YENIH CAROLINA GÓMEZ HERNÁNDEZ</div>
+                <div class="signature-sub">
+                    <strong>RECTORA Y REPRESENTANTE LEGAL</strong><br>
+                    INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL<br>
+                    C.C. 39.582.498 de Girardot &bull; Nit: 39582498-2<br>
+                    Girardot, Cundinamarca
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Auditoría Técnica -->
+    <div class="audit-footer">
+        <strong>Firma Electrónica Certificada:</strong> Firmado electrónicamente por <strong>{{GUARDIAN_NAME}}</strong> ({{GUARDIAN_DOC_TYPE}} {{GUARDIAN_DOC_NUMBER}}) el {{SIGNATURE_TIMESTAMP}} desde la IP {{SIGNER_IP}}.<br>
+        Hash SHA-256 de Autenticidad: <code>{{VERIFICATION_HASH}}</code> &bull; Registro Matrícula N° {{ENROLLMENT_CODE}}
+    </div>
+
+</body>
+</html>

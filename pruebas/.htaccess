@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prioridad para cargar primero index.html o index.php
+    DirectoryIndex index.html index.php
+
+    # Asegurar que el acceso a carpetas tenga barra final / para que las rutas relativas (css/, js/) carguen bien
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteCond %{REQUEST_URI} !/$
+    RewriteRule ^(.*)$ $1/ [R=301,L]
+
+    # Pasar cabecera de Autorización JWT en Hostinger / Apache / LiteSpeed
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Si el archivo o directorio existe físicamente, servirlo directamente (ej. /css, /js, /assets, /swagger, /uploads)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Enrutar cualquier otra petición hacia index.php en esta misma carpeta
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Requested-With"
+</IfModule>

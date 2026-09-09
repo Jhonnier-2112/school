@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carta de Instrucciones Pagaré {{SCHOOL_YEAR}} - {{ENROLLMENT_CODE}}</title>
+    <style>
+        @page {
+            margin: 18mm 14mm 18mm 14mm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 8.5px;
+                color: #555;
+            }
+        }
+        body {
+            font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10px;
+            line-height: 1.5;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            text-align: justify;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 6px;
+        }
+        .header-logo {
+            width: 80px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-logo img {
+            max-width: 75px;
+            max-height: 55px;
+        }
+        .header-title {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-title h1 {
+            font-size: 13px;
+            color: #003366;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        .header-title h2 {
+            font-size: 11px;
+            color: #15803d;
+            margin: 2px 0;
+            text-transform: uppercase;
+        }
+        .header-title p {
+            font-size: 8px;
+            color: #444;
+            margin: 2px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #0f172a;
+        }
+        p {
+            margin: 6px 0;
+        }
+        .instruction-point {
+            margin: 5px 0 5px 12px;
+        }
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+        .signature-cell {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px;
+        }
+        .signature-box {
+            min-height: 50px;
+            margin-bottom: 4px;
+        }
+        .signature-box img {
+            max-height: 48px;
+            max-width: 140px;
+        }
+        .signature-line {
+            border-top: 1px solid #334155;
+            padding-top: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .signature-sub {
+            font-size: 8.5px;
+            color: #475569;
+            line-height: 1.3;
+        }
+        .audit-footer {
+            margin-top: 20px;
+            padding: 6px 8px;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            font-size: 8px;
+            color: #64748b;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Institucional -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo" style="width: 70px;">
+                <img src="{{LOGO_BASE64}}" alt="Escudo Jean Piaget" style="max-height: 65px; max-width: 65px;">
+            </td>
+            <td class="header-title">
+                <h1>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</h1>
+                <h2>CARTA DE INSTRUCCIONES PAGARÉ</h2>
+                <p><strong>PAGARÉ N° {{ENROLLMENT_CODE}}</strong> &bull; AÑO ESCOLAR {{SCHOOL_YEAR}}</p>
+                <p>Nit: 39582498-2 &bull; Secretaría de Educación de Girardot (Resolución No. 644 de 2015 / No. 1187 de 2019)</p>
+            </td>
+            <td style="width: 75px; text-align: right; vertical-align: middle;">
+                <img src="{{FLAG_BASE64}}" alt="Bandera Jean Piaget" style="max-height: 32px;">
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        Mediante la presente carta de instrucciones, <strong>{{GUARDIAN_NAME}}</strong>, mayor de edad, identificado(a) como aparece al pie de mi respectiva firma, actuando en calidad de Deudor(a) solidario(a) dentro del <strong>Pagaré N° {{ENROLLMENT_CODE}}</strong>, suscrito el día <span class="highlight">{{SIGNATURE_DAY}}</span> del mes de <span class="highlight">{{SIGNATURE_MONTH}}</span> del año <span class="highlight">{{SIGNATURE_YEAR}}</span> en relación con los costos educativos del estudiante <span class="highlight">{{STUDENT_NAME}}</span>, en pleno uso de mis facultades y sin vicio alguno del consentimiento, manifiesto que autorizo expresa e irrevocablemente a la <strong>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</strong>, en su calidad de ACREEDOR dentro del referido título valor, o a quien goce de tal calidad o sus endosatarios, a llenar los espacios en blanco del pagaré de la referencia de la siguiente manera:
+    </p>
+
+    <div class="instruction-point">
+        <strong>1. Lugar y Fecha:</strong> El lugar de pago será la ciudad donde se diligencie el pagaré. El lugar y fecha de emisión serán el lugar y el día en que sea llenado por la INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL, y la fecha de vencimiento será el día hábil siguiente al de la fecha de su diligenciamiento.
+    </div>
+
+    <div class="instruction-point">
+        <strong>2. Monto del Capital:</strong> El monto por concepto de capital será igual al valor total de las obligaciones exigibles a favor de la INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL que se encuentren insolutas (matrícula, pensiones adeudadas u otros costos legalmente aprobados), más los valores correspondientes a honorarios profesionales de abogado, gastos administrativos y de cobranza judicial o extrajudicial a que hubiere lugar.
+    </div>
+
+    <div class="instruction-point">
+        <strong>3. Intereses:</strong> El monto por intereses causados y no pagados será el que corresponda a la tasa máxima legal permitida por concepto de mora desde la fecha de exigibilidad de cada cuota.
+    </div>
+
+    <div class="instruction-point">
+        <strong>4. Aceleración:</strong> En caso de retardo o incumplimiento en cualquiera de las obligaciones contraídas en el Contrato de Servicios Educativos, la institución queda facultada para acelerar el vencimiento y exigir anticipadamente la totalidad del saldo sin necesidad de requerimiento judicial previo para constituir en mora.
+    </div>
+
+    <div class="instruction-point">
+        <strong>5. Endoso y Cesión:</strong> Autorizo desde ahora cualquier endoso, traspaso o cesión que del pagaré hiciere el Acreedor a favor de terceros o entidades de cobranza especializada.
+    </div>
+
+    <div class="instruction-point">
+        <strong>6. Tratamiento de Datos Personales (Ley 1581 de 2012):</strong> Autorizo previa, informada y expresamente a la INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL para que recolecte y dé tratamiento a mis datos personales de contacto, dirección y teléfono para efectos de cobro prejurídico y jurídico.
+    </div>
+
+    <p>
+        El otorgante declara que ha recibido copia de esta carta de instrucciones, así como del pagaré y del Contrato de Prestación de Servicios Educativos, y que acepta libremente su contenido en todas sus partes.
+    </p>
+
+    <p style="font-size: 8.5px; color: #475569; font-style: italic; margin-top: 10px;">
+        “Las partes conocemos y consentimos sobre la validez de nuestras firmas electrónicas, y sobre todo el contenido del documento que suscribimos, de acuerdo a lo establecido en la Ley 527 de 1999, la cual DEFINE Y REGLAMENTA EL ACCESO Y USO DE LOS MENSAJES DE DATOS, DEL COMERCIO ELECTRÓNICO Y DE LAS FIRMAS DIGITALES”.
+    </p>
+
+    <p>
+        Para constancia se firma la presente Carta de Instrucciones en la ciudad de Girardot, a los <span class="highlight">{{SIGNATURE_DAY}}</span> días del mes de <span class="highlight">{{SIGNATURE_MONTH}}</span> del año <span class="highlight">{{SIGNATURE_YEAR}}</span>.
+    </p>
+
+    <!-- Firmas -->
+    <table class="signature-table">
+        <tr>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    {{GUARDIAN_SIGNATURE_HTML}}
+                </div>
+                <div class="signature-line">{{GUARDIAN_NAME}}</div>
+                <div class="signature-sub">
+                    <strong>EN CALIDAD DE DEUDOR OTORGANTE</strong><br>
+                    {{GUARDIAN_DOC_TYPE}} N° {{GUARDIAN_DOC_NUMBER}} de {{GUARDIAN_DOC_PLACE}}<br>
+                    Dirección: {{GUARDIAN_ADDRESS}}<br>
+                    Teléfono: {{GUARDIAN_PHONE}} &bull; Correo: {{GUARDIAN_EMAIL}}
+                </div>
+            </td>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    <div style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; color: #003366; padding-top: 15px;">
+                        Yenih C. Gómez H.
+                    </div>
+                </div>
+                <div class="signature-line">YENIH CAROLINA GÓMEZ HERNÁNDEZ</div>
+                <div class="signature-sub">
+                    <strong>EN CALIDAD DE ACREEDOR / REPRESENTANTE LEGAL</strong><br>
+                    INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL<br>
+                    C.C. 39.582.498 de Girardot &bull; Nit: 39582498-2
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Auditoría Técnica -->
+    <div class="audit-footer">
+        <strong>Firma Electrónica Autorizada:</strong> Suscrito por <strong>{{GUARDIAN_NAME}}</strong> &bull; Identificación: {{GUARDIAN_DOC_TYPE}} {{GUARDIAN_DOC_NUMBER}} &bull; Fecha: {{SIGNATURE_TIMESTAMP}} &bull; IP: {{SIGNER_IP}}<br>
+        Hash Verificador SHA-256: <code>{{VERIFICATION_HASH}}</code>
+    </div>
+
+</body>
+</html>

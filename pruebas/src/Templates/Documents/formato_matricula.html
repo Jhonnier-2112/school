@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formato de Matrícula {{SCHOOL_YEAR}} - {{ENROLLMENT_CODE}}</title>
+    <style>
+        @page {
+            margin: 18mm 14mm 18mm 14mm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9px;
+                color: #555;
+            }
+        }
+        body {
+            font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 10.5px;
+            line-height: 1.35;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 8px;
+        }
+        .header-logo {
+            width: 85px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-logo img {
+            max-width: 80px;
+            max-height: 60px;
+        }
+        .header-title {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-title h1 {
+            font-size: 14px;
+            color: #003366;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-title h2 {
+            font-size: 12px;
+            color: #15803d;
+            margin: 2px 0;
+            text-transform: uppercase;
+        }
+        .header-title p {
+            font-size: 8.5px;
+            color: #444;
+            margin: 2px 0;
+        }
+        .badge-matricula {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            display: inline-block;
+        }
+        .section-title {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+            font-size: 10.5px;
+            padding: 4px 8px;
+            border-left: 4px solid #003366;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+        table.data-table td, table.data-table th {
+            border: 1px solid #cbd5e1;
+            padding: 4.5px 6px;
+            font-size: 10px;
+        }
+        table.data-table th {
+            background-color: #f8fafc;
+            color: #334155;
+            text-align: left;
+            font-weight: 600;
+        }
+        .label {
+            font-weight: bold;
+            color: #334155;
+            width: 25%;
+        }
+        .value {
+            color: #0f172a;
+        }
+        .academic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+        .academic-table th, .academic-table td {
+            border: 1px solid #94a3b8;
+            padding: 4px 6px;
+            font-size: 9.5px;
+            text-align: center;
+        }
+        .academic-table th {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            font-weight: bold;
+        }
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        .signature-cell {
+            width: 33.3%;
+            vertical-align: bottom;
+            text-align: center;
+            padding: 0 10px;
+        }
+        .signature-box {
+            min-height: 55px;
+            margin-bottom: 5px;
+        }
+        .signature-box img {
+            max-height: 50px;
+            max-width: 130px;
+        }
+        .signature-line {
+            border-top: 1px solid #334155;
+            margin-top: 4px;
+            padding-top: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .signature-sub {
+            font-size: 8px;
+            color: #64748b;
+        }
+        .audit-footer {
+            margin-top: 15px;
+            padding: 6px 8px;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            font-size: 8px;
+            color: #64748b;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Institucional -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo" style="width: 70px;">
+                <img src="{{LOGO_BASE64}}" alt="Escudo Jean Piaget" style="max-height: 65px; max-width: 65px;">
+            </td>
+            <td class="header-title">
+                <h1>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</h1>
+                <h2>HOJA DE REGISTRO Y MATRÍCULA {{SCHOOL_YEAR}}</h2>
+                <p>NIVEL: <strong>{{ENROLLMENT_TYPE_LABEL}}</strong> &bull; GRADO: <strong>{{TARGET_GRADE}}</strong></p>
+                <p>Resolución de aprobación No. 644 de Agosto 13 de 2015 &bull; No. 1187 de Diciembre 16 de 2019</p>
+                <p>Secretaría de Educación de Girardot &bull; Nit: 39582498-2 &bull; Girardot, Cundinamarca</p>
+            </td>
+            <td style="width: 120px; text-align: right; vertical-align: middle;">
+                <img src="{{FLAG_BASE64}}" alt="Bandera Jean Piaget" style="max-height: 28px; margin-bottom: 4px;"><br>
+                <div class="badge-matricula">{{ENROLLMENT_CODE}}</div>
+                <div style="font-size: 8.5px; color: #475569; margin-top: 4px;">Fecha: {{REGISTRATION_DATE}}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Datos del Estudiante -->
+    <div class="section-title">1. Información General del Estudiante</div>
+    <table class="data-table">
+        <tr>
+            <td class="label">Nombres y Apellidos:</td>
+            <td class="value" colspan="3"><strong>{{STUDENT_NAME}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Tipo de Documento:</td>
+            <td class="value">{{STUDENT_DOC_TYPE}} N° {{STUDENT_DOC_NUMBER}}</td>
+            <td class="label">Lugar de Expedición:</td>
+            <td class="value">{{STUDENT_DOC_PLACE}}</td>
+        </tr>
+        <tr>
+            <td class="label">Fecha de Nacimiento:</td>
+            <td class="value">{{STUDENT_BIRTH_DATE}} ({{STUDENT_AGE}} años)</td>
+            <td class="label">Lugar de Nacimiento:</td>
+            <td class="value">{{STUDENT_BIRTH_PLACE}}</td>
+        </tr>
+        <tr>
+            <td class="label">E.P.S.:</td>
+            <td class="value">{{STUDENT_EPS}}</td>
+            <td class="label">Grupo Sanguíneo (RH):</td>
+            <td class="value"><strong>{{STUDENT_RH}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">¿Vive con sus padres?:</td>
+            <td class="value">{{STUDENT_LIVES_WITH_PARENTS}}</td>
+            <td class="label">¿Con quién vive?:</td>
+            <td class="value">{{STUDENT_LIVES_WITH}}</td>
+        </tr>
+        <tr>
+            <td class="label">Dirección de Residencia:</td>
+            <td class="value" colspan="3">{{STUDENT_ADDRESS}}</td>
+        </tr>
+        <tr>
+            <td class="label">Teléfono / Celular:</td>
+            <td class="value">{{STUDENT_PHONE}}</td>
+            <td class="label">Correo Electrónico:</td>
+            <td class="value">{{STUDENT_EMAIL}}</td>
+        </tr>
+    </table>
+
+    <!-- Datos de los Padres -->
+    <div class="section-title">2. Información Familiar (Padres de Familia)</div>
+    <table class="data-table">
+        <tr>
+            <th colspan="2" style="width: 50%;">INFORMACIÓN DEL PADRE</th>
+            <th colspan="2" style="width: 50%;">INFORMACIÓN DE LA MADRE</th>
+        </tr>
+        <tr>
+            <td class="label">Nombres:</td>
+            <td class="value">{{FATHER_NAME}}</td>
+            <td class="label">Nombres:</td>
+            <td class="value">{{MOTHER_NAME}}</td>
+        </tr>
+        <tr>
+            <td class="label">Documento:</td>
+            <td class="value">{{FATHER_DOC_TYPE}} {{FATHER_DOC_NUMBER}}</td>
+            <td class="label">Documento:</td>
+            <td class="value">{{MOTHER_DOC_TYPE}} {{MOTHER_DOC_NUMBER}}</td>
+        </tr>
+        <tr>
+            <td class="label">Ocupación:</td>
+            <td class="value">{{FATHER_OCCUPATION}}</td>
+            <td class="label">Ocupación:</td>
+            <td class="value">{{MOTHER_OCCUPATION}}</td>
+        </tr>
+        <tr>
+            <td class="label">Celular:</td>
+            <td class="value">{{FATHER_PHONE}}</td>
+            <td class="label">Celular:</td>
+            <td class="value">{{MOTHER_PHONE}}</td>
+        </tr>
+        <tr>
+            <td class="label">Correo:</td>
+            <td class="value">{{FATHER_EMAIL}}</td>
+            <td class="label">Correo:</td>
+            <td class="value">{{MOTHER_EMAIL}}</td>
+        </tr>
+    </table>
+
+    <!-- Datos del Acudiente -->
+    <div class="section-title">3. Información del Acudiente Responsable</div>
+    <table class="data-table">
+        <tr>
+            <td class="label">Nombre Completo:</td>
+            <td class="value"><strong>{{GUARDIAN_NAME}}</strong></td>
+            <td class="label">Parentesco:</td>
+            <td class="value"><strong>{{GUARDIAN_RELATIONSHIP}}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Documento de Identidad:</td>
+            <td class="value">{{GUARDIAN_DOC_TYPE}} {{GUARDIAN_DOC_NUMBER}} (Exp. {{GUARDIAN_DOC_PLACE}})</td>
+            <td class="label">Celular / Teléfono:</td>
+            <td class="value">{{GUARDIAN_PHONE}}</td>
+        </tr>
+        <tr>
+            <td class="label">Correo Electrónico:</td>
+            <td class="value">{{GUARDIAN_EMAIL}}</td>
+            <td class="label">Dirección:</td>
+            <td class="value">{{GUARDIAN_ADDRESS}}</td>
+        </tr>
+    </table>
+
+    <!-- Datos Académicos -->
+    <div class="section-title">4. Información Académica e Historial</div>
+    <table class="data-table" style="margin-bottom: 4px;">
+        <tr>
+            <td class="label" style="width: 30%;">Grado al que aspira:</td>
+            <td class="value"><strong>{{TARGET_GRADE}}</strong> (Año Escolar {{SCHOOL_YEAR}})</td>
+            <td class="label" style="width: 25%;">Institución Anterior:</td>
+            <td class="value">{{PREVIOUS_SCHOOL}}</td>
+        </tr>
+        <tr>
+            <td class="label">Último Grado Cursado:</td>
+            <td class="value">{{PREVIOUS_GRADE}}</td>
+            <td class="label">Año Cursado:</td>
+            <td class="value">{{PREVIOUS_YEAR}}</td>
+        </tr>
+    </table>
+
+    <!-- Firmas -->
+    <table class="signature-table">
+        <tr>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    <p style="font-size: 8px; color: #94a3b8; margin-top: 35px;">(Firma del Estudiante si aplica)</p>
+                </div>
+                <div class="signature-line">{{STUDENT_NAME}}</div>
+                <div class="signature-sub">FIRMA DEL ESTUDIANTE</div>
+            </td>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    {{GUARDIAN_SIGNATURE_HTML}}
+                </div>
+                <div class="signature-line">{{GUARDIAN_NAME}}</div>
+                <div class="signature-sub">FIRMA DEL ACUDIENTE / RESPONSABLE<br>{{GUARDIAN_DOC_TYPE}} N° {{GUARDIAN_DOC_NUMBER}}</div>
+            </td>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    <div style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 14px; color: #003366; padding-top: 20px;">
+                        Yenih C. Gómez H.
+                    </div>
+                </div>
+                <div class="signature-line">YENIH CAROLINA GÓMEZ HERNÁNDEZ</div>
+                <div class="signature-sub">RECTORA / REPRESENTANTE LEGAL<br>C.C. 39.582.498 de Girardot</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Auditoría Técnica de Firma -->
+    <div class="audit-footer">
+        <strong>Constancia de Registro y Firma Electrónica (Ley 527 de 1999):</strong><br>
+        Documento suscrito por <strong>{{GUARDIAN_NAME}}</strong> &bull; Identificación: {{GUARDIAN_DOC_TYPE}} {{GUARDIAN_DOC_NUMBER}} &bull; Fecha y hora: {{SIGNATURE_TIMESTAMP}}<br>
+        Dirección IP: {{SIGNER_IP}} &bull; Hash de Integridad SHA-256: <code>{{VERIFICATION_HASH}}</code>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ICFES Saber 11° - App Móvil del Estudiante</title>
+  <meta name="description" content="Aplicación de preparación académica ICFES Saber 11°: simulacros en vivo, contrato digital, pagos y seguimiento de progreso.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- CONTENEDOR PRINCIPAL DE LA APP -->
+  <div class="app-container">
+
+    <!-- 1. HEADER SUPERIOR -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="header-brand-logo">🎓</div>
+        <div class="header-brand-info">
+          <h1>Saber 11°</h1>
+          <span>App Estudiante</span>
+        </div>
+      </div>
+
+      <div id="header-user-badge" class="header-user-badge" title="Mi Perfil">
+        <div id="header-avatar" class="header-avatar">E</div>
+        <span id="header-username" class="header-username">Estudiante</span>
+      </div>
+    </header>
+
+    <!-- 2. CONTENIDO PRINCIPAL (VISTAS) -->
+    <main class="app-content">
+
+      <!-- ========================================================= -->
+      <!-- VISTA: LOGIN / REGISTRO (AUTH)                            -->
+      <!-- ========================================================= -->
+      <section id="view-auth" class="app-view">
+        <div style="text-align: center; margin: 20px 0 24px;">
+          <div style="width: 64px; height: 64px; margin: 0 auto 14px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; box-shadow: var(--shadow-glow);">
+            🎓
+          </div>
+          <h2 style="font-family: var(--font-primary); font-size: 1.4rem; font-weight: 800; margin-bottom: 6px;">
+            Bienvenido a tu App ICFES
+          </h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">
+            Ingresa con tus credenciales para acceder a tus simulacros y cursos.
+          </p>
+        </div>
+
+        <!-- Card de Formulario -->
+        <div class="card card-elevated">
+          <!-- Switch Login / Registro -->
+          <div style="display: flex; background: var(--bg-muted); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 18px;">
+            <button id="auth-tab-login" class="btn" style="flex: 1; padding: 8px; font-size: 0.82rem; background: var(--bg-card); color: var(--primary); box-shadow: var(--shadow-sm);">Iniciar Sesión</button>
+            <button id="auth-tab-register" class="btn" style="flex: 1; padding: 8px; font-size: 0.82rem; background: transparent; color: var(--text-muted); box-shadow: none;">Crear Cuenta</button>
+          </div>
+
+          <!-- Form Login -->
+          <form id="form-login">
+            <div class="form-group">
+              <label class="form-label">Correo Electrónico</label>
+              <input id="login-email" type="email" class="form-input" placeholder="estudiante@ejemplo.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contraseña</label>
+              <input id="login-password" type="password" class="form-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="btn-login-submit" class="btn btn-primary" style="margin-top: 6px;">
+              Entrar a la Plataforma
+            </button>
+          </form>
+
+          <!-- Form Registro -->
+          <form id="form-register" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Nombres Completos</label>
+              <input id="reg-name" type="text" class="form-input" placeholder="Ej: Santiago Mendoza" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Correo Electrónico</label>
+              <input id="reg-email" type="email" class="form-input" placeholder="estudiante@ejemplo.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono / Celular</label>
+              <input id="reg-phone" type="tel" class="form-input" placeholder="300 000 0000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Crea tu Contraseña (mínimo 8 caracteres)</label>
+              <input id="reg-password" type="password" class="form-input" placeholder="••••••••" minlength="8" required>
+            </div>
+            <button type="submit" id="btn-reg-submit" class="btn btn-primary" style="margin-top: 6px;">
+              Registrarme como Estudiante
+            </button>
+          </form>
+
+          <!-- Separador -->
+          <div style="text-align: center; margin: 18px 0; position: relative;">
+            <hr style="border: none; border-top: 1px solid var(--border);">
+            <span style="position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 10px; font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">O PRUEBA RÁPIDA</span>
+          </div>
+
+          <!-- Botón de acceso demo -->
+          <button id="btn-quick-demo" type="button" class="btn btn-secondary" style="font-size: 0.82rem;">
+            ⚡ Acceso Rápido de Prueba (Demo Estudiante)
+          </button>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 1: INICIO / DASHBOARD                               -->
+      <!-- ========================================================= -->
+      <section id="view-home" class="app-view active">
+        <!-- Saludo -->
+        <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 id="home-greeting" style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">
+              ¡Hola, Estudiante! 👋
+            </h2>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">
+              Preparación Oficial ICFES Saber 11°
+            </p>
+          </div>
+          <span id="home-enrollment-badge" class="badge badge-warning">Pendiente Firma</span>
+        </div>
+
+        <!-- Banner Destacado del Curso -->
+        <div class="card card-gradient">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <span class="badge" style="background: rgba(255,255,255,0.2); color: white; border: none;">CURSO OFICIAL</span>
+            <span style="font-size: 1.1rem; font-weight: 800;">$700.000 COP</span>
+          </div>
+          <h3 class="card-title" style="color: white; font-size: 1.1rem; line-height: 1.25; margin-bottom: 6px;">
+            Preparación Académica ICFES Saber 11°
+          </h3>
+          <p class="card-subtitle" style="font-size: 0.8rem; margin-bottom: 16px;">
+            Acceso a simulacros interactivos, evaluación por materias y retroalimentación pedagógica.
+          </p>
+          
+          <div style="background: rgba(0,0,0,0.2); padding: 12px 14px; border-radius: var(--radius-sm); margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.76rem; margin-bottom: 6px;">
+              <span>Progreso de Matrícula</span>
+              <span id="home-progress-percent" style="font-weight: 700;">60%</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden;">
+              <div id="home-progress-bar" style="width: 60%; height: 100%; background: #10B981; border-radius: 4px; transition: width 0.4s ease;"></div>
+            </div>
+          </div>
+
+          <button id="btn-hero-action" class="btn" style="background: white; color: var(--primary); font-size: 0.85rem;">
+            📝 Presentar Simulacro Diagnóstico
+          </button>
+        </div>
+
+        <!-- KPIs Resumen Rápido -->
+        <div class="kpi-row">
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-label">Simulacros</div>
+            <div id="kpi-exam-count" class="kpi-mini-value">1 Realizado</div>
+            <span style="font-size: 0.7rem; color: var(--success); font-weight: 600;">+2 Disponibles</span>
+          </div>
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-label">Mejor Puntaje</div>
+            <div id="kpi-best-score" class="kpi-mini-value" style="color: var(--primary);">385 / 500</div>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Nivel Alto</span>
+          </div>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-label">Contrato Digital</div>
+            <div id="kpi-contract-status" class="kpi-mini-value" style="font-size: 1.05rem;">Firmado ✅</div>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Términos aceptados</span>
+          </div>
+          <div class="kpi-mini-card">
+            <div class="kpi-mini-label">Documento Cédula</div>
+            <div id="kpi-doc-status" class="kpi-mini-value" style="font-size: 1.05rem; color: var(--warning);">En revisión ⌛</div>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Subido correctamente</span>
+          </div>
+        </div>
+
+        <!-- Acciones directas -->
+        <div class="card">
+          <h4 style="font-family: var(--font-primary); font-size: 0.92rem; font-weight: 700; margin-bottom: 12px;">
+            Ruta de Preparación
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div id="quick-action-contract" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-muted); border-radius: var(--radius-sm); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem;">📜</span>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Contrato de Servicio</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Revisa tus términos digitales</div>
+                </div>
+              </div>
+              <span style="color: var(--text-muted); font-weight: 700;">➔</span>
+            </div>
+
+            <div id="quick-action-payments" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-muted); border-radius: var(--radius-sm); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem;">💳</span>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Plan de Pagos</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Comprobantes y saldo pendiente</div>
+                </div>
+              </div>
+              <span style="color: var(--text-muted); font-weight: 700;">➔</span>
+            </div>
+
+            <div id="quick-action-doc" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-muted); border-radius: var(--radius-sm); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.2rem;">🪪</span>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Documento de Identidad</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Carga tu documento para certificar</div>
+                </div>
+              </div>
+              <span style="color: var(--text-muted); font-weight: 700;">➔</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 2: CONTRATO DIGITAL                                 -->
+      <!-- ========================================================= -->
+      <section id="view-contract" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Contrato del Servicio Educativo
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Aceptación oficial de términos para habilitar el curso
+          </p>
+        </div>
+
+        <div class="card">
+          <!-- Caja con scroll del contrato -->
+          <div id="contract-content-box" style="background: var(--bg-muted); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; max-height: 320px; overflow-y: auto; font-size: 0.8rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 16px;">
+            <p><strong>CONTRATO DE PRESTACIÓN DE SERVICIOS EDUCATIVOS - PREPARACIÓN ICFES SABER 11°</strong></p>
+            <br>
+            <p>Entre la institución y el estudiante registrado en la plataforma, se conviene celebrar el presente acuerdo bajo las siguientes cláusulas:</p>
+            <br>
+            <p><strong>PRIMERA. OBJETO:</strong> El presente servicio tiene como finalidad la preparación académica para la prueba de estado ICFES Saber 11°, mediante simulacros diagnósticos, módulos por materia y análisis de desempeño.</p>
+            <br>
+            <p><strong>SEGUNDA. VALOR Y PAGO:</strong> El valor total acordado para el curso es de <strong>$700.000 COP</strong>, el cual podrá abonarse según los plazos establecidos con administración.</p>
+            <br>
+            <p><strong>TERCERA. OBLIGACIONES DEL ESTUDIANTE:</strong> Cumplir con los simulacros asignados y cargar oportunamente su documento de identidad válido.</p>
+            <br>
+            <p><strong>CUARTA. FIRMA DIGITAL:</strong> La aceptación electrónica de este formulario constituye consentimiento expreso conforme a la Ley 527 de 1999 sobre mensajes de datos y comercio electrónico.</p>
+          </div>
+
+          <!-- Estado de firma -->
+          <div id="contract-unsigned-box">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.82rem; margin-bottom: 16px; cursor: pointer;">
+              <input type="checkbox" id="contract-agree-check" style="width: 18px; height: 18px; margin-top: 2px; accent-color: var(--primary);">
+              <span style="color: var(--text-primary); font-weight: 600;">
+                He leído y acepto expresamente los términos y condiciones del contrato de preparación educativa.
+              </span>
+            </label>
+
+            <button id="btn-sign-contract" class="btn btn-primary" disabled>
+              ✍️ Firmar y Aceptar Contrato Digital
+            </button>
+          </div>
+
+          <div id="contract-signed-box" style="display: none; background: var(--success-subtle); border: 1px solid #A7F3D0; border-radius: var(--radius-md); padding: 16px; text-align: center;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">✅</div>
+            <div style="font-family: var(--font-primary); font-weight: 800; color: var(--success-dark); font-size: 0.95rem; margin-bottom: 4px;">
+              Contrato Firmado Digitalmente
+            </div>
+            <p id="contract-signed-meta" style="font-size: 0.76rem; color: #065F46;">
+              Firmado por el estudiante. Matrícula activa.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 3: MIS PAGOS                                        -->
+      <!-- ========================================================= -->
+      <section id="view-payments" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Estado de Cuenta & Pagos
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Valor del curso: $700.000 COP
+          </p>
+        </div>
+
+        <!-- Tarjeta de Progreso Financiero -->
+        <div class="card card-elevated" style="text-align: center; padding: 22px;">
+          <div style="display: inline-block; position: relative; margin-bottom: 16px;">
+            <div style="width: 120px; height: 120px; border-radius: var(--radius-full); background: conic-gradient(var(--success) 0% 40%, var(--bg-muted) 40% 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+              <div style="width: 92px; height: 92px; border-radius: var(--radius-full); background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <span id="pay-percent" style="font-family: var(--font-primary); font-size: 1.4rem; font-weight: 800; color: var(--text-primary);">40%</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">ABONADO</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <div style="background: var(--bg-muted); padding: 12px; border-radius: var(--radius-sm);">
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">TOTAL PAGADO</div>
+              <div id="pay-amount-paid" style="font-family: var(--font-primary); font-size: 1.05rem; font-weight: 800; color: var(--success);">$0</div>
+            </div>
+            <div style="background: var(--bg-muted); padding: 12px; border-radius: var(--radius-sm);">
+              <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700;">SALDO PENDIENTE</div>
+              <div id="pay-amount-pending" style="font-family: var(--font-primary); font-size: 1.05rem; font-weight: 800; color: var(--danger);">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial de Recibos -->
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 12px; font-size: 0.95rem;">
+            Historial de Abonos
+          </h3>
+          <div id="payments-history-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Renderizado dinámico desde JS -->
+            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.82rem;">
+              Cargando historial de pagos...
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de consignación -->
+        <div class="card" style="background: var(--primary-subtle); border-color: var(--border-focus);">
+          <div style="display: flex; gap: 10px; align-items: flex-start;">
+            <span style="font-size: 1.3rem;">🏦</span>
+            <div>
+              <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 4px;">
+                ¿Cómo realizar un nuevo abono?
+              </h4>
+              <p style="font-size: 0.78rem; color: var(--primary-dark); line-height: 1.5;">
+                Transfiere por Bancolombia / Nequi o presenta tu comprobante a administración para que sea validado y registrado en tu cuenta.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 4: DOCUMENTO DE IDENTIDAD (CÉDULA)                  -->
+      <!-- ========================================================= -->
+      <section id="view-doc" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Documento de Identidad
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Requisito legal para certificar tu participación en el curso
+          </p>
+        </div>
+
+        <!-- Estado actual del documento -->
+        <div id="doc-status-banner" class="card" style="display: flex; align-items: center; gap: 12px; padding: 14px;">
+          <div id="doc-status-icon" style="font-size: 1.8rem;">⌛</div>
+          <div>
+            <div id="doc-status-title" style="font-weight: 700; font-size: 0.9rem;">Documento en Revisión</div>
+            <div id="doc-status-desc" style="font-size: 0.76rem; color: var(--text-secondary);">El documento está siendo verificado por el área administrativa.</div>
+          </div>
+        </div>
+
+        <!-- Zona de Carga -->
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 8px; font-size: 0.95rem;">Subir Cédula o Tarjeta de Identidad</h3>
+          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px;">
+            Formatos aceptados: PDF, JPG o PNG (máximo 5MB). Asegúrate de que los datos sean legibles.
+          </p>
+
+          <input type="file" id="doc-file-input" accept="application/pdf,image/png,image/jpeg" style="display: none;">
+
+          <div id="doc-drop-zone" style="border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--bg-muted);">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">📄</div>
+            <div style="font-weight: 700; font-size: 0.86rem; color: var(--text-primary); margin-bottom: 4px;">
+              Toca aquí para seleccionar tu archivo
+            </div>
+            <div id="doc-file-name" style="font-size: 0.76rem; color: var(--text-muted);">
+              Ningún archivo seleccionado todavía
+            </div>
+          </div>
+
+          <button id="btn-upload-doc" class="btn btn-primary" style="margin-top: 14px;" disabled>
+            ⬆️ Subir Documento a la Plataforma
+          </button>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 5: SIMULACROS ICFES                                 -->
+      <!-- ========================================================= -->
+      <section id="view-exams" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Simulacros Oficiales ICFES
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Pruebas cronometradas para medir tu nivel real
+          </p>
+        </div>
+
+        <div id="exams-list-container" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Renderizado dinámico desde JS -->
+          <div style="text-align: center; padding: 24px; color: var(--text-muted);">
+            Cargando simulacros disponibles...
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 6: RESULTADOS & ESTADÍSTICAS                        -->
+      <!-- ========================================================= -->
+      <section id="view-results" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Resultados del Simulacro
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Calificación ponderada en escala ICFES (0 a 500)
+          </p>
+        </div>
+
+        <!-- Tarjeta de Puntaje Global -->
+        <div class="card card-elevated" style="text-align: center; padding: 24px; background: linear-gradient(180deg, #FFFFFF 0%, #EEF2FF 100%);">
+          <span class="badge badge-primary" style="margin-bottom: 10px;">PUNTAJE GLOBAL ICFES</span>
+          <div id="results-score-value" style="font-family: var(--font-primary); font-size: 3.2rem; font-weight: 800; color: var(--primary); line-height: 1; letter-spacing: -0.03em; margin-bottom: 6px;">
+            385
+          </div>
+          <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+            de 500 Puntos Posibles
+          </div>
+          <p id="results-performance-text" style="font-size: 0.78rem; color: var(--success-dark); font-weight: 600;">
+            ¡Excelente desempeño! Tienes alta probabilidad de clasificar en programas de alta demanda.
+          </p>
+        </div>
+
+        <!-- Desglose por Materia -->
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 14px; font-size: 0.95rem;">Desglose por Materia</h3>
+          <div id="results-breakdown-list" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Matemáticas -->
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                <span>Matemáticas</span>
+                <span style="color: var(--primary);">82 / 100</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
+                <div style="width: 82%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
+              </div>
+            </div>
+            <!-- Lectura Crítica -->
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                <span>Lectura Crítica</span>
+                <span style="color: var(--secondary);">78 / 100</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
+                <div style="width: 78%; height: 100%; background: var(--secondary); border-radius: 4px;"></div>
+              </div>
+            </div>
+            <!-- Ciencias Naturales -->
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                <span>Ciencias Naturales</span>
+                <span style="color: var(--success);">75 / 100</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
+                <div style="width: 75%; height: 100%; background: var(--success); border-radius: 4px;"></div>
+              </div>
+            </div>
+            <!-- Sociales -->
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                <span>Sociales y Ciudadanas</span>
+                <span style="color: var(--warning);">74 / 100</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
+                <div style="width: 74%; height: 100%; background: var(--warning); border-radius: 4px;"></div>
+              </div>
+            </div>
+            <!-- Inglés -->
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">
+                <span>Inglés</span>
+                <span style="color: #8B5CF6;">76 / 100</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: var(--bg-muted); border-radius: 4px; overflow: hidden;">
+                <div style="width: 76%; height: 100%; background: #8B5CF6; border-radius: 4px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <button id="btn-back-to-exams" class="btn btn-primary" style="margin-bottom: 10px;">
+          🔄 Volver a Simulacros
+        </button>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- VISTA 7: PERFIL & AJUSTES                                 -->
+      <!-- ========================================================= -->
+      <section id="view-profile" class="app-view">
+        <div style="margin-bottom: 16px;">
+          <h2 style="font-family: var(--font-primary); font-size: 1.25rem; font-weight: 800;">
+            Mi Perfil de Estudiante
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">
+            Información de la cuenta y configuración
+          </p>
+        </div>
+
+        <div class="card" style="text-align: center; padding: 22px;">
+          <div id="profile-avatar-large" style="width: 70px; height: 70px; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; font-weight: 800; margin: 0 auto 12px; box-shadow: var(--shadow-glow);">
+            E
+          </div>
+          <h3 id="profile-name" style="font-family: var(--font-primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;">
+            Estudiante
+          </h3>
+          <p id="profile-email" style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">
+            estudiante@ejemplo.com
+          </p>
+          <span class="badge badge-success">Estudiante Activo</span>
+        </div>
+
+        <div class="card">
+          <h4 style="font-family: var(--font-primary); font-size: 0.92rem; font-weight: 700; margin-bottom: 12px;">
+            Plataforma & Accesos
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="../index.html" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg-muted); border-radius: var(--radius-sm); text-decoration: none; color: inherit;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>💻</span>
+                <span style="font-size: 0.82rem; font-weight: 600;">Abrir Panel Administrativo (Web)</span>
+              </div>
+              <span style="color: var(--text-muted);">➔</span>
+            </a>
+            <a href="../matricula.html" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg-muted); border-radius: var(--radius-sm); text-decoration: none; color: inherit;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span>🎓</span>
+                <span style="font-size: 0.82rem; font-weight: 600;">Matrícula Digital Jean Piaget 2026</span>
+              </div>
+              <span style="color: var(--text-muted);">➔</span>
+            </a>
+          </div>
+        </div>
+
+        <button id="btn-logout" class="btn btn-secondary" style="color: var(--danger); border-color: #FECACA;">
+          🚪 Cerrar Sesión
+        </button>
+      </section>
+
+    </main>
+
+    <!-- 3. BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV) -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-view="view-home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Inicio</span>
+      </button>
+      <button class="nav-item" data-view="view-contract">
+        <span class="nav-icon">📜</span>
+        <span class="nav-label">Contrato</span>
+      </button>
+      <button class="nav-item" data-view="view-payments">
+        <span class="nav-icon">💳</span>
+        <span class="nav-label">Pagos</span>
+      </button>
+      <button class="nav-item" data-view="view-exams">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">Simulacro</span>
+      </button>
+      <button class="nav-item" data-view="view-profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Perfil</span>
+      </button>
+    </nav>
+
+  </div> <!-- Fin .app-container -->
+
+  <!-- ============================================================= -->
+  <!-- MODAL / PANTALLA COMPLETA DEL REPRODUCTOR DE SIMULACRO EN VIVO -->
+  <!-- ============================================================= -->
+  <div id="exam-runner" class="exam-runner">
+    <div class="exam-runner-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="btn-exit-exam" style="background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+        <div>
+          <div id="runner-exam-title" style="font-size: 0.85rem; font-weight: 700;">Simulacro Diagnóstico</div>
+          <span id="runner-subject-badge" style="font-size: 0.68rem; color: #818CF8; font-weight: 600; text-transform: uppercase;">Matemáticas</span>
+        </div>
+      </div>
+      <div class="exam-timer">
+        <span>⏱️</span>
+        <span id="runner-timer-display">45:00</span>
+      </div>
+    </div>
+
+    <div class="exam-runner-body">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span id="runner-question-counter" style="font-size: 0.78rem; color: #94A3B8; font-weight: 700;">PREGUNTA 1 DE 5</span>
+        <span id="runner-score-badge" style="font-size: 0.72rem; background: rgba(79,70,229,0.3); color: #C7D2FE; padding: 2px 8px; border-radius: 10px;">Valor: 1 Pts</span>
+      </div>
+
+      <div id="runner-image-container" style="display: none; margin-bottom: 14px; text-align: center;">
+        <img id="runner-question-img" src="" alt="Ilustración" style="max-width: 100%; max-height: 220px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); object-fit: contain; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" />
+      </div>
+
+      <div class="question-card">
+        <p id="runner-question-text" style="font-size: 0.95rem; line-height: 1.5; font-weight: 500;">
+          Cargando pregunta...
+        </p>
+      </div>
+
+      <div id="runner-options-container">
+        <!-- Opciones A, B, C, D generadas por JS -->
+      </div>
+    </div>
+
+    <div class="exam-runner-footer">
+      <button id="btn-runner-prev" class="btn btn-secondary" style="flex: 1; background: #1E293B; color: white; border-color: rgba(255,255,255,0.15);">
+        ◀ Anterior
+      </button>
+      <button id="btn-runner-next" class="btn btn-primary" style="flex: 1;">
+        Siguiente ▶
+      </button>
+      <button id="btn-runner-submit" class="btn btn-success" style="flex: 1; display: none;">
+        Terminar ✔
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR TOASTS -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

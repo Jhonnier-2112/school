@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagaré {{SCHOOL_YEAR}} - {{ENROLLMENT_CODE}}</title>
+    <style>
+        @page {
+            margin: 18mm 14mm 18mm 14mm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 8.5px;
+                color: #555;
+            }
+        }
+        body {
+            font-family: 'DejaVu Sans', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 9.8px;
+            line-height: 1.45;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            text-align: justify;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 6px;
+        }
+        .header-logo {
+            width: 80px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-logo img {
+            max-width: 75px;
+            max-height: 55px;
+        }
+        .header-title {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .header-title h1 {
+            font-size: 13px;
+            color: #003366;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        .header-title h2 {
+            font-size: 11px;
+            color: #15803d;
+            margin: 2px 0;
+            text-transform: uppercase;
+        }
+        .header-title p {
+            font-size: 8px;
+            color: #444;
+            margin: 2px 0;
+        }
+        .summary-box {
+            width: 100%;
+            border: 1px solid #003366;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            background-color: #f8fafc;
+        }
+        .summary-box td {
+            border: 1px solid #cbd5e1;
+            padding: 5px 8px;
+            font-size: 9.5px;
+        }
+        .clause-title {
+            font-weight: bold;
+            color: #003366;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            font-size: 9.8px;
+        }
+        p {
+            margin: 4px 0;
+        }
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            page-break-inside: avoid;
+        }
+        .signature-cell {
+            width: 50%;
+            vertical-align: top;
+            padding: 10px;
+        }
+        .signature-box {
+            min-height: 50px;
+            margin-bottom: 4px;
+        }
+        .signature-box img {
+            max-height: 48px;
+            max-width: 140px;
+        }
+        .signature-line {
+            border-top: 1px solid #334155;
+            padding-top: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .signature-sub {
+            font-size: 8.5px;
+            color: #475569;
+            line-height: 1.3;
+        }
+        .audit-footer {
+            margin-top: 15px;
+            padding: 6px 8px;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            font-size: 8px;
+            color: #64748b;
+            border-radius: 4px;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Institucional -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo" style="width: 70px;">
+                <img src="{{LOGO_BASE64}}" alt="Escudo Jean Piaget" style="max-height: 65px; max-width: 65px;">
+            </td>
+            <td class="header-title">
+                <h1>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</h1>
+                <h2>PAGARÉ N° {{ENROLLMENT_CODE}}</h2>
+                <p>Nit: 39582498-2 &bull; Secretaría de Educación de Girardot (Resolución No. 644 de 2015 / No. 1187 de 2019)</p>
+            </td>
+            <td style="width: 75px; text-align: right; vertical-align: middle;">
+                <img src="{{FLAG_BASE64}}" alt="Bandera Jean Piaget" style="max-height: 32px;">
+            </td>
+        </tr>
+    </table>
+
+    <!-- Resumen del Título Valor -->
+    <table class="summary-box">
+        <tr>
+            <td style="width: 25%; font-weight: bold; color: #003366;">PAGARÉ NÚMERO:</td>
+            <td style="width: 25%;"><strong>{{ENROLLMENT_CODE}}</strong></td>
+            <td style="width: 25%; font-weight: bold; color: #003366;">VALOR TOTAL:</td>
+            <td style="width: 25%;"><strong>${{TOTAL_FEE_FORMATTED}} M/CTE</strong></td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; color: #003366;">LUGAR Y FECHA FIRMA:</td>
+            <td>Girardot, {{SIGNATURE_DAY}} de {{SIGNATURE_MONTH}} de {{SIGNATURE_YEAR}}</td>
+            <td style="font-weight: bold; color: #003366;">FECHA VENCIMIENTO:</td>
+            <td>Según plan de amortización estipulado</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; color: #003366;">ACREEDOR:</td>
+            <td colspan="3"><strong>YENIH CAROLINA GÓMEZ HERNÁNDEZ</strong> / INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL (Nit 39582498-2)</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; color: #003366;">LUGAR DE PAGO:</td>
+            <td colspan="3">Instalaciones de la Institución Educativa Jean Piaget School (Girardot - Cundinamarca)</td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; color: #003366;">DEUDOR (RESPONSABLE):</td>
+            <td colspan="3"><strong>{{GUARDIAN_NAME}}</strong> &bull; {{GUARDIAN_DOC_TYPE}} N° {{GUARDIAN_DOC_NUMBER}} &bull; Cel: {{GUARDIAN_PHONE}}</td>
+        </tr>
+    </table>
+
+    <p>
+        Nosotros, <strong>{{GUARDIAN_NAME}}</strong>, mayor de edad y con domicilio en <span style="font-weight: bold;">{{GUARDIAN_ADDRESS}}</span>, de la ciudad de Girardot, identificado(a) como aparece al pie de mi firma, actuando en mi propio nombre y representación del estudiante beneficiario(a) <strong>{{STUDENT_NAME}}</strong>, declaramos:
+    </p>
+
+    <div class="clause-title">PRIMERA. - OBJETO</div>
+    <p>
+        Que por virtud del presente título valor pagaré incondicionalmente a la orden de la <strong>INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</strong> o a quien represente sus derechos, en la ciudad y dirección indicadas, y en las fechas de amortización señaladas en la cláusula tercera de este pagaré, la suma de <strong>{{TOTAL_FEE_WORDS}} (${{TOTAL_FEE_FORMATTED}} M/CTE)</strong>, más los recargos por pago extemporáneo convenidos en caso de presentarse mora.
+    </p>
+
+    <div class="clause-title">SEGUNDA. - RECARGO POR PAGO EXTEMPORÁNEO</div>
+    <p>
+        En el evento de presentar mora en el pago de una o más cuotas correspondientes a las pensiones o a cualquier suma de dinero que adeudemos, nos obligamos a pagar por concepto de recargo por pago extemporáneo el cinco por ciento (5%) del valor de la cuota vencida, de acuerdo con las políticas de cartera institucional.
+    </p>
+
+    <div class="clause-title">TERCERA. - PLAN DE PAGO</div>
+    <p>
+        Que pagaré el capital indicado en la cláusula primera en la siguiente forma: a) Por concepto de matrícula la suma de <strong>{{ENROLLMENT_FEE_WORDS}} (${{ENROLLMENT_FEE_FORMATTED}} M/CTE)</strong>, cancelada al momento de la suscripción del contrato; b) El dinero restante por un monto de <strong>{{TOTAL_PENSION_WORDS}} (${{TOTAL_PENSION_FORMATTED}} M/CTE)</strong>, comprenderá la pensión escolar del año escolar {{SCHOOL_YEAR}} y será pagadero en diez (10) cuotas mensuales y sucesivas de <strong>{{MONTHLY_FEE_WORDS}} (${{MONTHLY_FEE_FORMATTED}} M/CTE)</strong>, cada una de las cuales será pagada dentro de los primeros cinco (5) días de cada mes.
+    </p>
+
+    <div class="clause-title">CUARTA. - CLÁUSULA ACELERATORIA</div>
+    <p>
+        La INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL queda autorizada para declarar vencido el plazo estipulado y exigir inmediatamente el pago total del saldo de la obligación, incluido capital, intereses y gastos de cobranza, en los siguientes eventos: a) Por mora en el pago del capital o recargos de cualquiera de las cuotas; b) Si fuere(mos) perseguidos judicialmente por terceros; c) Por giro de títulos o cheques devueltos sin fondos; d) Por fallecimiento de uno de los deudores; e) Por iniciación de procesos de insolvencia, liquidación o concurso de acreedores.
+    </p>
+
+    <div class="clause-title">QUINTA. - PROTESTO Y COBRO EXTRAJUDICIAL</div>
+    <p>
+        Excusamos el protesto del presente título valor y el aviso de rechazo. En caso de cobro prejudicial o judicial, serán de nuestro cargo todos los costos, gastos procesales y honorarios de abogado que se ocasionen por la cobranza.
+    </p>
+
+    <div class="clause-title">SEXTA. - IMPUESTO DE TIMBRE Y GARANTÍA</div>
+    <p>
+        Los gastos tributarios que se causaren serán por cuenta del deudor. Para respaldar el cumplimiento de la obligación contraída, el deudor autoriza al acreedor a perseguir cualquiera de sus bienes y derechos patrimoniales presentes o futuros.
+    </p>
+
+    <div class="clause-title">SÉPTIMA. - CONSULTA Y REPORTE A CENTRALES DE RIESGO</div>
+    <p>
+        Declaro que la información suministrada es verídica y otorgo consentimiento expreso e irrevocable a la INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL para consultar y reportar en cualquier tiempo en centrales de información financiera y crediticia (Datacrédito, TransUnion, etc.) mi comportamiento crediticio. <em>Nota:</em> A los sesenta (60) días de mora se remitirá la notificación preventiva correspondiente.
+    </p>
+
+    <div class="clause-title">OCTAVA. - PROTECCIÓN DE DATOS PERSONALES (LEY 1581 DE 2012)</div>
+    <p>
+        Los datos suministrados serán tratados bajo la Ley Estatutaria 1581 de 2012 y su Decreto Reglamentario 1377 de 2013 para los fines directos del contrato y cobro de obligaciones.
+    </p>
+
+    <p style="font-size: 8.5px; color: #475569; font-style: italic; margin-top: 8px;">
+        “Las partes conocemos y consentimos sobre la validez de nuestras firmas electrónicas, y sobre todo el contenido del documento que suscribimos, de acuerdo a lo establecido en la Ley 527 de 1999, la cual DEFINE Y REGLAMENTA EL ACCESO Y USO DE LOS MENSAJES DE DATOS, DEL COMERCIO ELECTRÓNICO Y DE LAS FIRMAS DIGITALES”.
+    </p>
+
+    <p>
+        Para constancia se firma el presente Pagaré en la ciudad de Girardot, a los <span style="font-weight: bold;">{{SIGNATURE_DAY}}</span> días del mes de <span style="font-weight: bold;">{{SIGNATURE_MONTH}}</span> del año <span style="font-weight: bold;">{{SIGNATURE_YEAR}}</span>.
+    </p>
+
+    <!-- Firmas -->
+    <table class="signature-table">
+        <tr>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    {{GUARDIAN_SIGNATURE_HTML}}
+                </div>
+                <div class="signature-line">{{GUARDIAN_NAME}}</div>
+                <div class="signature-sub">
+                    <strong>EN CALIDAD DE DEUDOR PRINCIPAL</strong><br>
+                    {{GUARDIAN_DOC_TYPE}} N° {{GUARDIAN_DOC_NUMBER}} de {{GUARDIAN_DOC_PLACE}}<br>
+                    Dirección: {{GUARDIAN_ADDRESS}}<br>
+                    Teléfono: {{GUARDIAN_PHONE}} &bull; Correo: {{GUARDIAN_EMAIL}}
+                </div>
+            </td>
+            <td class="signature-cell">
+                <div class="signature-box">
+                    <div style="font-family: 'Times New Roman', serif; font-style: italic; font-size: 15px; color: #003366; padding-top: 15px;">
+                        Yenih C. Gómez H.
+                    </div>
+                </div>
+                <div class="signature-line">YENIH CAROLINA GÓMEZ HERNÁNDEZ</div>
+                <div class="signature-sub">
+                    <strong>EN CALIDAD DE ACREEDOR / REPRESENTANTE LEGAL</strong><br>
+                    INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL<br>
+                    C.C. 39.582.498 de Girardot &bull; Nit: 39582498-2
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Auditoría Técnica -->
+    <div class="audit-footer">
+        <strong>Firma Electrónica Título Valor:</strong> Suscrito por <strong>{{GUARDIAN_NAME}}</strong> &bull; Identificación: {{GUARDIAN_DOC_TYPE}} {{GUARDIAN_DOC_NUMBER}} &bull; Fecha: {{SIGNATURE_TIMESTAMP}} &bull; IP: {{SIGNER_IP}}<br>
+        Hash Verificador SHA-256: <code>{{VERIFICATION_HASH}}</code>
+    </div>
+
+</body>
+</html>

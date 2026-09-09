@@ -1,0 +1,435 @@
+/* ===================================================================
+   PORTAL DE AUTENTICACIÓN INSTITUCIONAL - JEAN PIAGET SCHOOL 2026
+   Estilos Ultra-Premium, Responsivos y con Aceleración Gráfica
+   =================================================================== */
+
+:root {
+  --auth-navy-900: #041226;
+  --auth-navy-800: #092347;
+  --auth-navy-700: #0f3460;
+  --auth-primary: #003366;
+  --auth-accent-cyan: #0ea5e9;
+  --auth-accent-emerald: #10b981;
+  --auth-gold: #f59e0b;
+}
+
+/* Sección Contenedora con Fondo Ambiental */
+.auth-portal-section {
+  min-height: calc(100vh - 76px);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: radial-gradient(circle at 15% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 45%),
+              radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+              linear-gradient(135deg, #07152b 0%, #0c2340 50%, #001f3f 100%);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Orbes de luz ambientales decorativos */
+.auth-portal-section::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  left: -80px;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 102, 204, 0.25) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  animation: floatOrb 14s ease-in-out infinite alternate;
+}
+
+.auth-portal-section::after {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  right: -80px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  animation: floatOrb 18s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(40px, 30px) scale(1.1); }
+}
+
+/* Tarjeta Principal Dual */
+.auth-portal-container {
+  max-width: 1080px;
+  width: 100%;
+  min-height: 580px;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4),
+              0 0 0 1px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+/* Lado Izquierdo: Branding & Presentación Institucional */
+.auth-portal-brand {
+  background: linear-gradient(145deg, #001f3f 0%, #003366 50%, #082f49 100%);
+  padding: 48px 42px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-portal-brand::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -50px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.auth-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  color: #6ee7b7;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 30px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+.auth-brand-badge .pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.auth-brand-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.auth-brand-desc {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
+
+/* Lista de Beneficios / Módulos */
+.auth-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 12px 16px;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+.auth-feature-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.auth-feature-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.auth-feature-text strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.auth-feature-text span {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* Lado Derecho: Formulario de Autenticación */
+.auth-portal-form-wrapper {
+  padding: 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+}
+
+/* Navegación por pestañas */
+.auth-nav-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 16px;
+  margin-bottom: 26px;
+  gap: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 11px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-tab-btn.active {
+  background: #ffffff;
+  color: #003366;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.1);
+}
+
+/* Campos de Formulario */
+.auth-input-group {
+  margin-bottom: 18px;
+}
+
+.auth-input-label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 7px;
+}
+
+.auth-input-field-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.05rem;
+  color: #94a3b8;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.auth-input:focus {
+  border-color: #003366;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.12);
+}
+
+.auth-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Botón Principal */
+.auth-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #003366 0%, #001f3f 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 51, 102, 0.35);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 51, 102, 0.45);
+  background: linear-gradient(135deg, #004080 0%, #002244 100%);
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Caja de Acceso Rápido Directivo */
+.auth-quick-access-box {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: #f0fdf4;
+  border: 1.5px dashed #86efac;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.auth-quick-btn-admin {
+  background: #003366;
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 3px 8px rgba(0, 51, 102, 0.25);
+  transition: all 0.2s ease;
+}
+
+.auth-quick-btn-admin:hover {
+  background: #002244;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(0, 51, 102, 0.35);
+}
+
+.auth-quick-btn-demo {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: #003366;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-quick-btn-demo:hover {
+  background: #f8fafc;
+  border-color: #003366;
+}
+
+/* Alertas y Mensajes */
+.auth-alert-box {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-alert-box.error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.auth-alert-box.success {
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+}
+
+/* Responsividad */
+@media (max-width: 960px) {
+  .auth-portal-container {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+  .auth-portal-brand {
+    padding: 36px 30px;
+  }
+  .auth-portal-form-wrapper {
+    padding: 36px 30px;
+  }
+}
+
+@media (max-width: 540px) {
+  .auth-portal-section {
+    padding: 20px 12px;
+  }
+  .auth-portal-container {
+    border-radius: 20px;
+  }
+  .auth-portal-brand {
+    padding: 28px 20px;
+  }
+  .auth-brand-title {
+    font-size: 1.45rem;
+  }
+  .auth-portal-form-wrapper {
+    padding: 28px 20px;
+  }
+}

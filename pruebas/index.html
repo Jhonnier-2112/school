@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Institución Educativa Jean Piaget School - Sistema de Matrícula Digital 2026</title>
+  <meta name="description" content="Sistema Completo de Matrícula Digital y Plataforma Académica para la Institución Educativa Jean Piaget School (Año Escolar 2026).">
+  
+  <!-- Tipografías Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Hojas de Estilo con Cache Buster -->
+  <link rel="stylesheet" href="css/style.css?v=20260908_1">
+  <link rel="stylesheet" href="css/mobile-app.css?v=20260908_1">
+  <link rel="stylesheet" href="css/admin-panel.css?v=20260908_1">
+  <link rel="stylesheet" href="css/auth-portal.css?v=20260908_1">
+
+  <!-- Estilos Críticos en Línea: Portal de Autenticación Institucional -->
+  <style id="auth-portal-critical-styles">
+    /* Reset & Contenedor General */
+    .auth-portal-section {
+      min-height: calc(100vh - 76px) !important;
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 44px 20px !important;
+      background: radial-gradient(circle at 15% 20%, rgba(14, 165, 233, 0.18) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
+                  linear-gradient(135deg, #07152b 0%, #0c2340 50%, #001f3f 100%) !important;
+      position: relative !important;
+      overflow: hidden !important;
+      box-sizing: border-box !important;
+    }
+
+    .auth-portal-container {
+      max-width: 1080px !important;
+      width: 100% !important;
+      min-height: 580px !important;
+      display: grid !important;
+      grid-template-columns: 1.15fr 1fr !important;
+      background: #ffffff !important;
+      border-radius: 28px !important;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4),
+                  0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+      overflow: hidden !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+
+    /* Columna Izquierda: Branding */
+    .auth-portal-brand {
+      background: linear-gradient(145deg, #001f3f 0%, #003366 50%, #082f49 100%) !important;
+      padding: 48px 42px !important;
+      color: #ffffff !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+
+    .auth-brand-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      background: rgba(16, 185, 129, 0.2) !important;
+      border: 1px solid rgba(16, 185, 129, 0.5) !important;
+      color: #6ee7b7 !important;
+      font-size: 0.76rem !important;
+      font-weight: 800 !important;
+      padding: 6px 14px !important;
+      border-radius: 30px !important;
+      letter-spacing: 0.5px !important;
+      text-transform: uppercase !important;
+      margin-bottom: 20px !important;
+    }
+
+    .auth-brand-title {
+      font-size: 1.85rem !important;
+      font-weight: 800 !important;
+      line-height: 1.25 !important;
+      color: #ffffff !important;
+      letter-spacing: -0.02em !important;
+      margin-bottom: 16px !important;
+    }
+
+    .auth-brand-desc {
+      font-size: 0.9rem !important;
+      color: #cbd5e1 !important;
+      line-height: 1.65 !important;
+      margin-bottom: 28px !important;
+    }
+
+    .auth-feature-list {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+    }
+
+    .auth-feature-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 14px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      padding: 12px 16px !important;
+      border-radius: 14px !important;
+      transition: all 0.25s ease !important;
+    }
+
+    .auth-feature-item:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      transform: translateX(4px) !important;
+      border-color: rgba(56, 189, 248, 0.35) !important;
+    }
+
+    .auth-feature-icon {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 10px !important;
+      background: rgba(255, 255, 255, 0.14) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1.15rem !important;
+      flex-shrink: 0 !important;
+    }
+
+    .auth-feature-text strong {
+      display: block !important;
+      font-size: 0.88rem !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
+
+    .auth-feature-text span {
+      font-size: 0.78rem !important;
+      color: #94a3b8 !important;
+      line-height: 1.4 !important;
+    }
+
+    /* Columna Derecha: Formulario */
+    .auth-portal-form-wrapper {
+      padding: 44px 40px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      background: #ffffff !important;
+    }
+
+    .auth-nav-tabs {
+      display: flex !important;
+      background: #f1f5f9 !important;
+      padding: 6px !important;
+      border-radius: 16px !important;
+      margin-bottom: 26px !important;
+      gap: 6px !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+
+    .auth-tab-btn {
+      flex: 1 !important;
+      padding: 11px 16px !important;
+      border: none !important;
+      background: transparent !important;
+      border-radius: 12px !important;
+      font-family: inherit !important;
+      font-size: 0.9rem !important;
+      font-weight: 700 !important;
+      color: #64748b !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 8px !important;
+    }
+
+    .auth-tab-btn.active {
+      background: #ffffff !important;
+      color: #003366 !important;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.12) !important;
+    }
+
+    .auth-input-group {
+      margin-bottom: 18px !important;
+    }
+
+    .auth-input-label {
+      display: block !important;
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-bottom: 7px !important;
+    }
+
+    .auth-input-field-wrapper {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .auth-input-icon {
+      position: absolute !important;
+      left: 14px !important;
+      font-size: 1.05rem !important;
+      color: #94a3b8 !important;
+      pointer-events: none !important;
+    }
+
+    .auth-input {
+      width: 100% !important;
+      padding: 12px 14px 12px 42px !important;
+      border-radius: 12px !important;
+      border: 1.5px solid #e2e8f0 !important;
+      font-family: inherit !important;
+      font-size: 0.92rem !important;
+      color: #0f172a !important;
+      background: #f8fafc !important;
+      outline: none !important;
+      transition: all 0.2s ease !important;
+      box-sizing: border-box !important;
+    }
+
+    .auth-input:focus {
+      border-color: #003366 !important;
+      background: #ffffff !important;
+      box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.12) !important;
+    }
+
+    .auth-submit-btn {
+      width: 100% !important;
+      padding: 14px !important;
+      background: linear-gradient(135deg, #003366 0%, #001f3f 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 14px !important;
+      font-family: inherit !important;
+      font-size: 0.96rem !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+      box-shadow: 0 6px 18px rgba(0, 51, 102, 0.35) !important;
+      transition: all 0.25s ease !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 10px !important;
+    }
+
+    .auth-submit-btn:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(0, 51, 102, 0.45) !important;
+      background: linear-gradient(135deg, #004080 0%, #002244 100%) !important;
+    }
+
+    .auth-quick-access-box {
+      margin-top: 20px !important;
+      padding: 14px 16px !important;
+      background: #f0fdf4 !important;
+      border: 1.5px dashed #86efac !important;
+      border-radius: 14px !important;
+      text-align: center !important;
+    }
+
+    .auth-quick-btn-admin {
+      background: #003366 !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 9px 18px !important;
+      border-radius: 10px !important;
+      font-size: 0.82rem !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      box-shadow: 0 3px 8px rgba(0, 51, 102, 0.25) !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .auth-quick-btn-admin:hover {
+      background: #002244 !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .auth-quick-btn-demo {
+      background: #ffffff !important;
+      border: 1.5px solid #cbd5e1 !important;
+      padding: 8px 14px !important;
+      border-radius: 10px !important;
+      font-size: 0.8rem !important;
+      color: #003366 !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .auth-quick-btn-demo:hover {
+      background: #f8fafc !important;
+      border-color: #003366 !important;
+    }
+
+    .auth-alert-box {
+      padding: 12px 16px !important;
+      border-radius: 12px !important;
+      font-size: 0.85rem !important;
+      margin-bottom: 20px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+
+    .auth-alert-box.error {
+      background: #fef2f2 !important;
+      border: 1px solid #fca5a5 !important;
+      color: #991b1b !important;
+    }
+
+    .auth-alert-box.success {
+      background: #ecfdf5 !important;
+      border: 1px solid #6ee7b7 !important;
+      color: #065f46 !important;
+    }
+
+    @media (max-width: 960px) {
+      .auth-portal-container {
+        grid-template-columns: 1fr !important;
+        max-width: 520px !important;
+      }
+      .auth-portal-brand {
+        padding: 36px 30px !important;
+      }
+      .auth-portal-form-wrapper {
+        padding: 36px 30px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="top-navbar">
+    <div class="top-navbar-container">
+      <div class="brand-logo" style="display: flex; align-items: center; gap: 12px;">
+        <img src="assets/logo_jean_piaget.png" alt="Escudo Oficial Jean Piaget School" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+        <div class="brand-info">
+          <h1 style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin: 0; line-height: 1.2;">Institución Educativa Jean Piaget School</h1>
+          <p style="font-size: 0.76rem; color: var(--primary); margin: 0; font-weight: 700;">Sistema Completo de Matrícula Digital 2026</p>
+        </div>
+      </div>
+
+      <!-- Conmutador de Vistas (visible solo cuando hay sesión activa) -->
+      <nav class="view-switcher" id="main-view-switcher" style="display: none;" aria-label="Selector de vistas">
+        <button id="switch-to-admin" class="switcher-btn active">
+          <span>💻</span> Panel Administrativo
+        </button>
+        <button id="switch-to-student" class="switcher-btn">
+          <span>📱</span> Modo Estudiante
+        </button>
+      </nav>
+
+      <!-- Acciones de Sesión Administrativa -->
+      <div class="top-actions">
+        <!-- Sesión activa del Administrador (visible cuando SÍ hay sesión) -->
+        <div id="admin-top-session" style="display: none; align-items: center; gap: 10px;">
+          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 51, 102, 0.08); border: 1px solid rgba(0, 51, 102, 0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; color: #003366; font-weight: 700;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,0.3);"></span>
+            <span id="top-admin-name">Administrador</span>
+          </div>
+          <button id="btn-top-logout" class="docs-link" style="background: rgba(239, 68, 68, 0.1); color: #DC2626; border: 1px solid rgba(239, 68, 68, 0.3); font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s ease;" title="Cerrar sesión de administrador">
+            <span>🚪</span> Salir
+          </button>
+        </div>
+
+        <!-- Acciones públicas (visible cuando NO hay sesión) -->
+        <div id="guest-top-actions" style="display: flex; align-items: center; gap: 10px;">
+          <a href="matricula.html" class="docs-link" style="background: linear-gradient(135deg, #003366, #15803d); color: white; border-color: transparent; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 7px 14px; border-radius: 8px;" title="Iniciar Matrícula Digital Jean Piaget School 2026">
+            <span>🎓</span> Matrícula Digital 2026
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-viewport">
+
+    <!-- ============================================================= -->
+    <!-- VISTA PRINCIPAL (DEFAULT): LOGIN Y REGISTRO INSTITUCIONAL     -->
+    <!-- ============================================================= -->
+    <section id="view-auth" class="view-section active">
+      <div class="auth-portal-section">
+        <div class="auth-portal-container">
+          
+          <!-- Lado Izquierdo: Presentación Institucional -->
+          <div class="auth-portal-brand">
+            <div>
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
+                <div style="width: 58px; height: 58px; background: white; border-radius: 50%; padding: 4px; box-shadow: 0 4px 14px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <img src="assets/logo_jean_piaget.png" alt="Escudo Jean Piaget" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                  <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: white; line-height: 1.2;">Jean Piaget School</h2>
+                  <span style="font-size: 0.76rem; color: #38BDF8; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Institución Educativa</span>
+                </div>
+              </div>
+
+              <div class="auth-brand-badge">
+                <span class="pulse-dot"></span>
+                <span>AÑO LECTIVO 2026 • ADMISIONES ABIERTAS</span>
+              </div>
+
+              <h1 class="auth-brand-title">
+                Portal Institucional de Gestión y Acceso
+              </h1>
+
+              <p class="auth-brand-desc">
+                Bienvenido a la plataforma integrada de la <strong>Institución Educativa Jean Piaget School</strong>. Inicie sesión para acceder al panel directivo, seguimiento académico y servicios de matrícula digital.
+              </p>
+
+              <div class="auth-feature-list">
+                <div class="auth-feature-item">
+                  <div class="auth-feature-icon">💻</div>
+                  <div class="auth-feature-text">
+                    <strong>Panel Directivo & Administrativo</strong>
+                    <span>Control de matrículas, cronograma, banco de preguntas y reportes.</span>
+                  </div>
+                </div>
+
+                <div class="auth-feature-item">
+                  <div class="auth-feature-icon">🎓</div>
+                  <div class="auth-feature-text">
+                    <strong>Matrícula Digital 2026</strong>
+                    <span>Preescolar, Primaria y Bachillerato Ciclos con firma legal digital.</span>
+                  </div>
+                </div>
+
+                <div class="auth-feature-item">
+                  <div class="auth-feature-icon">📚</div>
+                  <div class="auth-feature-text">
+                    <strong>Simulacros & Preparación Saber 11°</strong>
+                    <span>Pruebas cronometradas por pregunta o global, en puntos o porcentajes.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie del Branding -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 20px; margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: #94A3B8;">Resolución Oficial Municipal</span>
+              <a href="matricula.html" style="color: #38BDF8; font-size: 0.78rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                Matrícula Digital ➔
+              </a>
+            </div>
+          </div>
+
+          <!-- Lado Derecho: Tarjeta Interactiva de Login y Registro -->
+          <div class="auth-portal-form-wrapper">
+            <!-- Selector de Pestañas: Iniciar Sesión / Registrarse -->
+            <div class="auth-nav-tabs">
+              <button id="auth-tab-login" class="auth-tab-btn active" type="button">
+                <span>🔐</span> Iniciar Sesión
+              </button>
+              <button id="auth-tab-register" class="auth-tab-btn" type="button">
+                <span>📝</span> Registrarse
+              </button>
+            </div>
+
+            <!-- ===================== FORMULARIO LOGIN ===================== -->
+            <form id="portal-login-form">
+              <!-- Mensaje de Error Login -->
+              <div id="portal-login-error" class="auth-alert-box error" style="display: none;">
+                <span style="font-size: 1.1rem; flex-shrink: 0;">⚠️</span>
+                <span id="portal-login-error-text">Correo o contraseña incorrectos.</span>
+              </div>
+
+              <div class="auth-input-group">
+                <label class="auth-input-label" for="portal-email">Correo Electrónico</label>
+                <div class="auth-input-field-wrapper">
+                  <span class="auth-input-icon">✉️</span>
+                  <input id="portal-email" type="email" class="auth-input" placeholder="correo@ejemplo.com" required autocomplete="username" value="">
+                </div>
+              </div>
+
+              <div class="auth-input-group">
+                <label class="auth-input-label" for="portal-password">Contraseña</label>
+                <div class="auth-input-field-wrapper">
+                  <span class="auth-input-icon">🔒</span>
+                  <input id="portal-password" type="password" class="auth-input" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right: 42px;">
+                  <button type="button" id="portal-toggle-pwd" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748B; font-size: 1rem; padding: 4px;" title="Mostrar contraseña">👁️</button>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; font-size: 0.8rem;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #475569;">
+                  <input type="checkbox" id="portal-remember" checked style="accent-color: #003366;">
+                  Recordar sesión
+                </label>
+                <span style="color: #64748B; font-size: 0.76rem;">Acceso Cifrado TLS / JWT</span>
+              </div>
+
+              <button type="submit" id="portal-btn-login" class="auth-submit-btn">
+                <span>🔐</span> Iniciar Sesión
+              </button>
+
+              <!-- Acceso Rápido Administrador -->
+              <div class="auth-quick-access-box">
+                <span style="font-size: 0.78rem; color: #166534; font-weight: 800; display: block; margin-bottom: 8px;">⚡ ACCESO DIRECTO ADMINISTRADOR DIRECTIVO:</span>
+                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                  <button type="button" id="btn-quick-admin-login" class="auth-quick-btn-admin">
+                    <span>⚡</span> Entrar directo como Administrador
+                  </button>
+                  <button type="button" id="btn-fill-admin-demo" class="auth-quick-btn-demo">
+                    Llenar Datos (Admin123456!)
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- ===================== FORMULARIO REGISTRO ===================== -->
+            <form id="portal-register-form" style="display: none;">
+              <!-- Alerta Registro -->
+              <div id="portal-register-error" class="auth-alert-box error" style="display: none;">
+                <span style="font-size: 1.1rem; flex-shrink: 0;">⚠️</span>
+                <span id="portal-register-error-text">Verifica los campos ingresados.</span>
+              </div>
+              <div id="portal-register-success" class="auth-alert-box success" style="display: none;">
+                <span style="font-size: 1.1rem; flex-shrink: 0;">✅</span>
+                <span>¡Cuenta creada con éxito! Redirigiendo...</span>
+              </div>
+
+              <div class="auth-input-group">
+                <label class="auth-input-label" for="reg-name">Nombre y Apellidos</label>
+                <div class="auth-input-field-wrapper">
+                  <span class="auth-input-icon">👤</span>
+                  <input id="reg-name" type="text" class="auth-input" placeholder="Ej: Santiago Mendoza García" required>
+                </div>
+              </div>
+
+              <div class="auth-input-group">
+                <label class="auth-input-label" for="reg-email">Correo Electrónico</label>
+                <div class="auth-input-field-wrapper">
+                  <span class="auth-input-icon">✉️</span>
+                  <input id="reg-email" type="email" class="auth-input" placeholder="correo@ejemplo.com" required>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="reg-phone">Teléfono</label>
+                  <div class="auth-input-field-wrapper">
+                    <span class="auth-input-icon">📱</span>
+                    <input id="reg-phone" type="tel" class="auth-input" placeholder="3101234567" required>
+                  </div>
+                </div>
+
+                <div class="auth-input-group">
+                  <label class="auth-input-label" for="reg-password">Contraseña</label>
+                  <div class="auth-input-field-wrapper">
+                    <span class="auth-input-icon">🔒</span>
+                    <input id="reg-password" type="password" class="auth-input" placeholder="••••••••" required minlength="8">
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" id="portal-btn-register" class="auth-submit-btn" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                <span>📝</span> Crear Cuenta de Estudiante / Acudiente
+              </button>
+            </form>
+
+            <div style="margin-top: 20px; text-align: center; font-size: 0.74rem; color: #94A3B8;">
+              © 2026 Institución Educativa Jean Piaget School • Sistema Oficial
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- VISTA 2: EXPERIENCIA DEL ESTUDIANTE (APP MÓVIL)                -->
+    <!-- ============================================================= -->
+    <section id="view-student-app" class="view-section">
+      <div class="mobile-showcase-wrapper">
+        
+        <!-- Header de la sección con resumen de propuesta -->
+        <div class="showcase-header">
+          <div class="showcase-badge">Propuesta de Desarrollo • MVP en 3 días</div>
+          <h2>Experiencia del Estudiante (App móvil)</h2>
+          <p>Interactúa con las 7 pantallas completas del flujo de preparación académica para el estudiante.</p>
+        </div>
+
+        <!-- Indicador interactivo de los 7 pasos -->
+        <div class="student-steps-tracker" role="navigation" aria-label="Pasos de la app móvil">
+          <button class="step-indicator active" data-step="1">
+            <span class="step-num">1</span>
+            <span>Registro</span>
+          </button>
+          <button class="step-indicator" data-step="2">
+            <span class="step-num">2</span>
+            <span>Contrato</span>
+          </button>
+          <button class="step-indicator" data-step="3">
+            <span class="step-num">3</span>
+            <span>Resumen</span>
+          </button>
+          <button class="step-indicator" data-step="4">
+            <span class="step-num">4</span>
+            <span>Mis pagos</span>
+          </button>
+          <button class="step-indicator" data-step="5">
+            <span class="step-num">5</span>
+            <span>Subir cédula</span>
+          </button>
+          <button class="step-indicator" data-step="6">
+            <span class="step-num">6</span>
+            <span>Simulacro ICFES</span>
+          </button>
+          <button class="step-indicator" data-step="7">
+            <span class="step-num">7</span>
+            <span>Resultados</span>
+          </button>
+        </div>
+
+        <!-- Grid: Beneficios a la izquierda + Mockup iPhone al centro + Cronograma a la derecha -->
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; width: 100%; align-items: start; max-width: 1350px;">
+          
+          <!-- Columna Izquierda: Información de Propuesta -->
+          <div style="background: var(--bg-surface); padding: 28px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 6px;">
+              Plataforma de Cursos (MVP)
+            </div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2;">
+              Todo lo que el estudiante necesita en una sola app
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+              Plataforma optimizada y ligera diseñada para garantizar la máxima retención y preparación de los aspirantes ICFES.
+            </p>
+
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Registro e inicio de sesión
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Aceptación de contrato digital
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Visualización del costo del curso
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Historial y progreso de pagos
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Subida de documento (cédula)
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Simulacros tipo ICFES por materia
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Resultados y estadísticas
+              </li>
+              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
+                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Notificaciones importantes
+              </li>
+            </ul>
+
+            <div style="border-top: 1px solid var(--border-light); padding-top: 16px;">
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Disponible en:</div>
+              <div style="display:flex; gap:10px;">
+                <div style="background:#000; color:#fff; padding:6px 14px; border-radius:8px; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:6px;">
+                  <span>▶</span> Google Play
+                </div>
+                <div style="background:#000; color:#fff; padding:6px 14px; border-radius:8px; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:6px;">
+                  <span></span> App Store
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Centro: Mockup Interactivo de iPhone -->
+          <div class="phone-mockup">
+            <div class="phone-screen">
+              
+              <!-- Barra Superior de Estado -->
+              <div class="phone-status-bar">
+                <span>9:41</span>
+                <div class="phone-notch"></div>
+                <div class="phone-status-icons">
+                  <span>📶</span>
+                  <span>🔋</span>
+                </div>
+              </div>
+
+              <!-- Contenido Interno de la App -->
+              <div class="phone-content">
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 1: REGISTRO                               -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-1" class="mobile-step active">
+                  <div class="mobile-header">
+                    <h3>Crear cuenta</h3>
+                  </div>
+
+                  <div style="margin-bottom: 20px;">
+                    <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--text-main);">¡Bienvenido!</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Crea tu cuenta para comenzar tu preparación.</p>
+                  </div>
+
+                  <form id="mobile-register-form">
+                    <div class="mobile-form-group">
+                      <label class="mobile-label" for="reg-name">Nombres completos</label>
+                      <input type="text" id="reg-name" class="mobile-input" placeholder="Ej: María García" value="María García" required>
+                    </div>
+
+                    <div class="mobile-form-group">
+                      <label class="mobile-label" for="reg-email">Correo electrónico</label>
+                      <input type="email" id="reg-email" class="mobile-input" placeholder="correo@ejemplo.com" value="maria@gmail.com" required>
+                    </div>
+
+                    <div class="mobile-form-group">
+                      <label class="mobile-label" for="reg-phone">Número de celular</label>
+                      <input type="tel" id="reg-phone" class="mobile-input" placeholder="300 123 4567" value="300 123 4567" required>
+                    </div>
+
+                    <div class="mobile-form-group">
+                      <label class="mobile-label" for="reg-pass">Contraseña</label>
+                      <input type="password" id="reg-pass" class="mobile-input" placeholder="••••••••" value="password123" required>
+                    </div>
+
+                    <button type="submit" id="btn-register-submit" class="mobile-btn">
+                      Registrarme
+                    </button>
+                  </form>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 2: CONTRATO                               -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-2" class="mobile-step">
+                  <div class="mobile-header">
+                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(1)">‹</button>
+                    <h3>Contrato del curso</h3>
+                  </div>
+
+                  <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase;">
+                    Contrato de Prestación de Servicios Educativos
+                  </div>
+
+                  <div id="contract-body-text" class="contract-scroll-box">
+El presente contrato regula los términos y condiciones de la preparación académica para la prueba Saber 11° ICFES.
+
+1. OBJETO: El estudiante adquiere acceso integral al programa académico incluyendo simulacros interactivos, banco de preguntas con retroalimentación, material descargable y asesoría pedagógica continua.
+
+2. CONDICIONES DE PAGO: El costo total del curso es de setecientos mil pesos m/cte ($700.000 COP), pagaderos según el cronograma acordado de abonos.
+
+3. DOCUMENTACIÓN: El estudiante se compromete a subir copia legible de su documento de identidad (cédula de ciudadanía o tarjeta de identidad) para validación oficial.
+
+4. DERECHOS Y DEBERES: El acceso a la plataforma es personal e intransferible. El uso indebido de los contenidos será causal de suspensión.
+                  </div>
+
+                  <label class="checkbox-label" for="contract-agree-check">
+                    <input type="checkbox" id="contract-agree-check">
+                    <span>He leído y acepto el contrato</span>
+                  </label>
+
+                  <button type="button" id="accept-contract-btn" class="mobile-btn" disabled>
+                    Aceptar contrato
+                  </button>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 3: RESUMEN DEL CURSO                      -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-3" class="mobile-step">
+                  <div class="mobile-header">
+                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(2)">‹</button>
+                    <h3>Resumen del curso</h3>
+                  </div>
+
+                  <div class="course-promo-card">
+                    <span class="promo-tag">Plan Completo</span>
+                    <h4>Curso Preparación ICFES Completo</h4>
+                    <div class="course-price-label">Precio del curso</div>
+                    <div class="course-price-val">$700.000</div>
+                  </div>
+
+                  <ul class="course-benefits-list">
+                    <li><span>✔</span> Acceso a todos los simulacros</li>
+                    <li><span>✔</span> Material de estudio especializado</li>
+                    <li><span>✔</span> Reportes de rendimiento</li>
+                    <li><span>✔</span> Acompañamiento académico</li>
+                  </ul>
+
+                  <button type="button" id="course-continue-btn" class="mobile-btn">
+                    Aceptar y continuar
+                  </button>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 4: MIS PAGOS                              -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-4" class="mobile-step">
+                  <div class="mobile-header">
+                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(3)">‹</button>
+                    <h3>Mis pagos</h3>
+                  </div>
+
+                  <div class="donut-chart-container">
+                    <div class="donut-chart">
+                      <svg viewBox="0 0 120 120">
+                        <circle class="donut-circle-bg" cx="60" cy="60" r="50"></circle>
+                        <circle id="donut-circle-bar" class="donut-circle-val" cx="60" cy="60" r="50" style="stroke-dasharray: 314.159; stroke-dashoffset: 188.495;"></circle>
+                      </svg>
+                      <div class="donut-center-text">
+                        <div id="donut-percent-num" class="percent">40%</div>
+                        <div class="desc">Progreso</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="payment-split-cards">
+                    <div class="split-card paid">
+                      <div class="lbl">Pagado</div>
+                      <div id="paid-amount-label" class="val">$0</div>
+                    </div>
+                    <div class="split-card pending">
+                      <div class="lbl">Pendiente</div>
+                      <div id="pending-amount-label" class="val">$700.000</div>
+                    </div>
+                  </div>
+
+                  <div class="payment-history-title">Historial de pagos</div>
+                  <div id="mobile-payment-history-list" style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 14px; margin-bottom: 20px;">
+                    <div style="text-align: center; padding: 12px; font-size: 0.78rem; color: var(--text-muted);">
+                      Consultando historial de abonos...
+                    </div>
+                  </div>
+
+                  <button type="button" id="payments-continue-btn" class="mobile-btn">
+                    Continuar a subir cédula
+                  </button>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 5: SUBIR CÉDULA                           -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-5" class="mobile-step">
+                  <div class="mobile-header">
+                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(4)">‹</button>
+                    <h3>Subir documento</h3>
+                  </div>
+
+                  <p class="upload-instruction">
+                    Por favor sube una foto clara de tu cédula (frente) para verificación académica.
+                  </p>
+
+                  <div id="doc-preview-area" class="id-card-preview-graphic">
+                    <input type="file" id="doc-file-input" accept="image/*,.pdf" style="display:none;">
+                    <div id="doc-preview-container" class="id-graphic-img">
+                      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='90' viewBox='0 0 140 90'><rect width='140' height='90' rx='6' fill='%23EEF2FF'/><rect x='10' y='15' width='35' height='45' rx='4' fill='%23C7D2FE'/><circle cx='27' cy='32' r='10' fill='%23818CF8'/><path d='M15 55 C15 45 40 45 40 55 Z' fill='%23818CF8'/><rect x='52' y='20' width='75' height='6' rx='3' fill='%23CBD5E1'/><rect x='52' y='32' width='60' height='5' rx='2.5' fill='%23E2E8F0'/><rect x='52' y='42' width='68' height='5' rx='2.5' fill='%23E2E8F0'/><rect x='52' y='52' width='50' height='5' rx='2.5' fill='%23E2E8F0'/></svg>" alt="Cédula">
+                    </div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 2px;">
+                      Toca para seleccionar
+                    </div>
+                    <div id="doc-upload-placeholder-text" style="font-size: 0.7rem; color: var(--text-muted);">
+                      o arrastra tu archivo aquí (JPG, PNG, PDF. Máx 5MB)
+                    </div>
+                  </div>
+
+                  <button type="button" id="upload-doc-btn" class="mobile-btn">
+                    Guardar documento
+                  </button>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 6: SIMULACRO ICFES                        -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-6" class="mobile-step">
+                  <div class="exam-top-bar">
+                    <div id="exam-subject-title" class="exam-subject-badge">Matemáticas</div>
+                    <div id="exam-timer-clock" class="exam-timer-pill">⏱ 00:44:48</div>
+                  </div>
+
+                  <div id="question-counter" class="question-progress-num">Pregunta 1 de 3</div>
+                  <div id="question-statement" class="question-statement-text">
+                    En la figura mostrada, ¿cuál es el valor de x?
+                  </div>
+
+                  <!-- Diagrama geométrico ICFES -->
+                  <div id="question-diagram-box" class="question-diagram"></div>
+
+                  <!-- Lista de 4 opciones A, B, C, D -->
+                  <div id="exam-options-container" class="exam-options-list"></div>
+
+                  <!-- Navegación Preguntas -->
+                  <div class="exam-nav-btns">
+                    <button type="button" id="exam-prev-btn" class="exam-prev-btn">Anterior</button>
+                    <button type="button" id="exam-next-btn" class="exam-next-btn">Siguiente</button>
+                  </div>
+                </div>
+
+                <!-- -------------------------------------------------- -->
+                <!-- PANTALLA 7: RESULTADOS DEL SIMULACRO               -->
+                <!-- -------------------------------------------------- -->
+                <div id="mobile-step-7" class="mobile-step">
+                  <div class="mobile-header">
+                    <h3>Resultados</h3>
+                  </div>
+
+                  <div style="text-align: center; margin-bottom: 12px;">
+                    <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">Simulacro Matemáticas</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">18 Mayo 2024</div>
+                  </div>
+
+                  <!-- Donut de Puntaje -->
+                  <div class="results-score-circle">
+                    <div class="donut-chart" style="width: 110px; height: 110px;">
+                      <svg viewBox="0 0 120 120">
+                        <circle class="donut-circle-bg" cx="60" cy="60" r="50"></circle>
+                        <circle class="donut-circle-val" cx="60" cy="60" r="50" style="stroke: #10B981; stroke-dasharray: 314.159; stroke-dashoffset: 69;"></circle>
+                      </svg>
+                      <div class="donut-center-text">
+                        <div id="res-score-percent" class="percent" style="color: #10B981;">78%</div>
+                        <div class="desc">Tu puntaje</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Resumen Aciertos / Errores / Sin responder -->
+                  <div class="results-stats-row">
+                    <div class="res-stat-card correct">
+                      <div id="res-correct-num" class="val">39</div>
+                      <div class="lbl">Aciertos</div>
+                    </div>
+                    <div class="res-stat-card wrong">
+                      <div id="res-wrong-num" class="val">11</div>
+                      <div class="lbl">Errores</div>
+                    </div>
+                    <div class="res-stat-card blank">
+                      <div id="res-blank-num" class="val">0</div>
+                      <div class="lbl">Sin responder</div>
+                    </div>
+                  </div>
+
+                  <!-- Desempeño por tema -->
+                  <div class="subject-bars-section">
+                    <h5>Desempeño por tema</h5>
+                    <div class="subject-bar-item">
+                      <div class="subject-bar-header">
+                        <span>Aritmética</span>
+                        <span>85%</span>
+                      </div>
+                      <div class="progress-track"><div class="progress-fill" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="subject-bar-item">
+                      <div class="subject-bar-header">
+                        <span>Geometría</span>
+                        <span>72%</span>
+                      </div>
+                      <div class="progress-track"><div class="progress-fill" style="width: 72%;"></div></div>
+                    </div>
+                    <div class="subject-bar-item">
+                      <div class="subject-bar-header">
+                        <span>Álgebra</span>
+                        <span>75%</span>
+                      </div>
+                      <div class="progress-track"><div class="progress-fill" style="width: 75%;"></div></div>
+                    </div>
+                    <div class="subject-bar-item">
+                      <div class="subject-bar-header">
+                        <span>Estadística</span>
+                        <span>80%</span>
+                      </div>
+                      <div class="progress-track"><div class="progress-fill" style="width: 80%;"></div></div>
+                    </div>
+                  </div>
+
+                  <button type="button" id="restart-exam-btn" class="mobile-btn">
+                    Repetir simulacro
+                  </button>
+                </div>
+
+              </div> <!-- .phone-content -->
+            </div> <!-- .phone-screen -->
+          </div> <!-- .phone-mockup -->
+
+          <!-- Columna Derecha: Cronograma y Alcance Integral -->
+          <div style="background: var(--bg-surface); padding: 28px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 6px;">
+              Plan de Ejecución Institucional 2026
+            </div>
+            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; line-height: 1.2;">
+              Cronograma & Alcance
+            </h3>
+
+            <!-- Cronograma de Fases -->
+            <div style="margin-bottom: 24px;">
+              <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); display: flex; justify-content: space-between;">
+                <span>Cronograma de Entrega</span>
+                <span style="color: var(--success); font-size: 0.78rem;">100% Implementado</span>
+              </h4>
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary); width: 60px;">Fase 1</td>
+                  <td style="padding: 7px 0;">
+                    <strong>Base de Datos y Seguridad:</strong> Arquitectura institucional, base de datos relacional y autenticación segura con roles.
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 2</td>
+                  <td style="padding: 7px 0;">
+                    <strong>Matrícula Digital Jean Piaget:</strong> Flujo 10 pasos, 4 PDFs legales, firma electrónica Ley 527.
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-light);">
+                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 3</td>
+                  <td style="padding: 7px 0;">
+                    <strong>App Móvil & Estudiantes:</strong> Experiencia interactiva, simulacros cronometrados y pagos.
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 4</td>
+                  <td style="padding: 7px 0;">
+                    <strong>Panel Administrativo:</strong> KPIs en tiempo real, revisión de expedientes, aprobación y auditoría.
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- Alcance Integral de la Plataforma -->
+            <div>
+              <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main);">Alcance Integral del Sistema</h4>
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 7px; font-size: 0.8rem; color: var(--text-muted);">
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Matrícula Digital 2026:</strong> Preescolar, Primaria y Ciclos</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Documentos Oficiales:</strong> Ficha, Contrato, Pagaré y Carta</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Firma Electrónica:</strong> Trazabilidad, IP y Hashes SHA-256</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Generación PDF Automática:</strong> Motor Dompdf oficial</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>App Móvil y Web:</strong> Simulacros ICFES por materias</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Gestión de Pagos:</strong> Matrícula + 10 mensualidades</li>
+                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Panel Administrativo:</strong> Control total y auditoría</li>
+              </ul>
+            </div>
+          </div>
+
+        </div> <!-- grid -->
+
+      </div> <!-- .mobile-showcase-wrapper -->
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- VISTA 2: PANEL ADMINISTRATIVO (WEB)                           -->
+    <!-- ============================================================= -->
+    <section id="view-admin-panel" class="view-section">
+      <div class="admin-layout">
+        
+        <!-- Sidebar del Panel -->
+        <aside class="admin-sidebar">
+          <!-- Branding Institucional Jean Piaget en Sidebar -->
+          <div style="padding: 16px 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+            <img src="assets/logo_jean_piaget.png" alt="Escudo Jean Piaget" style="width: 44px; height: 44px; object-fit: contain;">
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; color: #003366; line-height: 1.2;">Jean Piaget School</div>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Panel Administrativo 2026</div>
+            </div>
+          </div>
+
+          <div class="sidebar-heading">Menú Administrativo</div>
+          <button class="admin-nav-item active" data-tab="dashboard">
+            <span>📊</span> Dashboard
+          </button>
+          <button class="admin-nav-item" data-tab="usuarios">
+            <span>👥</span> Usuarios
+          </button>
+          <button class="admin-nav-item" data-tab="pagos">
+            <span>💳</span> Pagos
+          </button>
+          <button class="admin-nav-item" data-tab="preguntas">
+            <span>✏️</span> Preguntas
+          </button>
+          <button class="admin-nav-item" data-tab="simulacros">
+            <span>📚</span> Simulacros
+          </button>
+          <button class="admin-nav-item" data-tab="documentos">
+            <span>📄</span> Documentos
+          </button>
+          <button class="admin-nav-item" data-tab="reportes">
+            <span>📈</span> Reportes
+          </button>
+          <button class="admin-nav-item" data-tab="matriculas" style="background: rgba(0, 51, 102, 0.08); border-left: 3px solid #003366; font-weight: 700; color: #003366;">
+            <span>🎓</span> Matrículas 2026
+          </button>
+          <button class="admin-nav-item" data-tab="cronograma" style="font-weight: 600;">
+            <span>📅</span> Cronograma & Alcance
+          </button>
+
+          <!-- Perfil y Cierre de Sesión Admin -->
+          <div style="margin-top: auto; padding: 16px 12px; border-top: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+              <div id="admin-sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: #003366; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;">A</div>
+              <div style="overflow: hidden; flex: 1;">
+                <div id="admin-sidebar-name" style="font-weight: 700; font-size: 0.82rem; color: var(--text-primary); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">Administrador</div>
+                <div id="admin-sidebar-email" style="font-size: 0.7rem; color: var(--text-muted); text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">admin@icfes.com</div>
+              </div>
+            </div>
+            <button id="btn-admin-logout" class="btn" style="width: 100%; background: rgba(239, 68, 68, 0.08); color: #DC2626; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 700; font-size: 0.8rem; padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease;">
+              <span>🚪</span> Cerrar Sesión
+            </button>
+          </div>
+        </aside>
+
+        <!-- Contenido Dinámico de las Pestañas -->
+        <div class="admin-main-content">
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: DASHBOARD GENERAL                                  -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-dashboard" class="admin-tab-pane active">
+            <div class="admin-header-row">
+              <div>
+                <h2>Dashboard Administrativo</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Resumen global de estudiantes, ingresos y actividad del curso.</p>
+              </div>
+              <button class="admin-action-btn" onclick="AdminPanel.switchTab('pagos')">
+                <span>➕</span> Registrar Abono
+              </button>
+            </div>
+
+            <!-- Tarjetas KPI -->
+            <div class="kpi-grid">
+              <div class="kpi-card purple">
+                <span class="kpi-label">Estudiantes</span>
+                <span id="kpi-students" class="kpi-value">…</span>
+              </div>
+              <div class="kpi-card green">
+                <span class="kpi-label">Ingresos totales</span>
+                <span id="kpi-revenue" class="kpi-value">…</span>
+              </div>
+              <div class="kpi-card orange">
+                <span class="kpi-label">Pagos pendientes</span>
+                <span id="kpi-pending" class="kpi-value">…</span>
+              </div>
+              <div class="kpi-card cyan">
+                <span class="kpi-label">Simulacros realizados</span>
+                <span id="kpi-exams" class="kpi-value">…</span>
+              </div>
+            </div>
+
+            <!-- Gráficas del Dashboard -->
+            <div class="charts-grid">
+              <div class="chart-card">
+                <h4>Pagos por mes</h4>
+                <div id="chart-payments-area" class="chart-canvas-area"></div>
+              </div>
+              <div class="chart-card">
+                <h4>Estudiantes registrados</h4>
+                <div id="chart-students-bars" class="chart-canvas-area"></div>
+              </div>
+            </div>
+
+            <!-- Bloques Inferiores: Formulario de Abono + Revisión de Documentos -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              
+              <!-- Registrar Abono Rápido -->
+              <div style="background: var(--bg-surface); border-radius: var(--radius-lg); padding: 22px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;">Registrar abono</h4>
+                
+                <form id="admin-payment-form">
+                  <div class="mobile-form-group">
+                    <label class="mobile-label">Estudiante</label>
+                    <select id="pay-student-select" class="mobile-input">
+                      <option value="maria-garcia">María García (maria@gmail.com)</option>
+                      <option value="juan-perez">Juan Pérez (juan@gmail.com)</option>
+                      <option value="ana-torres">Ana Torres (ana@gmail.com)</option>
+                      <option value="carlos-ruiz">Carlos Ruiz (carlos@gmail.com)</option>
+                    </select>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="mobile-form-group">
+                      <label class="mobile-label">Valor del abono</label>
+                      <input type="number" id="pay-amount" class="mobile-input" placeholder="$ 150.000" value="150000" required>
+                    </div>
+                    <div class="mobile-form-group">
+                      <label class="mobile-label">Fecha</label>
+                      <input type="date" id="pay-date" class="mobile-input" value="2024-05-18" required>
+                    </div>
+                  </div>
+
+                  <div class="mobile-form-group">
+                    <label class="mobile-label">Método de pago</label>
+                    <select id="pay-method" class="mobile-input">
+                      <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                      <option value="Efectivo">Efectivo</option>
+                      <option value="Nequi / Daviplata">Nequi / Daviplata</option>
+                      <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                    </select>
+                  </div>
+
+                  <div class="mobile-form-group">
+                    <label class="mobile-label">Observación (opcional)</label>
+                    <input type="text" id="pay-notes" class="mobile-input" placeholder="Abono correspondiente al mes de mayo" value="Abono correspondiente al mes de mayo">
+                  </div>
+
+                  <button type="submit" id="btn-submit-payment" class="admin-action-btn" style="width: 100%; justify-content: center;">
+                    Registrar abono
+                  </button>
+                </form>
+              </div>
+
+              <!-- Revisión Rápida de Documentos -->
+              <div style="background: var(--bg-surface); border-radius: var(--radius-lg); padding: 22px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                <h4 style="font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;">Revisión de documentos</h4>
+                
+                <div class="admin-table-wrapper">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Estudiante</th>
+                        <th>Documento</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Vista</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-documents">
+                      <!-- Renderizado por JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: USUARIOS                                           -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-usuarios" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Gestión de usuarios</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Crear, editar y dar seguimiento a los estudiantes inscritos.</p>
+              </div>
+              <button id="btn-new-user" class="admin-action-btn">
+                <span>➕</span> Nuevo usuario
+              </button>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Plataformas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-users">
+                  <!-- Renderizado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: PAGOS                                              -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-pagos" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Control de Pagos y Abonos</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Registra abonos manuales y monitorea los saldos pendientes por estudiante.</p>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px; align-items: start;">
+              <!-- Formulario de Registro de Abono -->
+              <div style="background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <h4 style="margin-bottom: 16px; font-weight: 700; color: #003366;">Registrar Nuevo Abono / Pago</h4>
+                <form id="admin-payment-form">
+                  <div class="mobile-form-group" style="margin-bottom: 14px;">
+                    <label class="mobile-label" for="pay-student-select">Estudiante</label>
+                    <select id="pay-student-select" class="mobile-input" required style="width: 100%;">
+                      <option value="">Cargando estudiantes...</option>
+                    </select>
+                  </div>
+                  <div class="mobile-form-group" style="margin-bottom: 14px;">
+                    <label class="mobile-label" for="pay-amount">Valor del Abono (COP)</label>
+                    <input type="number" id="pay-amount" class="mobile-input" placeholder="Ej: 180000" min="1000" step="1000" required style="width: 100%;">
+                  </div>
+                  <div class="mobile-form-group" style="margin-bottom: 14px;">
+                    <label class="mobile-label" for="pay-date">Fecha de Pago</label>
+                    <input type="date" id="pay-date" class="mobile-input" required style="width: 100%;">
+                  </div>
+                  <div class="mobile-form-group" style="margin-bottom: 14px;">
+                    <label class="mobile-label" for="pay-method">Método de Pago</label>
+                    <select id="pay-method" class="mobile-input" style="width: 100%;">
+                      <option value="Transferencia Bancaria">Transferencia Bancaria (Bancolombia)</option>
+                      <option value="Nequi">Nequi</option>
+                      <option value="Daviplata">Daviplata</option>
+                      <option value="Efectivo">Efectivo en Secretaría</option>
+                    </select>
+                  </div>
+                  <div class="mobile-form-group" style="margin-bottom: 18px;">
+                    <label class="mobile-label" for="pay-notes">Concepto / Notas</label>
+                    <input type="text" id="pay-notes" class="mobile-input" placeholder="Ej: Matrícula 2026 / Abono 1 Pensión" style="width: 100%;">
+                  </div>
+                  <button type="submit" id="btn-submit-payment" class="admin-action-btn" style="width: 100%; justify-content: center; background: #003366; padding: 12px; font-weight: 700;">
+                    💾 Registrar Abono Oficial
+                  </button>
+                </form>
+              </div>
+
+              <!-- Listado de Abonos Recientes en Sistema -->
+              <div style="background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                  <h4 style="margin: 0; font-weight: 700; color: #003366;">Abonos Registrados</h4>
+                  <button type="button" id="btn-refresh-admin-payments" class="admin-action-btn" style="padding: 5px 12px; font-size: 0.78rem; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
+                    🔄 Actualizar
+                  </button>
+                </div>
+                <div style="overflow-x: auto;">
+                  <table class="admin-table" style="width: 100%;">
+                    <thead>
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Estudiante</th>
+                        <th>Método</th>
+                        <th>Concepto</th>
+                        <th style="text-align: right;">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-payments-table-body">
+                      <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">Cargando abonos... ⏳</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: PREGUNTAS                                          -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-preguntas" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Gestión de Preguntas ICFES</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Banco de reactivos administrable: Selección múltiple, Verdadero/Falso, Respuesta abierta, Calificación por puntos o %, Temporizadores e Imágenes ilustrativas.</p>
+              </div>
+              <button id="btn-new-question" class="admin-action-btn">
+                <span>➕</span> Nueva Pregunta
+              </button>
+            </div>
+
+            <!-- Mini KPIs del Banco de Preguntas -->
+            <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:140px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Total Preguntas</span>
+                <div id="kpi-q-total" style="font-size:1.3rem;font-weight:800;color:var(--primary);margin-top:2px;">—</div>
+              </div>
+              <div style="flex:1;min-width:140px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Selección Múltiple</span>
+                <div id="kpi-q-mc" style="font-size:1.3rem;font-weight:800;color:#0284C7;margin-top:2px;">—</div>
+              </div>
+              <div style="flex:1;min-width:140px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Verdadero / Falso</span>
+                <div id="kpi-q-tf" style="font-size:1.3rem;font-weight:800;color:#7C3AED;margin-top:2px;">—</div>
+              </div>
+              <div style="flex:1;min-width:140px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Respuesta Abierta</span>
+                <div id="kpi-q-open" style="font-size:1.3rem;font-weight:800;color:#15803D;margin-top:2px;">—</div>
+              </div>
+            </div>
+
+            <!-- Filtros Avanzados -->
+            <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+              <div style="flex:2;min-width:200px;">
+                <input type="text" id="filter-q-search" class="mobile-input" style="margin-bottom:0;padding:8px 12px;font-size:0.85rem;" placeholder="🔍 Buscar por enunciado o concepto...">
+              </div>
+              <div style="flex:1;min-width:160px;">
+                <select id="filter-q-subject" class="mobile-input" style="margin-bottom:0;padding:8px 12px;font-size:0.85rem;">
+                  <option value="">Todas las materias</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:150px;">
+                <select id="filter-q-type" class="mobile-input" style="margin-bottom:0;padding:8px 12px;font-size:0.85rem;">
+                  <option value="">Todos los tipos</option>
+                  <option value="multiple_choice">🔘 Selección Múltiple</option>
+                  <option value="true_false">⚖️ Verdadero / Falso</option>
+                  <option value="open_text">✍️ Respuesta Abierta</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:130px;">
+                <select id="filter-q-difficulty" class="mobile-input" style="margin-bottom:0;padding:8px 12px;font-size:0.85rem;">
+                  <option value="">Dificultad</option>
+                  <option value="easy">Fácil</option>
+                  <option value="medium">Medio</option>
+                  <option value="hard">Difícil</option>
+                </select>
+              </div>
+              <button id="btn-reset-q-filters" class="tbl-action-btn" style="height:38px;padding:0 14px;border:1px solid #E2E8F0;" title="Restablecer filtros">
+                Limpiar
+              </button>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width:60px;">Imagen</th>
+                    <th>Pregunta / Enunciado</th>
+                    <th>Materia</th>
+                    <th>Tipo</th>
+                    <th>Calificación</th>
+                    <th>Temporizador</th>
+                    <th>Dificultad</th>
+                    <th style="text-align:right;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-questions">
+                  <!-- Renderizado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: SIMULACROS                                         -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-simulacros" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Banco y Sesiones de Simulacros</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Configuración de evaluaciones ICFES: Calificación por puntos o %, Temporizador por examen o por pregunta, y asignación de reactivos.</p>
+              </div>
+              <button id="btn-new-exam" class="admin-action-btn">
+                <span>➕</span> Nuevo Simulacro
+              </button>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nombre del Simulacro</th>
+                    <th>Modo Calificación</th>
+                    <th>Control de Tiempo</th>
+                    <th>Preguntas</th>
+                    <th>Estado</th>
+                    <th style="text-align:right;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-exams">
+                  <!-- Renderizado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: DOCUMENTOS                                         -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-documentos" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Revisión de documentos de identidad</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Aprobación y verificación de cédulas y tarjetas de identidad cargadas por los alumnos.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-wrapper">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Estudiante</th>
+                    <th>Documento</th>
+                    <th>Fecha de Subida</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>María García</strong></td>
+                    <td>Cédula de Ciudadanía (CC)</td>
+                    <td>15/05/2024</td>
+                    <td><span class="table-badge active">Aprobado</span></td>
+                    <td><button class="tbl-action-btn" onclick="App.showToast('Documento ya validado', 'info')">👁️</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Juan Pérez</strong></td>
+                    <td>Cédula de Ciudadanía (CC)</td>
+                    <td>16/05/2024</td>
+                    <td><span class="table-badge pending">Pendiente</span></td>
+                    <td>
+                      <div class="table-actions">
+                        <button class="tbl-action-btn" title="Aprobar" onclick="App.showToast('Documento aprobado para Juan Pérez', 'success')">✔</button>
+                        <button class="tbl-action-btn delete" title="Rechazar" onclick="App.showToast('Documento rechazado', 'error')">✖</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: REPORTES                                           -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-reportes" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>Estadísticas y Reportes</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Métricas de desempeño general y avance por materia ICFES.</p>
+              </div>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card purple">
+                <span class="kpi-label">Promedio Global</span>
+                <span class="kpi-value">345 / 500</span>
+              </div>
+              <div class="kpi-card green">
+                <span class="kpi-label">Tasa de Aprobación</span>
+                <span class="kpi-value">91.4%</span>
+              </div>
+              <div class="kpi-card orange">
+                <span class="kpi-label">Materia a Reforzar</span>
+                <span class="kpi-value">Lectura Crítica</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: MATRÍCULAS 2026 (JEAN PIAGET SCHOOL)               -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-matriculas" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>🎓 Sistema de Matrículas Digitales 2026</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Gestión de solicitudes, revisión de documentos oficiales y aprobación de matrículas para la I.E. Jean Piaget School.</p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <a href="matricula.html" target="_blank" class="admin-action-btn" style="text-decoration: none;">
+                  <span>➕</span> Nueva Solicitud
+                </a>
+                <button class="admin-action-btn" style="background: #003366;" onclick="AdminPanel.loadMatriculasData()">
+                  <span>🔄</span> Actualizar
+                </button>
+              </div>
+            </div>
+
+            <!-- Tarjetas KPI de Matrículas -->
+            <div class="kpi-grid">
+              <div class="kpi-card blue">
+                <span class="kpi-label">Total Solicitudes</span>
+                <span id="kpi-mat-total" class="kpi-value">0</span>
+              </div>
+              <div class="kpi-card yellow">
+                <span class="kpi-label">Pendientes Revisión</span>
+                <span id="kpi-mat-pending" class="kpi-value">0</span>
+              </div>
+              <div class="kpi-card purple">
+                <span class="kpi-label">Firmadas</span>
+                <span id="kpi-mat-signed" class="kpi-value">0</span>
+              </div>
+              <div class="kpi-card green">
+                <span class="kpi-label">Aprobadas</span>
+                <span id="kpi-mat-approved" class="kpi-value">0</span>
+              </div>
+              <div class="kpi-card orange">
+                <span class="kpi-label">Borradores</span>
+                <span id="kpi-mat-draft" class="kpi-value">0</span>
+              </div>
+              <div class="kpi-card red">
+                <span class="kpi-label">Rechazadas</span>
+                <span id="kpi-mat-rejected" class="kpi-value">0</span>
+              </div>
+            </div>
+
+            <!-- Barra de Búsqueda y Filtros -->
+            <div class="filter-bar" style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; background: #ffffff; padding: 14px 18px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+              <input type="text" id="mat-filter-search" placeholder="🔍 Buscar por código, estudiante, documento o acudiente..." style="flex: 2; min-width: 250px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.85rem;">
+              
+              <select id="mat-filter-status" style="flex: 1; min-width: 150px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.85rem;">
+                <option value="">Todos los Estados</option>
+                <option value="PENDING_REVIEW">Pendiente de Revisión</option>
+                <option value="SIGNED">Firmadas</option>
+                <option value="APPROVED">Aprobadas</option>
+                <option value="DOCUMENTS_PENDING">Correcciones Requeridas</option>
+                <option value="REJECTED">Rechazadas</option>
+                <option value="DRAFT">Borradores</option>
+              </select>
+
+              <select id="mat-filter-level" style="flex: 1; min-width: 160px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.85rem;">
+                <option value="">Todos los Niveles</option>
+                <option value="PREESCOLAR">Preescolar</option>
+                <option value="BASICA_PRIMARIA">Básica Primaria</option>
+                <option value="BACHILLERATO_CICLOS">Bachillerato por Ciclos</option>
+              </select>
+
+              <button type="button" class="btn-primary" style="padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; background: #003366; color: #ffffff; border: none;" onclick="AdminPanel.loadMatriculasData()">
+                Filtrar
+              </button>
+            </div>
+
+            <!-- Tabla de Matrículas -->
+            <div class="data-table-card" style="margin-top: 16px;">
+              <div class="table-responsive">
+                <table class="admin-data-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Estudiante</th>
+                      <th>Doc. Identidad</th>
+                      <th>Nivel / Grado</th>
+                      <th>Acudiente</th>
+                      <th>Celular</th>
+                      <th>Estado</th>
+                      <th>Documentos</th>
+                      <th style="text-align: right;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="matriculas-table-body">
+                    <tr>
+                      <td colspan="9" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                        Cargando solicitudes de matrícula...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- -------------------------------------------------------- -->
+          <!-- PANE: CRONOGRAMA & ALCANCE INSTITUCIONAL 2026            -->
+          <!-- -------------------------------------------------------- -->
+          <div id="pane-cronograma" class="admin-tab-pane">
+            <div class="admin-header-row">
+              <div>
+                <h2>📅 Cronograma Institucional & Alcance de la Plataforma</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                  Planificación estratégica del Año Escolar 2026, seguimiento de hitos de calendario y matriz de alcance integral para la Institución Educativa Jean Piaget School.
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" id="btn-add-cronograma" class="admin-action-btn" style="background: #003366; font-size: 0.8rem; padding: 7px 14px;">
+                  ➕ Nuevo Hito
+                </button>
+                <button type="button" id="btn-print-cronograma" class="admin-action-btn" style="background: #475569; font-size: 0.8rem; padding: 7px 14px;">
+                  🖨️ Exportar / Imprimir
+                </button>
+                <button type="button" id="btn-reset-cronograma" class="admin-action-btn" style="background: #64748b; font-size: 0.8rem; padding: 7px 14px;">
+                  🔄 Restablecer Oficial
+                </button>
+              </div>
+            </div>
+
+            <!-- KPIs de Cronograma & Entregables -->
+            <div class="kpi-grid">
+              <div class="kpi-card blue">
+                <span class="kpi-label">Hitos Institucionales</span>
+                <span class="kpi-value" id="kpi-cronograma-total">6 Fases</span>
+              </div>
+              <div class="kpi-card green">
+                <span class="kpi-label">Fase Actual</span>
+                <span class="kpi-value" style="font-size: 1.15rem; color: #15803d;">Matrículas 2026</span>
+              </div>
+              <div class="kpi-card purple">
+                <span class="kpi-label">Alcance Funcional</span>
+                <span class="kpi-value">4 Módulos (100%)</span>
+              </div>
+              <div class="kpi-card orange">
+                <span class="kpi-label">Marco Legal</span>
+                <span class="kpi-value" style="font-size: 1.15rem; color: #b45309;">Ley 527 / CGP</span>
+              </div>
+            </div>
+
+            <!-- SECCIÓN 1: CRONOGRAMA INSTITUCIONAL 2026 INTERACTIVO -->
+            <div style="background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-top: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h3 style="font-size: 1.1rem; color: var(--piaget-navy); font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    🗓️ Calendario de Actividades e Hitos 2026
+                  </h3>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Resolución No. 644 / No. 1187 &bull; Girardot, Cundinamarca</span>
+                </div>
+                <span class="badge-matricula" style="background: #15803d; color: white; padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 0.78rem;">
+                  ✔ Calendario Oficial Activo
+                </span>
+              </div>
+
+              <!-- Barra de Filtros y Búsqueda -->
+              <div class="cronograma-toolbar">
+                <div class="cronograma-filters">
+                  <input type="text" id="input-search-cronograma" class="cronograma-select-filter" placeholder="🔍 Buscar hito o actividad..." style="min-width: 220px;">
+                  <select id="select-status-cronograma" class="cronograma-select-filter">
+                    <option value="ALL">Todos los Estados</option>
+                    <option value="EN EJECUCIÓN">En Ejecución</option>
+                    <option value="PROGRAMADO">Programados</option>
+                    <option value="PERMANENTE">Permanentes</option>
+                    <option value="CONCLUIDO">Concluidos</option>
+                  </select>
+                  <select id="select-area-cronograma" class="cronograma-select-filter">
+                    <option value="ALL">Todas las Áreas</option>
+                    <option value="Rectoría">Rectoría / Admisiones</option>
+                    <option value="Secretaría Académica">Secretaría Académica</option>
+                    <option value="Tesorería">Tesorería / Pagaduría</option>
+                    <option value="Coordinación">Coordinación Pedagógica</option>
+                    <option value="Tecnología">Sistemas & TI</option>
+                  </select>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);" id="cronograma-count-label">
+                  Mostrando 6 hitos
+                </div>
+              </div>
+
+              <!-- Contenedor Dinámico de Hitos -->
+              <div id="cronograma-milestones-container">
+                <!-- Se renderiza dinámicamente con JavaScript -->
+              </div>
+            </div>
+
+            <!-- SECCIÓN 2: MATRIZ DE ALCANCE INTEGRAL (SEGMENTADA POR PESTAÑAS) -->
+            <div style="background: var(--bg-surface); border-radius: var(--radius-lg); padding: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-top: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                <h3 style="font-size: 1.1rem; color: var(--piaget-navy); font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                  🎯 Matriz de Alcance Integral del Sistema
+                </h3>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">Especificación Técnica & Jurídica</span>
+              </div>
+
+              <!-- Pestañas de Navegación de Alcance -->
+              <div class="scope-tabs-nav">
+                <button type="button" class="scope-tab-btn active" data-scope="modulos">🧩 Módulos del Sistema</button>
+                <button type="button" class="scope-tab-btn" data-scope="legal">⚖️ Marco Legal & Normativo</button>
+                <button type="button" class="scope-tab-btn" data-scope="financiero">💰 Régimen Económico & Cartera</button>
+                <button type="button" class="scope-tab-btn" data-scope="tecnico">📦 Entregables Técnicos & SLA</button>
+              </div>
+
+              <!-- Panel 1: Módulos del Sistema -->
+              <div id="scope-pane-modulos" class="scope-pane-content active">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 18px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                      <span style="font-size: 1.4rem;">🎓</span>
+                      <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #003366; margin: 0;">1. Matrícula Digital Jean Piaget</h4>
+                        <span style="font-size: 0.72rem; color: #15803d; font-weight: 700;">100% OPERATIVO</span>
+                      </div>
+                    </div>
+                    <ul style="font-size: 0.8rem; color: #475569; line-height: 1.6; padding-left: 16px; margin: 0;">
+                      <li>Flujo guiado de 10 pasos con persistencia automática de borrador.</li>
+                      <li>Niveles configurados: Preescolar, Básica Primaria y Bachillerato Ciclos.</li>
+                      <li>Compilación PDF automática de los 4 documentos oficiales institucionales.</li>
+                      <li>Firma electrónica sobre Canvas (Ley 527/99) con trazabilidad IP y SHA-256.</li>
+                    </ul>
+                  </div>
+
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 18px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                      <span style="font-size: 1.4rem;">📱</span>
+                      <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #003366; margin: 0;">2. Portal Web & App Móvil</h4>
+                        <span style="font-size: 0.72rem; color: #15803d; font-weight: 700;">100% OPERATIVO</span>
+                      </div>
+                    </div>
+                    <ul style="font-size: 0.8rem; color: #475569; line-height: 1.6; padding-left: 16px; margin: 0;">
+                      <li>Autenticación segura JWT con link de invitación por correo (48h de vigencia).</li>
+                      <li>Simuladores cronometrados tipo ICFES por materias con cálculo en tiempo real.</li>
+                      <li>Subida y verificación de documento de identidad del estudiante.</li>
+                      <li>Historial de pagos, estado de cuenta y consulta de calificaciones.</li>
+                    </ul>
+                  </div>
+
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 18px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                      <span style="font-size: 1.4rem;">💳</span>
+                      <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #003366; margin: 0;">3. Cartera, Costos & Pagaré</h4>
+                        <span style="font-size: 0.72rem; color: #15803d; font-weight: 700;">100% OPERATIVO</span>
+                      </div>
+                    </div>
+                    <ul style="font-size: 0.8rem; color: #475569; line-height: 1.6; padding-left: 16px; margin: 0;">
+                      <li>Cálculo automático de Matrícula ($180.000) y 10 mensualidades ($150.000).</li>
+                      <li>Conversión automática de montos monetarios a palabras en español.</li>
+                      <li>Carta de instrucciones y pagaré en blanco con mérito ejecutivo (Art. 422 CGP).</li>
+                      <li>Gestión de recargos moratorios del 5% y reportes a centrales de riesgo a 60 días.</li>
+                    </ul>
+                  </div>
+
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: 18px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                      <span style="font-size: 1.4rem;">📊</span>
+                      <div>
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #003366; margin: 0;">4. Panel Administrativo & Auditoría</h4>
+                        <span style="font-size: 0.72rem; color: #15803d; font-weight: 700;">100% OPERATIVO</span>
+                      </div>
+                    </div>
+                    <ul style="font-size: 0.8rem; color: #475569; line-height: 1.6; padding-left: 16px; margin: 0;">
+                      <li>Tablero de control con KPIs financieros, de matrículas y simulacros.</li>
+                      <li>Búsqueda y filtros avanzados por estado, cédula, nombre y código.</li>
+                      <li>Modal de decisión de Rectoría con notificación inmediata SMTP por correo.</li>
+                      <li>Pistas de auditoría inmutables en tabla <code>enrollment_audit_logs</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 2: Marco Legal & Normativo -->
+              <div id="scope-pane-legal" class="scope-pane-content">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
+                  <div style="background: #f8fafc; border-left: 4px solid #0284c7; padding: 14px; border-radius: 6px;">
+                    <strong style="color: #0369a1; font-size: 0.88rem;">Ley 115 de 1994 & Decreto 1075 de 2015</strong>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 6px 0 0;">
+                      Regula el servicio público educativo en Colombia. Formaliza el contrato de cooperativa y prestación de servicios educativos entre la institución y los padres de familia para el ciclo escolar 2026.
+                    </p>
+                  </div>
+                  <div style="background: #f8fafc; border-left: 4px solid #16a34a; padding: 14px; border-radius: 6px;">
+                    <strong style="color: #15803d; font-size: 0.88rem;">Ley 527 de 1999 (Comercio Electrónico & Firma Digital)</strong>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 6px 0 0;">
+                      Otorga plena validez jurídica, probatoria y ejecutiva a los mensajes de datos y a las firmas electrónicas capturadas con estampa de tiempo UTC, dirección IP de radicación y hash criptográfico SHA-256.
+                    </p>
+                  </div>
+                  <div style="background: #f8fafc; border-left: 4px solid #9333ea; padding: 14px; border-radius: 6px;">
+                    <strong style="color: #7e22ce; font-size: 0.88rem;">Ley 1581 de 2012 (Protección de Datos / Habeas Data)</strong>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 6px 0 0;">
+                      Consentimiento expreso e informado del acudiente para el tratamiento de datos personales y sensibles de menores de edad con fines estrictamente académicos e institucionales.
+                    </p>
+                  </div>
+                  <div style="background: #f8fafc; border-left: 4px solid #ea580c; padding: 14px; border-radius: 6px;">
+                    <strong style="color: #c2410c; font-size: 0.88rem;">Sentencia SU-624 de 1999 (Corte Constitucional)</strong>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 6px 0 0;">
+                      Establece la facultad legal de la institución educativa para retener certificados y constancias de estudio en casos de mora calificada e injustificada, garantizando el debido proceso.
+                    </p>
+                  </div>
+                  <div style="background: #f8fafc; border-left: 4px solid #dc2626; padding: 14px; border-radius: 6px; grid-column: 1 / -1;">
+                    <strong style="color: #b91c1c; font-size: 0.88rem;">Artículo 422 Código General del Proceso (Mérito Ejecutivo de Pagaré)</strong>
+                    <p style="font-size: 0.8rem; color: #475569; margin: 6px 0 0;">
+                      El Pagaré formalizado junto con la Carta de Instrucciones presta mérito ejecutivo claro, expreso y exigible para cobro coactivo o judicial de saldos vencidos, gastos de cobranza (20%) y cláusula penal moratoria.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 3: Régimen Económico & Cartera -->
+              <div id="scope-pane-financiero" class="scope-pane-content">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+                    <h4 style="margin: 0 0 10px; color: #003366; font-size: 0.92rem;">💵 Tarifas Institucionales Vigentes 2026</h4>
+                    <table style="width: 100%; font-size: 0.82rem; border-collapse: collapse;">
+                      <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 8px 0; font-weight: 600;">Concepto Matrícula Ordinaria:</td>
+                        <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #15803d;">$180.000 COP</td>
+                      </tr>
+                      <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 8px 0; font-weight: 600;">Pensión Mensual (10 Cuotas):</td>
+                        <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #0284c7;">$150.000 COP / mes</td>
+                      </tr>
+                      <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 8px 0; font-weight: 600;">Periodo de Cobro Pensión:</td>
+                        <td style="padding: 8px 0; text-align: right; color: #475569;">Primeros 5 días calendario</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-weight: 600;">Recargo Extemporáneo por Mora:</td>
+                        <td style="padding: 8px 0; text-align: right; font-weight: 700; color: #dc2626;">5% adicional</td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+                    <h4 style="margin: 0 0 10px; color: #003366; font-size: 0.92rem;">⚖️ Política de Cobranza & Centrales de Riesgo</h4>
+                    <ul style="font-size: 0.8rem; color: #475569; line-height: 1.6; padding-left: 16px; margin: 0;">
+                      <li><strong>Plazo Ordinario:</strong> Cancelación durante los primeros 5 días hábiles del mes sin penalidad.</li>
+                      <li><strong>Preaviso de Reporte:</strong> Envío de comunicación de alerta previa con 19 días calendario de anticipación.</li>
+                      <li><strong>Reporte Negativo a Centrales:</strong> Notificación a TransUnion / Datacrédito una vez cumplidos 60 días de mora continua.</li>
+                      <li><strong>Gastos de Cobranza:</strong> Reconocimiento del 20% sobre el saldo capital por concepto de gestión prejurídica y jurídica.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel 4: Entregables Técnicos & SLA -->
+              <div id="scope-pane-tecnico" class="scope-pane-content">
+                <div class="table-responsive">
+                  <table class="admin-data-table" style="font-size: 0.82rem;">
+                    <thead>
+                      <tr>
+                        <th>Entregable Técnico</th>
+                        <th>Componente / Archivos Clave</th>
+                        <th>Tecnología</th>
+                        <th>Estado</th>
+                        <th style="text-align: right;">Progreso</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Motor de Matrículas REST</strong></td>
+                        <td><code>EnrollmentController.php</code>, <code>AdminEnrollmentController.php</code></td>
+                        <td>PHP 8.3 / PDO / JSON</td>
+                        <td><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">OPERATIVO</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">100%</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Base de Datos Relacional</strong></td>
+                        <td>10 Tablas (students, parents, guardians, enrollments, signatures...)</td>
+                        <td>MySQL / InnoDB</td>
+                        <td><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">OPERATIVO</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">100%</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Motor de PDFs Oficiales</strong></td>
+                        <td><code>PdfDocumentService.php</code> + 4 Plantillas Oficiales</td>
+                        <td>Dompdf ^3.1</td>
+                        <td><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">OPERATIVO</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">100%</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Frontend Wizard 10 Pasos</strong></td>
+                        <td><code>matricula.html</code>, <code>matricula.css</code>, <code>matricula-wizard.js</code></td>
+                        <td>Vanilla JS / CSS3 / Canvas</td>
+                        <td><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">OPERATIVO</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">100%</td>
+                      </tr>
+                      <tr>
+                        <td><strong>Notificaciones Transaccionales</strong></td>
+                        <td><code>EmailService.php</code> (Radicación y Estados)</td>
+                        <td>SMTP Hostinger Nativo</td>
+                        <td><span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">OPERATIVO</span></td>
+                        <td style="text-align: right; font-weight: 700; color: #15803d;">100%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div> <!-- .admin-main-content -->
+
+      </div> <!-- .admin-layout -->
+    </section>
+
+  </main>
+
+  <!-- MODAL: NUEVO USUARIO -->
+  <div id="user-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>✉️ Invitar Nuevo Estudiante</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-user">
+        <div class="modal-body">
+
+          <!-- Aviso informativo -->
+          <div style="background:linear-gradient(135deg,#EEF2FF,#F0FDF4);border:1px solid #C7D2FE;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start;">
+            <span style="font-size:1.3rem;flex-shrink:0;">📧</span>
+            <div>
+              <p style="margin:0 0 4px;font-weight:700;color:#3730A3;font-size:0.88rem;">Se enviará un correo de activación</p>
+              <p style="margin:0;color:#4338CA;font-size:0.82rem;line-height:1.5;">El estudiante recibirá un enlace para crear su contraseña. El enlace expira en 48 horas.</p>
+            </div>
+          </div>
+
+          <div class="mobile-form-group">
+            <label class="mobile-label">Nombres Completos <span style="color:#EF4444;">*</span></label>
+            <input id="modal-user-name" type="text" class="mobile-input" placeholder="Ej: Santiago Mendoza García" required>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Correo Electrónico <span style="color:#EF4444;">*</span></label>
+            <input id="modal-user-email" type="email" class="mobile-input" placeholder="correo@ejemplo.com" required>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Teléfono / Celular</label>
+            <input id="modal-user-phone" type="tel" class="mobile-input" placeholder="300 000 0000">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width:auto;padding:0 14px;">Cancelar</button>
+          <button id="btn-send-invite" type="submit" class="admin-action-btn">📤 Enviar invitación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN DE PREGUNTA (CREAR / EDITAR) -->
+  <div id="question-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 id="modal-q-title">Nueva Pregunta ICFES</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-question" style="display: flex; flex-direction: column; overflow: hidden; flex: 1;">
+        <input type="hidden" id="modal-q-id" value="">
+        <input type="hidden" id="modal-q-image-url" value="">
+
+        <div class="modal-body" style="overflow-y: auto; padding: 18px 22px; flex: 1;">
+          
+          <!-- Fila 1: Materia y Tipo de Pregunta -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Materia ICFES <span style="color:#EF4444;">*</span></label>
+              <select id="modal-q-subject" class="mobile-input" required>
+                <!-- Opciones dinámicas de materias -->
+              </select>
+            </div>
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Tipo de Pregunta <span style="color:#EF4444;">*</span></label>
+              <select id="modal-q-type" class="mobile-input">
+                <option value="multiple_choice">🔘 Selección Múltiple (4 Opciones)</option>
+                <option value="true_false">⚖️ Verdadero o Falso</option>
+                <option value="open_text">✍️ Escribir Respuesta (Abierta / Corta)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Fila 2: Calificación y Tiempo -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap: 12px; margin-bottom: 14px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 10px;">
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Sistema de Calificación</label>
+              <select id="modal-q-score-type" class="mobile-input" style="background:#FFF;">
+                <option value="points">Por Puntos directos</option>
+                <option value="percentage">Por Porcentaje (%)</option>
+              </select>
+            </div>
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label" id="lbl-score-val">Valor (Puntos)</label>
+              <input type="number" id="modal-q-score-weight" class="mobile-input" value="1.0" min="0.1" step="0.1" required style="background:#FFF;">
+            </div>
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">⏱️ Tiempo Límite</label>
+              <select id="modal-q-time-limit" class="mobile-input" style="background:#FFF;">
+                <option value="0">Global (Sin límite ind.)</option>
+                <option value="30">⏱️ 30 Segundos</option>
+                <option value="45">⏱️ 45 Segundos</option>
+                <option value="60">⏱️ 60 Segundos (1 min)</option>
+                <option value="90">⏱️ 90 Segundos (1.5 m)</option>
+                <option value="120">⏱️ 120 Segundos (2 m)</option>
+                <option value="180">⏱️ 180 Segundos (3 m)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dificultad -->
+          <div class="mobile-form-group">
+            <label class="mobile-label">Nivel de Dificultad</label>
+            <div style="display: flex; gap: 10px;">
+              <label style="flex:1; display:flex; align-items:center; gap:6px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:6px 12px; font-size:0.82rem; cursor:pointer;">
+                <input type="radio" name="q-diff-radio" value="easy"> 🟢 Fácil
+              </label>
+              <label style="flex:1; display:flex; align-items:center; gap:6px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:6px 12px; font-size:0.82rem; cursor:pointer;">
+                <input type="radio" name="q-diff-radio" value="medium" checked> 🟡 Medio
+              </label>
+              <label style="flex:1; display:flex; align-items:center; gap:6px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:6px 12px; font-size:0.82rem; cursor:pointer;">
+                <input type="radio" name="q-diff-radio" value="hard"> 🔴 Difícil
+              </label>
+            </div>
+          </div>
+
+          <!-- Enunciado -->
+          <div class="mobile-form-group">
+            <label class="mobile-label">Enunciado o Pregunta <span style="color:#EF4444;">*</span></label>
+            <textarea id="modal-q-statement" class="mobile-input" rows="3" placeholder="Escribe aquí el contexto, problema, texto o pregunta..." required></textarea>
+          </div>
+
+          <!-- Imagen Ilustrativa -->
+          <div class="mobile-form-group" style="background:#F1F5F9; border:1.5px dashed #CBD5E1; border-radius:10px; padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="mobile-label" style="margin-bottom:0;">🖼️ Imagen Ilustrativa (Opcional)</label>
+              <span style="font-size:0.75rem; color:var(--text-muted);">PNG, JPG, WEBP (Max 10MB)</span>
+            </div>
+            
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="file" id="modal-q-image-file" accept="image/*" style="font-size:0.82rem; flex:1;">
+              <button type="button" id="btn-upload-q-img" class="tbl-action-btn" style="padding:6px 12px; height:auto; border:1px solid #CBD5E1;">
+                Subir Imagen
+              </button>
+            </div>
+
+            <!-- Preview de la imagen -->
+            <div id="modal-q-image-preview-wrap" style="display:none; margin-top:10px; align-items:center; gap:12px; background:#FFFFFF; padding:8px 12px; border-radius:8px; border:1px solid #E2E8F0;">
+              <img id="modal-q-image-preview" src="" style="max-height:80px; max-width:120px; object-fit:contain; border-radius:6px;">
+              <div style="flex:1;">
+                <div style="font-size:0.75rem; font-weight:700; color:#0F172A;">Imagen adjunta lista</div>
+                <div id="modal-q-image-name" style="font-size:0.72rem; color:var(--text-muted); word-break:break-all;"></div>
+              </div>
+              <button type="button" id="btn-remove-q-img" class="tbl-action-btn delete" style="padding:4px 8px; font-size:0.75rem;">
+                ❌ Quitar
+              </button>
+            </div>
+          </div>
+
+          <!-- PANEL: OPCIONES PARA SELECCIÓN MÚLTIPLE -->
+          <div id="panel-opt-multiple-choice" style="display:block; margin-top:14px;">
+            <label class="mobile-label">Opciones de Respuesta (Marca cuál es la correcta) <span style="color:#EF4444;">*</span></label>
+            
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Opción A -->
+              <div style="display:flex; align-items:center; gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 12px; border-radius:8px;">
+                <input type="radio" name="q-correct-option" id="radio-opt-A" value="A" checked title="Marcar como correcta">
+                <span style="font-weight:800; font-size:0.85rem; width:22px; color:var(--primary);">A)</span>
+                <input type="text" id="modal-q-optA" class="mobile-input" style="margin-bottom:0; flex:1;" placeholder="Opción A...">
+              </div>
+
+              <!-- Opción B -->
+              <div style="display:flex; align-items:center; gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 12px; border-radius:8px;">
+                <input type="radio" name="q-correct-option" id="radio-opt-B" value="B" title="Marcar como correcta">
+                <span style="font-weight:800; font-size:0.85rem; width:22px; color:var(--primary);">B)</span>
+                <input type="text" id="modal-q-optB" class="mobile-input" style="margin-bottom:0; flex:1;" placeholder="Opción B...">
+              </div>
+
+              <!-- Opción C -->
+              <div style="display:flex; align-items:center; gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 12px; border-radius:8px;">
+                <input type="radio" name="q-correct-option" id="radio-opt-C" value="C" title="Marcar como correcta">
+                <span style="font-weight:800; font-size:0.85rem; width:22px; color:var(--primary);">C)</span>
+                <input type="text" id="modal-q-optC" class="mobile-input" style="margin-bottom:0; flex:1;" placeholder="Opción C...">
+              </div>
+
+              <!-- Opción D -->
+              <div style="display:flex; align-items:center; gap:10px; background:#F8FAFC; border:1px solid #E2E8F0; padding:8px 12px; border-radius:8px;">
+                <input type="radio" name="q-correct-option" id="radio-opt-D" value="D" title="Marcar como correcta">
+                <span style="font-weight:800; font-size:0.85rem; width:22px; color:var(--primary);">D)</span>
+                <input type="text" id="modal-q-optD" class="mobile-input" style="margin-bottom:0; flex:1;" placeholder="Opción D...">
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL: OPCIONES PARA VERDADERO / FALSO -->
+          <div id="panel-opt-true-false" style="display:none; margin-top:14px; background:#FAF5FF; border:1px solid #E9D5FF; padding:14px; border-radius:10px;">
+            <label class="mobile-label" style="color:#6B21A8;">Respuesta Correcta para Verdadero / Falso <span style="color:#EF4444;">*</span></label>
+            <div style="display:flex; gap:16px; margin-top:6px;">
+              <label style="flex:1; display:flex; align-items:center; gap:8px; background:#FFFFFF; border:1.5px solid #C084FC; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="q-correct-tf" value="A" checked> ✅ Verdadero
+              </label>
+              <label style="flex:1; display:flex; align-items:center; gap:8px; background:#FFFFFF; border:1.5px solid #C084FC; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="q-correct-tf" value="B"> ❌ Falso
+              </label>
+            </div>
+          </div>
+
+          <!-- PANEL: RESPUESTA ABIERTA / ESCRIBIR RESPUESTA -->
+          <div id="panel-opt-open-text" style="display:none; margin-top:14px; background:#F0FDF4; border:1px solid #BBF7D0; padding:14px; border-radius:10px;">
+            <label class="mobile-label" style="color:#166534;">Respuesta Correcta Esperada <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="modal-q-correct-text" class="mobile-input" style="background:#FFF; margin-bottom:6px;" placeholder="Ej: Fotosíntesis, 42, Bogotá...">
+            <p style="font-size:0.75rem; color:#15803D; margin:0;">
+              💡 <em>Insensible a mayúsculas y minúsculas. Puedes separar múltiples respuestas válidas por comas (ej: <code>10, diez, diez metros</code>).</em>
+            </p>
+          </div>
+
+          <!-- Explicación pedagógica -->
+          <div class="mobile-form-group" style="margin-top:16px;">
+            <label class="mobile-label">Explicación Pedagógica / Retroalimentación</label>
+            <textarea id="modal-q-explanation" class="mobile-input" rows="2" placeholder="Explica por qué la respuesta correcta es la elegida..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; padding:14px 22px; border-top:1px solid #E2E8F0;">
+          <button type="button" id="btn-preview-question" class="tbl-action-btn" style="padding:8px 14px; height:auto; border:1px solid #CBD5E1;">
+            👁️ Vista Previa
+          </button>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 16px; height:auto;">Cancelar</button>
+            <button type="submit" id="btn-save-question" class="admin-action-btn">💾 Guardar Pregunta</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VISTA PREVIA DE PREGUNTA (ESTUDIANTE) -->
+  <div id="preview-question-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header" style="background:#002244;">
+        <h3 style="color:#FFF;">👁️ Vista Previa de Pregunta</h3>
+        <button class="modal-close-btn" style="color:#FFF;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        
+        <!-- Badges meta -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+          <span id="prev-q-subject-badge" style="background:#EFF6FF; color:#1D4ED8; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:6px;">MATEMÁTICAS</span>
+          <span id="prev-q-type-badge" style="background:#F1F5F9; color:#475569; font-size:0.75rem; font-weight:700; padding:4px 8px; border-radius:6px;">🔘 Selección Múltiple</span>
+          <span id="prev-q-score-badge" style="background:#DCFCE7; color:#15803D; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:6px;">1.0 pts</span>
+          <span id="prev-q-timer-badge" style="background:#FEF3C7; color:#B45309; font-size:0.75rem; font-weight:800; padding:4px 8px; border-radius:6px;">⏱️ 60s</span>
+        </div>
+
+        <!-- Imagen ilustrativa si existe -->
+        <div id="prev-q-img-wrap" style="display:none; text-align:center; margin-bottom:14px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:10px;">
+          <img id="prev-q-img" src="" style="max-height:180px; max-width:100%; object-fit:contain; border-radius:6px;">
+        </div>
+
+        <!-- Enunciado -->
+        <div id="prev-q-statement" style="font-size:0.95rem; font-weight:700; color:#0F172A; line-height:1.5; margin-bottom:16px;">
+          Enunciado de prueba...
+        </div>
+
+        <!-- Opciones renderizadas -->
+        <div id="prev-q-options" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+          <!-- Opciones dinámicas -->
+        </div>
+
+        <!-- Explicación -->
+        <div id="prev-q-exp-wrap" style="background:#EFF6FF; border-left:4px solid #3B82F6; padding:10px 14px; border-radius:6px;">
+          <div style="font-size:0.75rem; font-weight:800; color:#1D4ED8; margin-bottom:2px;">💡 Explicación pedagógica:</div>
+          <div id="prev-q-exp-text" style="font-size:0.8rem; color:#334155;"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="modal-close-btn admin-action-btn" style="width:100%;">Entendido / Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN DE SIMULACRO (CREAR / EDITAR) -->
+  <div id="exam-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 650px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 id="modal-exam-heading">Configurar Simulacro ICFES</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-exam" style="display: flex; flex-direction: column; overflow: hidden; flex: 1;">
+        <input type="hidden" id="modal-exam-id" value="">
+
+        <div class="modal-body" style="overflow-y: auto; padding: 18px 22px; flex: 1;">
+          <div class="mobile-form-group">
+            <label class="mobile-label">Título del Simulacro <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="modal-exam-title" class="mobile-input" placeholder="Ej: Simulacro Diagnóstico Saber 11° - Sesión 1" required>
+          </div>
+
+          <div class="mobile-form-group">
+            <label class="mobile-label">Descripción</label>
+            <textarea id="modal-exam-description" class="mobile-input" rows="2" placeholder="Objetivo, materias y alcance pedagógico..."></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Modo de Calificación</label>
+              <select id="modal-exam-scoring-mode" class="mobile-input">
+                <option value="points">Por Puntos Directos</option>
+                <option value="percentage">Por Porcentajes (%)</option>
+              </select>
+            </div>
+
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Modo de Temporizador</label>
+              <select id="modal-exam-timer-mode" class="mobile-input">
+                <option value="exam">Por todo el Cuestionario (Global)</option>
+                <option value="per_question">Por cada Pregunta (Individual)</option>
+                <option value="both">Ambos (Límite global y por pregunta)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Duración Global (Minutos)</label>
+              <input type="number" id="modal-exam-duration" class="mobile-input" value="60" min="5" max="360" required>
+            </div>
+
+            <div class="mobile-form-group" style="margin-bottom: 0;">
+              <label class="mobile-label">Tiempo por Pregunta por defecto (Segundos)</label>
+              <input type="number" id="modal-exam-time-per-q" class="mobile-input" value="60" min="10" max="600" required>
+            </div>
+          </div>
+
+          <!-- Selector de Preguntas -->
+          <div class="mobile-form-group" style="margin-bottom:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="mobile-label" style="margin-bottom:0;">Seleccionar Preguntas del Banco (<span id="modal-exam-selected-count">0</span> seleccionadas)</label>
+              <button type="button" id="btn-select-all-q" style="background:none; border:none; color:var(--primary); font-size:0.75rem; font-weight:700; cursor:pointer;">Seleccionar Todas</button>
+            </div>
+            
+            <input type="text" id="modal-exam-search-q" class="mobile-input" placeholder="🔍 Filtrar preguntas del banco..." style="padding:6px 10px; font-size:0.8rem; margin-bottom:8px;">
+
+            <div id="modal-exam-questions-list" style="max-height: 180px; overflow-y: auto; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px; background: #F8FAFC;">
+              <!-- Checkboxes generados dinámicamente -->
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 0 14px;">Cancelar</button>
+          <button type="submit" id="btn-save-exam" class="admin-action-btn">💾 Guardar Simulacro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ACTIVACIÓN DE CUENTA / CREAR CONTRASEÑA -->
+  <div id="activation-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔐 Activa tu Cuenta de Estudiante</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-activation">
+        <input type="hidden" id="activation-token" value="">
+        <div class="modal-body">
+          <div style="background:linear-gradient(135deg,#EEF2FF,#F5F3FF);border:1px solid #C7D2FE;border-radius:12px;padding:14px 16px;margin-bottom:18px;">
+            <p style="margin:0 0 4px;font-weight:700;color:#3730A3;font-size:0.9rem;">¡Bienvenido/a a la plataforma ICFES!</p>
+            <p id="activation-welcome-text" style="margin:0;color:#4338CA;font-size:0.83rem;line-height:1.5;">Hola, define tu contraseña para activar tu acceso y comenzar tu preparación.</p>
+          </div>
+
+          <div class="mobile-form-group">
+            <label class="mobile-label">Nueva Contraseña <span style="color:#EF4444;">*</span></label>
+            <input id="modal-act-pass" type="password" class="mobile-input" placeholder="Mínimo 8 caracteres" required minlength="8">
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Confirmar Contraseña <span style="color:#EF4444;">*</span></label>
+            <input id="modal-act-pass-confirm" type="password" class="mobile-input" placeholder="Repite tu contraseña" required minlength="8">
+          </div>
+          <div id="activation-error-msg" style="display:none;color:#EF4444;font-size:0.82rem;font-weight:600;margin-top:8px;"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-submit-activation" type="submit" class="admin-action-btn" style="width:100%;">🚀 Activar cuenta y entrar</button>
+        </div>
+      </form>
+    </div>
+  <!-- MODAL: DETALLE Y REVISIÓN DE MATRÍCULA (JEAN PIAGET SCHOOL) -->
+  <div id="matricula-detail-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 850px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #002244, #003366); color: white;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="assets/flag_jean_piaget.jpg" style="width: 32px; height: 20px; border-radius: 3px;" alt="Bandera">
+          <div>
+            <h3 id="modal-mat-title" style="margin: 0; font-size: 1.1rem; color: white;">Expediente de Matrícula</h3>
+            <span id="modal-mat-code" style="font-size: 0.8rem; color: #6ee7b7; font-weight: 700;">MAT-2026-0000</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div id="modal-mat-content">
+          <!-- Dinámico desde JS -->
+        </div>
+
+        <!-- Formulario de Decisión Administrativa -->
+        <div style="margin-top: 24px; padding-top: 18px; border-top: 2px solid #e2e8f0;">
+          <h4 style="color: #003366; margin-bottom: 12px; font-size: 1rem;">⚖️ Decisión Administrativa de Rectoría</h4>
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 14px;">
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Cambiar Estado:</label>
+              <select id="modal-mat-action-status" class="mobile-input" style="width: 100%; padding: 8px 12px;">
+                <option value="APPROVED">✅ Aprobar Matrícula</option>
+                <option value="DOCUMENTS_PENDING">⚠️ Solicitar Correcciones</option>
+                <option value="REJECTED">❌ Rechazar Solicitud</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.82rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px;">Observaciones / Motivo (se enviará al acudiente):</label>
+              <input type="text" id="modal-mat-action-obs" class="mobile-input" placeholder="Ej: Cumple con todos los requisitos / Adjuntar certificado..." style="width: 100%; padding: 8px 12px;">
+            </div>
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="modal-cancel-btn" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer;">Cerrar</button>
+            <button type="button" id="btn-save-mat-decision" class="admin-action-btn" style="background: #15803d; padding: 10px 22px;">
+              💾 Guardar y Notificar por Correo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- MODAL: AGREGAR / EDITAR HITO DE CRONOGRAMA -->
+  <div id="cronograma-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="modal-cronograma-header-title">📅 Hito del Cronograma Institucional</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-modal-cronograma">
+        <input type="hidden" id="modal-cronograma-id" value="">
+        <div class="modal-body">
+          <div class="mobile-form-group">
+            <label class="mobile-label">Nombre del Hito o Actividad <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="modal-cronograma-title" class="mobile-input" required placeholder="Ej: Fase 1: Matrículas Ordinarias 2026">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Fase</label>
+              <select id="modal-cronograma-fase" class="mobile-input">
+                <option value="Fase 1">Fase 1</option>
+                <option value="Fase 2">Fase 2</option>
+                <option value="Fase 3">Fase 3</option>
+                <option value="Fase 4">Fase 4</option>
+                <option value="Fase 5">Fase 5</option>
+                <option value="Fase 6">Fase 6</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Periodo / Fechas <span style="color:#EF4444;">*</span></label>
+              <input type="text" id="modal-cronograma-fechas" class="mobile-input" required placeholder="Ej: Nov 2025 - Feb 2026">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Área Responsable</label>
+              <select id="modal-cronograma-area" class="mobile-input">
+                <option value="Rectoría">Rectoría / Admisiones</option>
+                <option value="Secretaría Académica">Secretaría Académica</option>
+                <option value="Tesorería">Tesorería / Pagaduría</option>
+                <option value="Coordinación">Coordinación Pedagógica</option>
+                <option value="Tecnología">Sistemas & TI</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Estado Actual</label>
+              <select id="modal-cronograma-status" class="mobile-input">
+                <option value="EN EJECUCIÓN">EN EJECUCIÓN</option>
+                <option value="PROGRAMADO">PROGRAMADO</option>
+                <option value="PERMANENTE">PERMANENTE</option>
+                <option value="CONCLUIDO">CONCLUIDO</option>
+              </select>
+            </div>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Porcentaje de Avance (0% a 100%)</label>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <input type="range" id="modal-cronograma-progress-range" min="0" max="100" value="100" style="flex: 1;">
+              <span id="modal-cronograma-progress-val" style="font-weight: 700; color: #003366; min-width: 45px;">100%</span>
+            </div>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Descripción y Objetivos</label>
+            <textarea id="modal-cronograma-desc" class="mobile-input" rows="3" placeholder="Detalle de actividades, entregables y alcance de este hito..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 0 16px;">Cancelar</button>
+          <button type="submit" class="admin-action-btn" style="background: #003366;">💾 Guardar Hito</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: INGRESO ADMINISTRATIVO -->
+  <div id="admin-login-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 51, 102, 0.35); border: 1px solid rgba(0, 51, 102, 0.15);">
+      <!-- Cabecera Institucional -->
+      <div style="background: linear-gradient(135deg, #003366 0%, #001F3F 100%); padding: 26px 24px; text-align: center; color: white; position: relative;">
+        <button type="button" class="modal-close-btn" id="btn-close-admin-login" style="position: absolute; top: 14px; right: 14px; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: all 0.2s ease;">&times;</button>
+        <div style="width: 64px; height: 64px; background: white; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); padding: 4px;">
+          <img src="assets/logo_jean_piaget.png" alt="Escudo Jean Piaget" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <h3 style="margin: 0 0 4px; font-size: 1.25rem; font-weight: 800; color: white; letter-spacing: -0.02em;">Ingreso Administrativo</h3>
+        <p style="margin: 0; font-size: 0.8rem; color: #94A3B8;">Institución Educativa Jean Piaget School</p>
+      </div>
+
+      <!-- Formulario de Login -->
+      <form id="form-admin-login" style="padding: 24px; background: white;">
+        <!-- Alerta de Error -->
+        <div id="admin-login-error" style="display: none; background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 12px 14px; border-radius: 10px; font-size: 0.83rem; margin-bottom: 16px; align-items: center; gap: 8px;">
+          <span style="font-size: 1.1rem; flex-shrink: 0;">⚠️</span>
+          <span id="admin-login-error-text">Correo o contraseña incorrectos.</span>
+        </div>
+
+        <!-- Campo Correo -->
+        <div class="mobile-form-group" style="margin-bottom: 16px;">
+          <label class="mobile-label" for="admin-login-email" style="font-weight: 700; font-size: 0.82rem; color: #1E293B; margin-bottom: 6px; display: block;">
+            Correo Electrónico Directivo
+          </label>
+          <div style="position: relative;">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #64748B;">✉️</span>
+            <input 
+              id="admin-login-email" 
+              type="email" 
+              class="mobile-input" 
+              placeholder="admin@icfes.com" 
+              required 
+              style="padding-left: 38px; width: 100%; box-sizing: border-box; font-size: 0.9rem;"
+              autocomplete="username"
+            >
+          </div>
+        </div>
+
+        <!-- Campo Contraseña -->
+        <div class="mobile-form-group" style="margin-bottom: 16px;">
+          <label class="mobile-label" for="admin-login-password" style="font-weight: 700; font-size: 0.82rem; color: #1E293B; margin-bottom: 6px; display: block;">
+            Contraseña de Seguridad
+          </label>
+          <div style="position: relative;">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #64748B;">🔒</span>
+            <input 
+              id="admin-login-password" 
+              type="password" 
+              class="mobile-input" 
+              placeholder="••••••••••••" 
+              required 
+              style="padding-left: 38px; padding-right: 42px; width: 100%; box-sizing: border-box; font-size: 0.9rem;"
+              autocomplete="current-password"
+            >
+            <button 
+              type="button" 
+              id="btn-toggle-admin-password" 
+              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748B; font-size: 1rem; padding: 4px;" 
+              title="Mostrar u ocultar contraseña"
+            >
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <!-- Opciones adicionales -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.8rem;">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #475569;">
+            <input type="checkbox" id="admin-login-remember" checked style="accent-color: #003366;">
+            Recordar sesión
+          </label>
+          <span style="color: #64748B; font-size: 0.76rem;">Acceso Cifrado TLS / JWT</span>
+        </div>
+
+        <!-- Botón de Envío -->
+        <button 
+          type="submit" 
+          id="btn-submit-admin-login" 
+          class="btn btn-primary" 
+          style="width: 100%; background: linear-gradient(135deg, #003366, #002244); border: none; padding: 13px; font-size: 0.95rem; font-weight: 800; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,51,102,0.35); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease;"
+        >
+          <span>🔐</span> Ingresar al Panel Administrativo
+        </button>
+
+        <!-- Pie institucional -->
+        <div style="margin-top: 18px; text-align: center; font-size: 0.74rem; color: #64748B; border-top: 1px solid #E2E8F0; padding-top: 14px;">
+          Plataforma de Gestión Institucional • Jean Piaget School 2026
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR TOASTS -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/mobile-app.js"></script>
+  <script src="js/admin-panel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrícula Digital 2026 | Institución Educativa Jean Piaget School</title>
+    <link rel="stylesheet" href="css/matricula.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Header Institucional -->
+    <header class="matricula-header">
+        <div class="matricula-header-content">
+            <a href="index.html" class="flag-brand-container" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                <img src="assets/logo_jean_piaget.png" alt="Escudo Oficial Jean Piaget School" style="height: 52px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));">
+                <img src="assets/flag_jean_piaget.jpg" alt="Bandera Jean Piaget School" class="school-flag-badge">
+                <div class="school-info">
+                    <h1 style="letter-spacing: 0.5px;">INSTITUCIÓN EDUCATIVA JEAN PIAGET SCHOOL</h1>
+                    <p>Resolución No. 644 de 2015 / No. 1187 de 2019 &bull; Girardot, Cundinamarca</p>
+                </div>
+            </a>
+            <div class="header-actions">
+                <span class="btn-header" style="background: rgba(255,255,255,0.08); cursor: default;">
+                    Radicado: <strong id="headerEnrollmentCode" style="color: #6ee7b7; margin-left: 4px;">Cargando...</strong>
+                </span>
+                <a href="index.html" class="btn-header">
+                    ← Portal Principal
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="matricula-container">
+
+        <!-- Stepper Card -->
+        <div class="stepper-card">
+            <div class="stepper-progress-bar">
+                <div id="stepperProgressBar" class="stepper-progress-fill"></div>
+            </div>
+            <div class="stepper-steps-wrapper">
+                <div class="step-item active" data-step="1">
+                    <div class="step-bubble">1</div>
+                    <div class="step-label">Estudiante</div>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-bubble">2</div>
+                    <div class="step-label">Padre</div>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-bubble">3</div>
+                    <div class="step-label">Madre</div>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-bubble">4</div>
+                    <div class="step-label">Acudiente</div>
+                </div>
+                <div class="step-item" data-step="5">
+                    <div class="step-bubble">5</div>
+                    <div class="step-label">Académica</div>
+                </div>
+                <div class="step-item" data-step="6">
+                    <div class="step-bubble">6</div>
+                    <div class="step-label">Económica</div>
+                </div>
+                <div class="step-item" data-step="7">
+                    <div class="step-bubble">7</div>
+                    <div class="step-label">Autorizaciones</div>
+                </div>
+                <div class="step-item" data-step="8">
+                    <div class="step-bubble">8</div>
+                    <div class="step-label">Revisión</div>
+                </div>
+                <div class="step-item" data-step="9">
+                    <div class="step-bubble">9</div>
+                    <div class="step-label">Firma</div>
+                </div>
+                <div class="step-item" data-step="10">
+                    <div class="step-bubble">10</div>
+                    <div class="step-label">Finalización</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Card Container -->
+        <div class="form-step-card">
+
+            <!-- PASO 1: Información del Estudiante -->
+            <div id="stepContainer1" style="display: block;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 1 de 10</span>
+                    <h2>Información del Estudiante</h2>
+                    <p>Ingrese los datos personales y de identificación oficial del estudiante aspirante.</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="student_first_name">Nombres <span class="required">*</span></label>
+                        <input type="text" id="student_first_name" class="form-control" placeholder="Ej: Santiago">
+                        <div id="student_first_name_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_last_name">Apellidos <span class="required">*</span></label>
+                        <input type="text" id="student_last_name" class="form-control" placeholder="Ej: Gómez Pérez">
+                        <div id="student_last_name_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_doc_type">Tipo de Documento <span class="required">*</span></label>
+                        <select id="student_doc_type" class="form-control">
+                            <option value="RC">Registro Civil (RC)</option>
+                            <option value="TI" selected>Tarjeta de Identidad (TI)</option>
+                            <option value="CC">Cédula de Ciudadanía (CC)</option>
+                            <option value="CE">Cédula de Extranjería (CE)</option>
+                            <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_doc_number">Número de Documento <span class="required">*</span></label>
+                        <input type="text" id="student_doc_number" class="form-control" placeholder="Ej: 1069758412">
+                        <div id="student_doc_number_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_doc_issue_place">Lugar de Expedición <span class="required">*</span></label>
+                        <input type="text" id="student_doc_issue_place" class="form-control" placeholder="Ej: Girardot">
+                        <div id="student_doc_issue_place_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_birth_date">Fecha de Nacimiento <span class="required">*</span></label>
+                        <input type="date" id="student_birth_date" class="form-control">
+                        <div id="student_birth_date_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_birth_place">Lugar de Nacimiento <span class="required">*</span></label>
+                        <input type="text" id="student_birth_place" class="form-control" placeholder="Ej: Girardot, Cundinamarca">
+                        <div id="student_birth_place_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_age">Edad (Años)</label>
+                        <input type="number" id="student_age" class="form-control" placeholder="Calculada automáticamente" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_eps">E.P.S. <span class="required">*</span></label>
+                        <input type="text" id="student_eps" class="form-control" placeholder="Ej: Nueva EPS / Sanitas / Famisanar">
+                        <div id="student_eps_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_rh">Grupo Sanguíneo y RH <span class="required">*</span></label>
+                        <select id="student_rh" class="form-control">
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_lives_with_parents">¿Vive con sus padres? <span class="required">*</span></label>
+                        <select id="student_lives_with_parents" class="form-control">
+                            <option value="SI">SÍ</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_lives_with_whom">¿Con quién vive?</label>
+                        <input type="text" id="student_lives_with_whom" class="form-control" placeholder="Ej: Padres / Madre / Abuelos">
+                    </div>
+                    <div class="form-group col-span-2">
+                        <label for="student_address">Dirección de Residencia <span class="required">*</span></label>
+                        <input type="text" id="student_address" class="form-control" placeholder="Ej: Carrera 10 # 15-30 Barrio Centro">
+                        <div id="student_address_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_phone">Teléfono / Celular <span class="required">*</span></label>
+                        <input type="tel" id="student_phone" class="form-control" placeholder="Ej: 3101234567">
+                        <div id="student_phone_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_email">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="student_email" class="form-control" placeholder="estudiante@correo.com">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: Información del Padre -->
+            <div id="stepContainer2" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 2 de 10</span>
+                    <h2>Información del Padre de Familia</h2>
+                    <p>Registre los datos del padre. Si no aplica, puede dejar estos campos en blanco y continuar.</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group col-span-2">
+                        <label for="father_name">Nombres y Apellidos del Padre</label>
+                        <input type="text" id="father_name" class="form-control" placeholder="Ej: Carlos Gómez Rodríguez">
+                    </div>
+                    <div class="form-group">
+                        <label for="father_doc_type">Tipo de Documento</label>
+                        <select id="father_doc_type" class="form-control">
+                            <option value="CC" selected>Cédula de Ciudadanía (CC)</option>
+                            <option value="CE">Cédula de Extranjería (CE)</option>
+                            <option value="PPT">PPT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="father_doc_number">Número de Documento</label>
+                        <input type="text" id="father_doc_number" class="form-control" placeholder="Ej: 19485721">
+                    </div>
+                    <div class="form-group">
+                        <label for="father_doc_place">Lugar de Expedición</label>
+                        <input type="text" id="father_doc_place" class="form-control" placeholder="Ej: Girardot">
+                    </div>
+                    <div class="form-group">
+                        <label for="father_occupation">Ocupación / Profesión</label>
+                        <input type="text" id="father_occupation" class="form-control" placeholder="Ej: Empleado / Independiente">
+                    </div>
+                    <div class="form-group">
+                        <label for="father_phone">Celular</label>
+                        <input type="tel" id="father_phone" class="form-control" placeholder="Ej: 3118945612">
+                        <div id="father_phone_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="father_email">Correo Electrónico</label>
+                        <input type="email" id="father_email" class="form-control" placeholder="padre@correo.com">
+                    </div>
+                    <div class="form-group col-span-2">
+                        <label for="father_address">Dirección de Residencia</label>
+                        <input type="text" id="father_address" class="form-control" placeholder="Ej: Calle 14 # 8-22">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: Información de la Madre -->
+            <div id="stepContainer3" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 3 de 10</span>
+                    <h2>Información de la Madre de Familia</h2>
+                    <p>Registre los datos de la madre del estudiante.</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group col-span-2">
+                        <label for="mother_name">Nombres y Apellidos de la Madre</label>
+                        <input type="text" id="mother_name" class="form-control" placeholder="Ej: María Pérez Torres">
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_doc_type">Tipo de Documento</label>
+                        <select id="mother_doc_type" class="form-control">
+                            <option value="CC" selected>Cédula de Ciudadanía (CC)</option>
+                            <option value="CE">Cédula de Extranjería (CE)</option>
+                            <option value="PPT">PPT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_doc_number">Número de Documento</label>
+                        <input type="text" id="mother_doc_number" class="form-control" placeholder="Ej: 52418932">
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_doc_place">Lugar de Expedición</label>
+                        <input type="text" id="mother_doc_place" class="form-control" placeholder="Ej: Girardot">
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_occupation">Ocupación / Profesión</label>
+                        <input type="text" id="mother_occupation" class="form-control" placeholder="Ej: Docente / Comerciante">
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_phone">Celular</label>
+                        <input type="tel" id="mother_phone" class="form-control" placeholder="Ej: 3124567890">
+                        <div id="mother_phone_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mother_email">Correo Electrónico</label>
+                        <input type="email" id="mother_email" class="form-control" placeholder="madre@correo.com">
+                    </div>
+                    <div class="form-group col-span-2">
+                        <label for="mother_address">Dirección de Residencia</label>
+                        <input type="text" id="mother_address" class="form-control" placeholder="Ej: Manzana B Casa 12">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 4: Datos del Acudiente Responsable -->
+            <div id="stepContainer4" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 4 de 10</span>
+                    <h2>Datos del Acudiente Responsable</h2>
+                    <p>Persona mayor de edad responsable legal y financieramente ante la institución educativa.</p>
+                </div>
+
+                <!-- Botones de auto-llenado -->
+                <div class="autofill-banner">
+                    <p>¿El acudiente es el padre o la madre? Ahorre tiempo copiando los datos:</p>
+                    <div class="autofill-btn-group">
+                        <button type="button" class="btn-autofill" onclick="MatriculaWizard.copyFromFather()">Copiar datos del Padre</button>
+                        <button type="button" class="btn-autofill" onclick="MatriculaWizard.copyFromMother()">Copiar datos de la Madre</button>
+                    </div>
+                </div>
+
+                <input type="hidden" id="guardian_is_parent" value="OTRO">
+
+                <div class="form-grid">
+                    <div class="form-group col-span-2">
+                        <label for="guardian_name">Nombres y Apellidos del Acudiente <span class="required">*</span></label>
+                        <input type="text" id="guardian_name" class="form-control" placeholder="Nombre completo">
+                        <div id="guardian_name_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_doc_type">Tipo de Documento <span class="required">*</span></label>
+                        <select id="guardian_doc_type" class="form-control">
+                            <option value="CC" selected>Cédula de Ciudadanía (CC)</option>
+                            <option value="CE">Cédula de Extranjería (CE)</option>
+                            <option value="PPT">PPT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_doc_number">Número de Documento <span class="required">*</span></label>
+                        <input type="text" id="guardian_doc_number" class="form-control" placeholder="Ej: 39582498">
+                        <div id="guardian_doc_number_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_doc_place">Lugar de Expedición</label>
+                        <input type="text" id="guardian_doc_place" class="form-control" placeholder="Ej: Girardot">
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_relationship">Parentesco <span class="required">*</span></label>
+                        <select id="guardian_relationship" class="form-control">
+                            <option value="Padre">Padre</option>
+                            <option value="Madre">Madre</option>
+                            <option value="Abuelo/a">Abuelo / Abuela</option>
+                            <option value="Tío/a">Tío / Tía</option>
+                            <option value="Tutor Legal">Tutor Legal</option>
+                            <option value="Hermano/a Mayor">Hermano(a) Mayor de Edad</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <div id="guardian_relationship_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_phone">Celular de Contacto <span class="required">*</span></label>
+                        <input type="tel" id="guardian_phone" class="form-control" placeholder="Ej: 3101234567">
+                        <div id="guardian_phone_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_email">Correo Electrónico (Notificaciones) <span class="required">*</span></label>
+                        <input type="email" id="guardian_email" class="form-control" placeholder="acudiente@correo.com">
+                        <div id="guardian_email_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group col-span-2">
+                        <label for="guardian_address">Dirección de Residencia <span class="required">*</span></label>
+                        <input type="text" id="guardian_address" class="form-control" placeholder="Ej: Girardot, Cundinamarca">
+                        <div id="guardian_address_err" class="field-error-msg"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="guardian_occupation">Ocupación</label>
+                        <input type="text" id="guardian_occupation" class="form-control" placeholder="Ej: Ingeniero / Empleado">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 5: Nivel Educativo, Grado e Información Académica -->
+            <div id="stepContainer5" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 5 de 10</span>
+                    <h2>Nivel Educativo y Datos Académicos</h2>
+                    <p>Seleccione el tipo de matrícula y el grado al que aspira el estudiante para el Año Escolar 2026.</p>
+                </div>
+
+                <input type="hidden" id="enrollmentTypeInput" value="BASICA_PRIMARIA">
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label>Tipo de Matrícula <span class="required">*</span></label>
+                </div>
+                <div id="levelSelectorContainer" class="level-selector-grid">
+                    <!-- Dinámico desde JS -->
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group col-span-2">
+                        <label for="targetGradeSelect">Grado al que Aspira (Año Escolar 2026) <span class="required">*</span></label>
+                        <select id="targetGradeSelect" class="form-control" style="font-weight: 700; color: var(--piaget-navy);">
+                            <!-- Dinámico según nivel -->
+                        </select>
+                        <div id="targetGradeSelect_err" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group col-span-2" style="margin-top: 10px;">
+                        <h4 style="font-size: 0.95rem; color: var(--piaget-navy); border-bottom: 1px solid #e2e8f0; padding-bottom: 6px;">
+                            Historial Académico Previo
+                        </h4>
+                    </div>
+
+                    <div class="form-group col-span-2">
+                        <label for="previous_school">Institución Educativa Anterior <span class="required">*</span></label>
+                        <input type="text" id="previous_school" class="form-control" placeholder="Ej: Colegio San José / Jean Piaget">
+                        <div id="previous_school_err" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="previous_grade">Último Grado Cursado <span class="required">*</span></label>
+                        <input type="text" id="previous_grade" class="form-control" placeholder="Ej: Transición / Cuarto">
+                        <div id="previous_grade_err" class="field-error-msg"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="previous_year">Año en que lo cursó</label>
+                        <input type="number" id="previous_year" class="form-control" value="2025">
+                    </div>
+
+                    <div class="form-group col-span-2">
+                        <label for="academic_notes">Observaciones Académicas (Opcional)</label>
+                        <textarea id="academic_notes" class="form-control" rows="2" placeholder="Detalles de desempeño o consideraciones especiales..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 6: Información Económica -->
+            <div id="stepContainer6" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 6 de 10</span>
+                    <h2>Información Económica y Tarifas 2026</h2>
+                    <p>Costos educativos aprobados por la Secretaría de Educación para el Año Escolar 2026.</p>
+                </div>
+
+                <div class="economics-box">
+                    <div class="econ-row">
+                        <span>Valor de la Matrícula (Pago inicial):</span>
+                        <span id="econMatFee" style="font-weight: 700;">$180.000</span>
+                    </div>
+                    <div class="econ-row">
+                        <span>Pensión Escolar (10 cuotas mensuales):</span>
+                        <span id="econPenFee" style="font-weight: 700;">$150.000 / mes</span>
+                    </div>
+                    <div class="econ-row">
+                        <span>Modalidad de Pago de Pensión:</span>
+                        <span>Dentro de los primeros 5 días de cada mes</span>
+                    </div>
+                    <div class="econ-row">
+                        <span>Total Costos del Año Escolar 2026:</span>
+                        <span id="econTotalFee">$1.680.000</span>
+                    </div>
+                </div>
+
+                <div class="alert-box alert-info">
+                    ℹ️ <strong>Condiciones Financieras:</strong> La matrícula se cancela al formalizar el registro. La pensión comprende diez (10) cuotas mensuales de febrero a noviembre, respaldadas mediante el pagaré y la carta de instrucciones oficiales.
+                </div>
+            </div>
+
+            <!-- PASO 7: Documentos y Autorizaciones Legales -->
+            <div id="stepContainer7" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 7 de 10</span>
+                    <h2>Documentos y Autorizaciones Legales</h2>
+                    <p>Revise y acepte las condiciones legales del servicio educativo según la normatividad colombiana.</p>
+                </div>
+
+                <div class="terms-card">
+                    <div class="terms-checkbox-item">
+                        <input type="checkbox" id="check_terms_service">
+                        <label for="check_terms_service">
+                            <strong>Aceptación del Contrato de Prestación de Servicios Educativos 2026:</strong>
+                            Declaro que conozco y acepto en su integridad las 13 cláusulas del contrato educativo, el Manual de Convivencia y el PEI de la Institución Educativa Jean Piaget School.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="terms-card">
+                    <div class="terms-checkbox-item">
+                        <input type="checkbox" id="check_terms_privacy">
+                        <label for="check_terms_privacy">
+                            <strong>Protección y Tratamiento de Datos Personales (Ley 1581 de 2012):</strong>
+                            Autorizo de manera libre, expresa e informada a la Institución Educativa Jean Piaget School para el tratamiento de mis datos personales y los del estudiante con fines estrictamente académicos y de gestión escolar.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="terms-card">
+                    <div class="terms-checkbox-item">
+                        <input type="checkbox" id="check_terms_central">
+                        <label for="check_terms_central">
+                            <strong>Autorización para Consulta y Reporte a Centrales de Riesgo:</strong>
+                            Autorizo al colegio a consultar y reportar mi comportamiento en centrales de riesgo financiero en caso de mora superior a 60 días según las políticas de cartera.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="terms-card">
+                    <div class="terms-checkbox-item">
+                        <input type="checkbox" id="check_terms_image" checked>
+                        <label for="check_terms_image">
+                            <strong>Autorización de Uso de Imagen Institucional:</strong>
+                            Autorizo el uso de fotografías o videos del estudiante para fines exclusivamente educativos e institucionales del colegio.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="terms-card">
+                    <div class="terms-checkbox-item">
+                        <input type="checkbox" id="check_terms_notifications" checked>
+                        <label for="check_terms_notifications">
+                            <strong>Autorización para Notificaciones Electrónicas:</strong>
+                            Acepto recibir citaciones, boletines y facturación a través del WhatsApp personal y correo electrónico suministrados.
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 8: Revisión Integral -->
+            <div id="stepContainer8" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 8 de 10</span>
+                    <h2>Revisión de la Información</h2>
+                    <p>Verifique cuidadosamente todos los datos antes de proceder a la firma electrónica de los documentos.</p>
+                </div>
+
+                <div id="reviewSummaryContainer">
+                    <!-- Dinámico desde JS -->
+                </div>
+
+                <div class="alert-box alert-info" style="margin-top: 20px;">
+                    📝 Al presionar <strong>"Continuar a Firma Electrónica"</strong>, se compilarán los 4 documentos contractuales oficiales con los datos registrados.
+                </div>
+            </div>
+
+            <!-- PASO 9: Firma Electrónica -->
+            <div id="stepContainer9" style="display: none;">
+                <div class="step-header">
+                    <span class="step-header-badge">Paso 9 de 10</span>
+                    <h2>Firma Electrónica de Documentos</h2>
+                    <p>Suscripción digital oficial con validez jurídica según la Ley 527 de 1999 de la República de Colombia.</p>
+                </div>
+
+                <h4 style="font-size: 0.95rem; color: var(--piaget-navy); margin-bottom: 8px;">Documentos a Suscribir:</h4>
+                <div id="signatureDocsContainer" class="documents-grid">
+                    <!-- Lista de documentos generados -->
+                </div>
+
+                <div class="signature-section">
+                    <h3 style="font-size: 1.05rem; color: var(--piaget-navy); margin-bottom: 6px;">Firma del Acudiente / Deudor Responsable</h3>
+                    <p style="font-size: 0.85rem; color: var(--piaget-text-muted); margin-bottom: 14px;">
+                        Dibuje su firma en el recuadro usando su dedo (en pantalla táctil) o el cursor del ratón.
+                    </p>
+
+                    <div class="signature-canvas-wrapper">
+                        <canvas id="signatureCanvas" width="460" height="200"></canvas>
+                        <div class="signature-guideline"></div>
+                    </div>
+
+                    <div class="signature-actions">
+                        <button type="button" id="btnClearSignature" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">
+                            🗑️ Limpiar Firma
+                        </button>
+                    </div>
+
+                    <div style="max-width: 600px; margin: 18px auto 0; font-size: 0.8rem; color: #64748b; line-height: 1.4;">
+                        “Las partes conocemos y consentimos sobre la validez de nuestras firmas electrónicas, y sobre todo el contenido del documento que suscribimos, de acuerdo a lo establecido en la Ley 527 de 1999, la cual DEFINE Y REGLAMENTA EL ACCESO Y USO DE LOS MENSAJES DE DATOS, DEL COMERCIO ELECTRÓNICO Y DE LAS FIRMAS DIGITALES”.
+                    </div>
+
+                    <div style="margin-top: 24px;">
+                        <button type="button" id="btnConfirmSignature" class="btn btn-success" style="padding: 14px 32px; font-size: 1rem;">
+                            Firmar Electrónicamente y Radicar Matrícula ✍️
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 10: Finalización y Radicación Exitosa -->
+            <div id="stepContainer10" style="display: none;">
+                <div style="text-align: center; padding: 20px 0;">
+                    <div style="font-size: 3.5rem; margin-bottom: 12px;">🎉</div>
+                    <h2 style="font-size: 1.6rem; color: var(--piaget-green); font-weight: 800; margin-bottom: 6px;">
+                        ¡Matrícula Radicada Exitosamente!
+                    </h2>
+                    <p style="color: var(--piaget-text-muted); font-size: 0.95rem; max-width: 600px; margin: 0 auto 16px;">
+                        La solicitud de matrícula para el Año Escolar 2026 ha sido firmada electrónicamente y enviada para revisión por la administración de la institución.
+                    </p>
+
+                    <div style="display: inline-block; background: #eff6ff; border: 2px dashed #3b82f6; padding: 12px 24px; border-radius: 10px; margin-bottom: 24px;">
+                        <span style="font-size: 0.85rem; color: #1e40af; font-weight: 600;">CÓDIGO DE RADICACIÓN OFICIAL:</span><br>
+                        <strong id="finalEnrollmentCode" style="font-size: 1.4rem; color: var(--piaget-navy);">MAT-2026-0000</strong>
+                    </div>
+
+                    <div class="alert-box alert-success" style="text-align: left; max-width: 700px; margin: 0 auto 24px;">
+                        <div>
+                            <strong>Estado Actual: PENDIENTE DE REVISIÓN ADMINISTRATIVA</strong><br>
+                            Hemos enviado un correo electrónico de confirmación. Una vez revisados los soportes por la Rectoría, recibirá la notificación de aprobación final.
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.1rem; color: var(--piaget-navy); margin-bottom: 12px;">
+                        Descargue sus Documentos Oficiales Firmados:
+                    </h3>
+                    <div id="finalDocsContainer" class="documents-grid" style="max-width: 800px; margin: 0 auto 28px;">
+                        <!-- Dinámico con enlaces de descarga -->
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                        <a href="index.html" class="btn btn-primary" style="padding: 12px 24px;">
+                            Ir al Panel de Estudiante / Acudiente →
+                        </a>
+                        <button type="button" class="btn btn-secondary" onclick="window.print()" style="padding: 12px 24px;">
+                            Imprimir Comprobante 🖨️
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Navegación Inferior -->
+            <div class="form-nav-bar">
+                <button type="button" id="btnPrevStep" class="btn btn-secondary" style="display: none;">
+                    ← Paso Anterior
+                </button>
+                <button type="button" id="btnSaveDraft" class="btn-save-draft">
+                    💾 Guardar Borrador
+                </button>
+                <button type="button" id="btnNextStep" class="btn btn-primary">
+                    Siguiente Paso →
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/matricula-wizard.js"></script>
+</body>
+</html>
