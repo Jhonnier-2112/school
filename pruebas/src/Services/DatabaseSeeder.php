@@ -384,10 +384,12 @@ class DatabaseSeeder {
 
         $now = date('Y-m-d H:i:s');
 
-        // 1. Seed Admin User
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role = 'admin'");
-        $stmt->execute();
-        if ($stmt->fetchColumn() == 0) {
+        // 1. Seed / Sync Admin User
+        $stmt = $pdo->prepare("SELECT id, password_hash FROM users WHERE email = ? LIMIT 1");
+        $stmt->execute([$config['initial_admin_email']]);
+        $existingAdmin = $stmt->fetch();
+
+        if (!$existingAdmin) {
             $adminId = self::uuid();
             $hash = password_hash($config['initial_admin_password'], PASSWORD_BCRYPT);
             $stmt = $pdo->prepare("
@@ -395,6 +397,13 @@ class DatabaseSeeder {
                 VALUES (?, 'Administrador Principal', ?, '3001234567', ?, 'admin', 1, ?, ?)
             ");
             $stmt->execute([$adminId, $config['initial_admin_email'], $hash, $now, $now]);
+        } else {
+            // Asegurar que la contraseña coincida con INITIAL_ADMIN_PASSWORD de config/.env
+            if (!password_verify($config['initial_admin_password'], $existingAdmin['password_hash'])) {
+                $newHash = password_hash($config['initial_admin_password'], PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("UPDATE users SET password_hash = ?, role = 'admin', is_active = 1, updated_at = ? WHERE id = ?");
+                $stmt->execute([$newHash, $now, $existingAdmin['id']]);
+            }
         }
 
         // 2. Seed Default Course

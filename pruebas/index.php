@@ -31,7 +31,11 @@ spl_autoload_register(function ($class) {
 });
 
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require_once __DIR__ . '/vendor/autoload.php';
+    try {
+        require_once __DIR__ . '/vendor/autoload.php';
+    } catch (\Throwable $e) {
+        error_log('[Autoload Warning] Error cargando vendor/autoload.php: ' . $e->getMessage());
+    }
 }
 
 use App\Controllers\AuthController;

@@ -204,7 +204,7 @@ VALUES (
     'Administrador Principal',
     'admin@icfes.com',
     '3001234567',
-    '$2y$10$wOaW9sH1O9T51eHwI7sEpu9FqG5V15E2n1vX1xGfN3yWjV.c/wE.u',
+    '$2y$10$GRnHalrlAb57O1MTyU2ciODKAJdmzAiIU/0opwiZCKfvdYfu8ACk2',
     'admin',
     1,
     NOW(),

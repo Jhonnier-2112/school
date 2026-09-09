@@ -16,6 +16,9 @@ class PdfDocumentService {
     private string $logoBase64;
 
     public function __construct(PDO $pdo, array $config) {
+        if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+            require_once __DIR__ . '/../../vendor/autoload.php';
+        }
         $this->pdo = $pdo;
         $this->config = $config;
         $this->uploadDir = rtrim($config['upload_dir'] ?? (__DIR__ . '/../../uploads'), '/') . '/documents';
