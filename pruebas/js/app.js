@@ -184,6 +184,32 @@ const App = {
         const emailInput    = document.getElementById('portal-email');
         const btnOpenTop    = document.getElementById('btn-open-admin-login');
 
+        const hideAllAlerts = () => {
+            const errL = document.getElementById('portal-login-error');
+            const errR = document.getElementById('portal-register-error');
+            const sucR = document.getElementById('portal-register-success');
+            if (errL) { errL.classList.remove('show'); errL.style.display = 'none'; }
+            if (errR) { errR.classList.remove('show'); errR.style.display = 'none'; }
+            if (sucR) { sucR.classList.remove('show'); sucR.style.display = 'none'; }
+        };
+
+        const showAlert = (el) => {
+            if (el) {
+                el.classList.add('show');
+                el.style.setProperty('display', 'flex', 'important');
+            }
+        };
+
+        const hideAlert = (el) => {
+            if (el) {
+                el.classList.remove('show');
+                el.style.setProperty('display', 'none', 'important');
+            }
+        };
+
+        // Asegurar que todas las alertas estén ocultas al iniciar
+        hideAllAlerts();
+
         // Toggle entre pestañas Iniciar Sesión / Registrarse
         if (tabLogin && tabRegister && formLogin && formReg) {
             tabLogin.addEventListener('click', () => {
@@ -191,6 +217,7 @@ const App = {
                 tabRegister.classList.remove('active');
                 formLogin.style.display = 'block';
                 formReg.style.display = 'none';
+                hideAllAlerts();
             });
 
             tabRegister.addEventListener('click', () => {
@@ -198,6 +225,7 @@ const App = {
                 tabLogin.classList.remove('active');
                 formReg.style.display = 'block';
                 formLogin.style.display = 'none';
+                hideAllAlerts();
             });
         }
 
@@ -242,12 +270,12 @@ const App = {
             if (!email || !password) {
                 if (errLogin && errLoginTxt) {
                     errLoginTxt.textContent = 'Por favor ingresa tu correo y contraseña.';
-                    errLogin.style.display = 'flex';
+                    showAlert(errLogin);
                 }
                 return;
             }
 
-            if (errLogin) errLogin.style.display = 'none';
+            hideAlert(errLogin);
             const originalBtnHtml = triggerBtn ? triggerBtn.innerHTML : '';
             if (triggerBtn) {
                 triggerBtn.disabled = true;
@@ -276,7 +304,7 @@ const App = {
             } catch (err) {
                 if (errLogin && errLoginTxt) {
                     errLoginTxt.textContent = err.message || 'Credenciales inválidas. Verifica tu correo y contraseña.';
-                    errLogin.style.display = 'flex';
+                    showAlert(errLogin);
                 }
                 this.showToast(err.message || 'Error al iniciar sesión', 'error');
             } finally {
@@ -286,16 +314,6 @@ const App = {
                 }
             }
         };
-
-        // Clic en "Entrar directo como Administrador" (1 Clic)
-        if (btnQuickAdmin) {
-            btnQuickAdmin.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (emailInput) emailInput.value = 'admin@icfes.com';
-                if (pwdInput) pwdInput.value = 'Admin123456!';
-                await doPortalLogin('admin@icfes.com', 'Admin123456!', btnQuickAdmin);
-            });
-        }
 
         // Envío del Formulario de Login Principal
         if (formLogin) {
@@ -324,13 +342,13 @@ const App = {
                 if (!name || !email || !phone || !pass) {
                     if (errReg && errRegTxt) {
                         errRegTxt.textContent = 'Todos los campos son obligatorios.';
-                        errReg.style.display = 'flex';
+                        showAlert(errReg);
                     }
                     return;
                 }
 
-                if (errReg) errReg.style.display = 'none';
-                if (sucReg) sucReg.style.display = 'none';
+                hideAlert(errReg);
+                hideAlert(sucReg);
 
                 if (btnReg) {
                     btnReg.disabled = true;
@@ -345,7 +363,7 @@ const App = {
                         password: pass
                     });
 
-                    if (sucReg) sucReg.style.display = 'flex';
+                    showAlert(sucReg);
                     this.showToast('¡Cuenta creada con éxito! Iniciando sesión...', 'success');
 
                     // Auto-login automático
@@ -359,7 +377,7 @@ const App = {
                 } catch (err) {
                     if (errReg && errRegTxt) {
                         errRegTxt.textContent = err.message || 'Error al registrar la cuenta.';
-                        errReg.style.display = 'flex';
+                        showAlert(errReg);
                     }
                     this.showToast(err.message || 'Error al registrar', 'error');
                 } finally {

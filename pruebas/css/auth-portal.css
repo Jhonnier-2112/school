@@ -385,9 +385,13 @@
   border-radius: 12px;
   font-size: 0.85rem;
   margin-bottom: 20px;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 10px;
+}
+
+.auth-alert-box.show {
+  display: flex !important;
 }
 
 .auth-alert-box.error {

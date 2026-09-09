@@ -452,9 +452,13 @@ body {
   border-radius: 10px;
   font-size: 0.83rem;
   margin-bottom: 18px;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 8px;
+}
+
+.auth-alert-box.show {
+  display: flex !important;
 }
 
 .auth-alert-box.error {

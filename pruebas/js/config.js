@@ -2,14 +2,22 @@
 const getBaseApiUrl = () => {
     if (typeof window !== 'undefined') {
         const origin = window.location.origin;
+        const host = window.location.host;
         const pathname = window.location.pathname;
+
+        // Si el usuario ingresa por el subdominio no configurado pruebas.femtribe.com.co
+        if (host === 'pruebas.femtribe.com.co') {
+            return 'https://femtribe.com.co/pruebas/api/v1';
+        }
+
         // Detecta automáticamente si se ejecuta en subcarpeta /pruebas (en Hostinger o MAMP local)
-        if (pathname.startsWith('/pruebas')) {
+        if (pathname.includes('/pruebas')) {
             return `${origin}/pruebas/api/v1`;
         }
+
         return `${origin}/api/v1`;
     }
-    return 'https://pruebas.femtribe.com.co/api/v1';
+    return 'https://femtribe.com.co/pruebas/api/v1';
 };
 
 const CONFIG = {

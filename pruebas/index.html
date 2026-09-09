@@ -308,9 +308,13 @@
       border-radius: 12px !important;
       font-size: 0.85rem !important;
       margin-bottom: 20px !important;
-      display: flex !important;
+      display: none !important;
       align-items: center !important;
       gap: 10px !important;
+    }
+
+    .auth-alert-box.show {
+      display: flex !important;
     }
 
     .auth-alert-box.error {
@@ -506,19 +510,6 @@
               <button type="submit" id="portal-btn-login" class="auth-submit-btn">
                 <span>🔐</span> Iniciar Sesión
               </button>
-
-              <!-- Acceso Rápido Administrador -->
-              <div class="auth-quick-access-box">
-                <span style="font-size: 0.78rem; color: #166534; font-weight: 800; display: block; margin-bottom: 8px;">⚡ ACCESO DIRECTO ADMINISTRADOR DIRECTIVO:</span>
-                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                  <button type="button" id="btn-quick-admin-login" class="auth-quick-btn-admin">
-                    <span>⚡</span> Entrar directo como Administrador
-                  </button>
-                  <button type="button" id="btn-fill-admin-demo" class="auth-quick-btn-demo">
-                    Llenar Datos (Admin123456!)
-                  </button>
-                </div>
-              </div>
             </form>
 
             <!-- ===================== FORMULARIO REGISTRO ===================== -->
@@ -2546,11 +2537,11 @@ El presente contrato regula los términos y condiciones de la preparación acad�
   <!-- CONTENEDOR TOASTS -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-  <!-- SCRIPTS -->
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/mobile-app.js"></script>
-  <script src="js/admin-panel.js"></script>
-  <script src="js/app.js"></script>
+  <!-- SCRIPTS CON CACHE-BUSTER -->
+  <script src="js/config.js?v=20260909_4"></script>
+  <script src="js/api.js?v=20260909_4"></script>
+  <script src="js/mobile-app.js?v=20260909_4"></script>
+  <script src="js/admin-panel.js?v=20260909_4"></script>
+  <script src="js/app.js?v=20260909_4"></script>
 </body>
 </html>

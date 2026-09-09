@@ -2,12 +2,19 @@
 const CONFIG = {
     // Detecta automáticamente la URL base para funcionar en local (MAMP) o en producción (Hostinger)
     get API_BASE_URL() {
-        const origin = window.location.origin;
-        const path = window.location.pathname;
-        if (path.includes('/pruebas')) {
-            return `${origin}/pruebas/api/v1`;
+        if (typeof window !== 'undefined') {
+            const host = window.location.host;
+            if (host === 'pruebas.femtribe.com.co') {
+                return 'https://femtribe.com.co/pruebas/api/v1';
+            }
+            const origin = window.location.origin;
+            const path = window.location.pathname;
+            if (path.includes('/pruebas')) {
+                return `${origin}/pruebas/api/v1`;
+            }
+            return `${origin}/api/v1`;
         }
-        return `${origin}/api/v1`;
+        return 'https://femtribe.com.co/pruebas/api/v1';
     },
     TOKEN_KEY: 'icfes_student_token',
     USER_KEY: 'icfes_student_user',
