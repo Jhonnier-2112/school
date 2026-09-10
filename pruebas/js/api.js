@@ -124,13 +124,40 @@ const API = {
         return this.request('/admin/dashboard');
     },
 
-    async listStudents(search = '', limit = 20, offset = 0) {
-        const q = new URLSearchParams({ search, limit, offset });
+    async listStudents(search = '', limit = 50, offset = 0, role = '', status = '') {
+        const clean = { search, limit, offset };
+        if (role) clean.role = role;
+        if (status) clean.status = status;
+        const q = new URLSearchParams(clean);
         return this.request(`/admin/students?${q.toString()}`);
     },
 
     async getStudentDetail(studentId) {
-        return this.request(`/admin/students/${studentId}`);
+        return this.request(`/admin/users/${studentId}`);
+    },
+
+    async getAdminUser(userId) {
+        return this.request(`/admin/users/${userId}`);
+    },
+
+    async updateAdminUser(userId, data) {
+        return this.request(`/admin/users/${userId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async disableAdminUser(userId) {
+        return this.request(`/admin/users/${userId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async toggleAdminUserStatus(userId, isActive = null) {
+        return this.request(`/admin/users/${userId}/toggle-status`, {
+            method: 'PUT',
+            body: JSON.stringify(isActive !== null ? { is_active: isActive } : {})
+        });
     },
 
     async inviteStudent(data) {
@@ -150,6 +177,30 @@ const API = {
     async listAdminPayments(params = {}) {
         const q = new URLSearchParams(params).toString();
         return this.request(`/admin/payments${q ? '?' + q : ''}`);
+    },
+
+    async getAdminPayment(paymentId) {
+        return this.request(`/admin/payments/${paymentId}`);
+    },
+
+    async updateAdminPayment(paymentId, data) {
+        return this.request(`/admin/payments/${paymentId}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async disableAdminPayment(paymentId) {
+        return this.request(`/admin/payments/${paymentId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async toggleAdminPaymentStatus(paymentId, isActive = null) {
+        return this.request(`/admin/payments/${paymentId}/toggle-status`, {
+            method: 'PUT',
+            body: JSON.stringify(isActive !== null ? { is_active: isActive } : {})
+        });
     },
 
     async listPendingDocuments(limit = 20, offset = 0) {
@@ -347,6 +398,26 @@ const API = {
     async regenerateAdminEnrollmentDocuments(id) {
         return this.request(`/admin/enrollments/${id}/documents/regenerate`, {
             method: 'POST'
+        });
+    },
+
+    async updateAdminEnrollmentData(id, data) {
+        return this.request(`/admin/enrollments/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async disableAdminEnrollment(id) {
+        return this.request(`/admin/enrollments/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async toggleAdminEnrollmentStatus(id, isActive = null) {
+        return this.request(`/admin/enrollments/${id}/toggle-status`, {
+            method: 'PUT',
+            body: JSON.stringify(isActive !== null ? { is_active: isActive } : {})
         });
     }
 };

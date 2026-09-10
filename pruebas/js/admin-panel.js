@@ -85,6 +85,36 @@ const AdminPanel = {
 
         this.setupQuestionsAndExamsListeners();
 
+        // Bindings para administración de usuarios
+        const btnRefreshUsers = document.getElementById('btn-refresh-users');
+        if (btnRefreshUsers) btnRefreshUsers.addEventListener('click', () => this.renderUsersTable());
+        const btnFilterUsers = document.getElementById('btn-apply-filter-users');
+        if (btnFilterUsers) btnFilterUsers.addEventListener('click', () => this.renderUsersTable());
+        const inputFilterSearch = document.getElementById('filter-user-search');
+        if (inputFilterSearch) {
+            inputFilterSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.renderUsersTable();
+            });
+        }
+        const formEditUser = document.getElementById('form-edit-user');
+        if (formEditUser) {
+            formEditUser.addEventListener('submit', (e) => this.handleSaveUserEdit(e));
+        }
+
+        // Bindings para administración de pagos
+        const btnRefreshPayments = document.getElementById('btn-refresh-admin-payments');
+        if (btnRefreshPayments) btnRefreshPayments.addEventListener('click', () => this.loadAdminPaymentsData());
+        const formEditPayment = document.getElementById('form-edit-payment');
+        if (formEditPayment) {
+            formEditPayment.addEventListener('submit', (e) => this.handleSavePaymentEdit(e));
+        }
+
+        // Bindings para administración de matrículas
+        const formEditMat = document.getElementById('form-edit-matricula');
+        if (formEditMat) {
+            formEditMat.addEventListener('submit', (e) => this.handleSaveMatriculaEdit(e));
+        }
+
         document.querySelectorAll('.modal-close-btn, .modal-cancel-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const modal = btn.closest('.modal-overlay');
@@ -102,7 +132,9 @@ const AdminPanel = {
         const target = document.getElementById(`pane-${tabId}`);
         if (target) target.classList.add('active');
 
-        if (tabId === 'matriculas') {
+        if (tabId === 'usuarios') {
+            this.renderUsersTable();
+        } else if (tabId === 'matriculas') {
             this.loadMatriculasData();
         } else if (tabId === 'cronograma') {
             this.initCronograma();
@@ -271,36 +303,284 @@ const AdminPanel = {
     async renderUsersTable() {
         this.renderTableSkeleton('tbody-users', 6);
         try {
-            const res      = await API.listStudents('', 50, 0);
-            const students = (res && res.data && res.data.students) ? res.data.students : [];
+            const search = document.getElementById('filter-user-search')?.value?.trim() || '';
+            const role   = document.getElementById('filter-user-role')?.value || '';
+            const status = document.getElementById('filter-user-status')?.value || '';
+
+            const res      = await API.listStudents(search, 50, 0, role, status);
+            const students = (res && res.data && (res.data.students || res.data.users)) ? (res.data.students || res.data.users) : [];
             const tbody    = document.getElementById('tbody-users');
             if (!tbody) return;
-            if (!students.length) { this.renderTableEmpty('tbody-users', 6, 'No hay estudiantes registrados'); return; }
-            tbody.innerHTML = students.map(u => `
-                <tr>
-                    <td><strong>${u.full_name}</strong></td>
-                    <td>${u.email}</td>
+            if (!students.length) { this.renderTableEmpty('tbody-users', 6, 'No se encontraron usuarios registrados'); return; }
+
+            tbody.innerHTML = students.map(u => {
+                const isActive = (u.is_active !== undefined && u.is_active !== null) ? Number(u.is_active) === 1 : true;
+                const roleBadge = u.role === 'admin'
+                    ? '<span style="font-size:0.72rem;background:#FDF2F8;color:#BE185D;padding:2px 8px;border-radius:999px;font-weight:700;">👑 Administrador</span>'
+                    : '<span style="font-size:0.72rem;background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:999px;font-weight:700;">🎓 Estudiante</span>';
+                const statusBadge = isActive
+                    ? '<span class="table-badge active">Activo</span>'
+                    : '<span class="table-badge inactive" style="background:#fee2e2;color:#b91c1c;">Deshabilitado</span>';
+
+                const safeName = (u.full_name || '').replace(/'/g, "\\'");
+
+                return `
+                <tr style="${!isActive ? 'opacity: 0.65; background: #fafafa;' : ''}">
+                    <td>
+                        <div style="font-weight: 700; color: #003366;">${u.full_name || 'Sin Nombre'}</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted);">ID: ${u.id ? u.id.substr(0, 8) + '...' : ''}</div>
+                    </td>
+                    <td>${u.email || '—'}</td>
                     <td>${u.phone || '—'}</td>
-                    <td><span style="font-size:0.72rem;background:#EEF2FF;color:#4338CA;padding:2px 8px;border-radius:999px;font-weight:700;">💻 Web & 📱 Móvil</span></td>
-                    <td><span class="table-badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Activo' : 'Inactivo'}</span></td>
-                    <td><div class="table-actions">
-                        <button class="tbl-action-btn" title="Ver detalle"
-                            onclick="AdminPanel.viewStudentDetail('${u.id}','${(u.full_name||'').replace(/'/g,"\\'")}')">👁️</button>
-                    </div></td>
-                </tr>`).join('');
+                    <td>${roleBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <div style="display: inline-flex; gap: 4px; justify-content: flex-end;">
+                            <button class="tbl-action-btn view" title="Ver información completa"
+                                onclick="AdminPanel.openUserDetailModal('${u.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #003366; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                👁️ Ver
+                            </button>
+                            <button class="tbl-action-btn edit" title="Editar usuario"
+                                onclick="AdminPanel.openUserEditModal('${u.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                ✏️ Editar
+                            </button>
+                            <button class="tbl-action-btn delete" title="${isActive ? 'Deshabilitar cuenta' : 'Habilitar cuenta'}"
+                                onclick="AdminPanel.toggleUserActive('${u.id}', ${isActive ? 1 : 0}, '${safeName}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: ${isActive ? '#ef4444' : '#10b981'}; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                ${isActive ? '🚫 Deshabilitar' : '🔄 Habilitar'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
         } catch (e) {
-            this.renderTableEmpty('tbody-users', 6, '⚠️ Error al cargar estudiantes');
+            this.renderTableEmpty('tbody-users', 6, '⚠️ Error al cargar usuarios: ' + (e.message || 'Error de conexión'));
         }
     },
 
     async viewStudentDetail(id, name) {
+        this.openUserDetailModal(id);
+    },
+
+    async openUserDetailModal(userId) {
+        const modal = document.getElementById('user-detail-modal');
+        const content = document.getElementById('modal-user-detail-content');
+        const actions = document.getElementById('modal-user-detail-actions');
+        if (!content) return;
+
+        content.innerHTML = `<div style="text-align: center; padding: 24px;">Cargando información del usuario... ⏳</div>`;
+        if (actions) actions.innerHTML = '';
+        this.openModal('user-detail-modal');
+
         try {
-            const res = await API.getStudentDetail(id);
-            const ps  = res && res.data && res.data.payment_summary;
-            if (!ps) return;
-            App.showToast(`${name} — Pagado: ${this.formatCOP(ps.total_paid)} | Pendiente: ${this.formatCOP(ps.remaining_amount)} (${ps.percentage_paid}%)`, 'info');
+            const res = await API.getAdminUser(userId);
+            const d = res && res.data ? res.data : null;
+            if (!d || !d.user) {
+                content.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Usuario no encontrado.</div>`;
+                return;
+            }
+
+            const u = d.user;
+            const ps = d.payment_summary || {};
+            const doc = d.document;
+            const mat = d.school_matricula;
+            const isActive = (u.is_active !== undefined && u.is_active !== null) ? Number(u.is_active) === 1 : true;
+            const safeName = (u.full_name || '').replace(/'/g, "\\'");
+
+            content.innerHTML = `
+                <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #003366; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; flex-shrink: 0;">
+                        ${(u.full_name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 4px; font-size: 1.15rem; color: #003366;">${u.full_name}</h4>
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">${u.email}</span>
+                            <span>•</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">${u.phone || 'Sin teléfono'}</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="table-badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Cuenta Activa' : 'Cuenta Deshabilitada'}</span>
+                        <div style="margin-top: 4px; font-size: 0.75rem; font-weight: 700; color: #4338ca; text-transform: uppercase;">
+                            ${u.role === 'admin' ? '👑 Administrador' : '🎓 Estudiante'}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen de Pagos / Curso -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 0.88rem; font-weight: 700; color: #003366; margin-bottom: 10px;">💳 Estado de Cuenta & Abonos</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Costo Total</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #003366;">${this.formatCOP(ps.course_price || 0)}</div>
+                        </div>
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 10px 12px;">
+                            <div style="font-size: 0.72rem; color: #166534; text-transform: uppercase;">Total Pagado</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #15803d;">${this.formatCOP(ps.total_paid || 0)}</div>
+                        </div>
+                        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 10px 12px;">
+                            <div style="font-size: 0.72rem; color: #9a3412; text-transform: uppercase;">Saldo Pendiente</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #c2410c;">${this.formatCOP(ps.remaining_amount || 0)}</div>
+                        </div>
+                    </div>
+                    <div style="background: #e2e8f0; border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 6px;">
+                        <div style="background: #15803d; width: ${Math.min(100, ps.percentage_paid || 0)}%; height: 100%;"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right;">${ps.percentage_paid || 0}% completado</div>
+                </div>
+
+                <!-- Matrícula Digital si existe -->
+                ${mat ? `
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 700; color: #1e40af; font-size: 0.88rem;">🎓 Matrícula Jean Piaget: ${mat.code}</div>
+                        <div style="font-size: 0.78rem; color: #3b82f6;">Grado: ${mat.target_grade || 'N/A'} • Estado: ${mat.status}</div>
+                    </div>
+                    <button type="button" class="admin-action-btn" style="padding: 4px 10px; font-size: 0.75rem; background: #1e40af;" onclick="AdminPanel.closeModal('user-detail-modal'); AdminPanel.viewMatriculaDetail('${mat.id}');">Ver Expediente</button>
+                </div>` : ''}
+
+                <!-- Documento de Identidad -->
+                ${doc ? `
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.85rem;">📄 Documento: ${doc.document_type || 'CC'} ${doc.document_number || ''}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Estado: ${doc.status}</div>
+                    </div>
+                    ${doc.file_url ? `<a href="${doc.file_url}" target="_blank" class="tbl-action-btn" style="width:auto;padding:4px 12px;text-decoration:none;font-size:0.75rem;">Ver Archivo</a>` : ''}
+                </div>` : ''}
+
+                <!-- Historial de Abonos -->
+                <div>
+                    <div style="font-size: 0.88rem; font-weight: 700; color: #003366; margin-bottom: 8px;">Historial de Abonos Registrados</div>
+                    ${(ps.payments && ps.payments.length) ? `
+                        <div style="max-height: 180px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            <table style="width: 100%; font-size: 0.8rem; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; text-align: left;">
+                                        <th style="padding: 6px 10px;">Fecha</th>
+                                        <th style="padding: 6px 10px;">Recibo</th>
+                                        <th style="padding: 6px 10px;">Método</th>
+                                        <th style="padding: 6px 10px; text-align: right;">Monto</th>
+                                        <th style="padding: 6px 10px;">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${ps.payments.map(p => {
+                                        const pActive = (p.is_active !== undefined && p.is_active !== null) ? Number(p.is_active) === 1 : true;
+                                        return `
+                                        <tr style="border-bottom: 1px solid #f1f5f9; ${!pActive ? 'opacity: 0.6; text-decoration: line-through;' : ''}">
+                                            <td style="padding: 6px 10px;">${(p.payment_date || '').substr(0, 10)}</td>
+                                            <td style="padding: 6px 10px; font-family: monospace;">${p.receipt_number || 'S/N'}</td>
+                                            <td style="padding: 6px 10px;">${p.payment_method || 'transfer'}</td>
+                                            <td style="padding: 6px 10px; text-align: right; font-weight: 700;">${this.formatCOP(p.amount)}</td>
+                                            <td style="padding: 6px 10px;">
+                                                <span class="table-badge ${pActive ? 'active' : 'inactive'}" style="font-size: 0.65rem; padding: 2px 6px;">
+                                                    ${pActive ? 'Activo' : 'Anulado'}
+                                                </span>
+                                            </td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<div style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">No hay abonos registrados para este usuario.</div>'}
+                </div>
+            `;
+
+            if (actions) {
+                actions.innerHTML = `
+                    <button type="button" class="admin-action-btn" style="padding: 6px 14px; font-size: 0.8rem; background: #003366;" onclick="AdminPanel.closeModal('user-detail-modal'); AdminPanel.openUserEditModal('${u.id}');">
+                        ✏️ Editar Usuario
+                    </button>
+                    <button type="button" class="admin-action-btn" style="padding: 6px 14px; font-size: 0.8rem; background: ${isActive ? '#fee2e2; color: #b91c1c; border: 1px solid #fca5a5;' : '#f0fdf4; color: #15803d; border: 1px solid #86efac;'}" onclick="AdminPanel.toggleUserActive('${u.id}', ${isActive ? 1 : 0}, '${safeName}'); AdminPanel.closeModal('user-detail-modal');">
+                        ${isActive ? '🚫 Deshabilitar Cuenta' : '🔄 Habilitar Cuenta'}
+                    </button>
+                `;
+            }
         } catch (e) {
-            App.showToast('No se pudo cargar el detalle', 'error');
+            content.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Error al cargar detalle del usuario: ${e.message}</div>`;
+        }
+    },
+
+    async openUserEditModal(userId) {
+        try {
+            const res = await API.getAdminUser(userId);
+            const u = res && res.data ? (res.data.user || res.data.student) : null;
+            if (!u) {
+                App.showToast('No se encontró la información del usuario', 'error');
+                return;
+            }
+
+            document.getElementById('edit-user-id').value = u.id || '';
+            document.getElementById('edit-user-name').value = u.full_name || '';
+            document.getElementById('edit-user-email').value = u.email || '';
+            document.getElementById('edit-user-phone').value = u.phone || '';
+            document.getElementById('edit-user-role').value = u.role || 'student';
+            document.getElementById('edit-user-status').value = (u.is_active !== undefined && u.is_active !== null) ? u.is_active : '1';
+            document.getElementById('edit-user-password').value = '';
+
+            this.openModal('user-edit-modal');
+        } catch (e) {
+            App.showToast('Error al preparar edición del usuario: ' + e.message, 'error');
+        }
+    },
+
+    async handleSaveUserEdit(e) {
+        if (e) e.preventDefault();
+        const userId = document.getElementById('edit-user-id').value;
+        const name = document.getElementById('edit-user-name').value.trim();
+        const email = document.getElementById('edit-user-email').value.trim();
+        const phone = document.getElementById('edit-user-phone').value.trim();
+        const role = document.getElementById('edit-user-role').value;
+        const isActive = Number(document.getElementById('edit-user-status').value);
+        const password = document.getElementById('edit-user-password').value.trim();
+
+        if (!name || !email) {
+            App.showToast('El nombre y correo son obligatorios', 'warning');
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-user-edit');
+        if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+        try {
+            const payload = {
+                full_name: name,
+                email: email,
+                phone: phone,
+                role: role,
+                is_active: isActive
+            };
+            if (password) payload.password = password;
+
+            await API.updateAdminUser(userId, payload);
+            App.showToast('Usuario actualizado exitosamente ✅', 'success');
+            this.closeModal('user-edit-modal');
+            await this.renderUsersTable();
+            await this.renderKPIs();
+        } catch (err) {
+            App.showToast(err.message || 'Error al actualizar usuario', 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar Cambios'; }
+        }
+    },
+
+    async toggleUserActive(userId, currentActive, userName) {
+        const confirmMsg = currentActive
+            ? `¿Deseas deshabilitar al usuario "${userName}"?\n\nNo se eliminarán sus datos ni su historial, pero no podrá iniciar sesión en la plataforma.`
+            : `¿Deseas rehabilitar al usuario "${userName}"? Podrá volver a acceder al sistema.`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const newStatus = currentActive ? 0 : 1;
+            await API.toggleAdminUserStatus(userId, newStatus);
+            App.showToast(`Usuario ${newStatus === 1 ? 'habilitado' : 'deshabilitado'} exitosamente`, 'success');
+            await this.renderUsersTable();
+            await this.renderKPIs();
+        } catch (e) {
+            App.showToast('Error al cambiar estado del usuario: ' + e.message, 'error');
         }
     },
 
@@ -1179,7 +1459,7 @@ const AdminPanel = {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">Cargando historial de abonos... ⏳</td></tr>`;
 
         try {
-            const res = await API.listAdminPayments({ limit: 50 });
+            const res = await API.listAdminPayments({ limit: 100 });
             const list = (res && res.data) ? (Array.isArray(res.data) ? res.data : (res.data.payments || [])) : [];
 
             if (list.length === 0) {
@@ -1189,25 +1469,214 @@ const AdminPanel = {
 
             const methodBadges = {
                 'transfer': '<span class="badge badge-info" style="font-size: 0.72rem;">Transferencia</span>',
+                'Transferencia Bancaria': '<span class="badge badge-info" style="font-size: 0.72rem;">Transferencia</span>',
                 'cash': '<span class="badge badge-success" style="font-size: 0.72rem;">Efectivo</span>',
+                'Efectivo': '<span class="badge badge-success" style="font-size: 0.72rem;">Efectivo</span>',
                 'card': '<span class="badge badge-warning" style="font-size: 0.72rem;">Tarjeta</span>',
-                'nequi': '<span class="badge badge-info" style="font-size: 0.72rem; background: #6b21a8; color: #fff;">Nequi/Daviplata</span>'
+                'Tarjeta de Crédito': '<span class="badge badge-warning" style="font-size: 0.72rem;">Tarjeta</span>',
+                'nequi': '<span class="badge badge-info" style="font-size: 0.72rem; background: #6b21a8; color: #fff;">Nequi</span>',
+                'Nequi': '<span class="badge badge-info" style="font-size: 0.72rem; background: #6b21a8; color: #fff;">Nequi</span>',
+                'Daviplata': '<span class="badge badge-danger" style="font-size: 0.72rem; background: #dc2626; color: #fff;">Daviplata</span>'
             };
 
-            tbody.innerHTML = list.map(p => `
-                <tr>
-                    <td style="font-weight: 600; color: #003366;">${p.student_name || 'Estudiante'}</td>
-                    <td style="color: var(--text-muted); font-size: 0.8rem;">${p.student_email || ''}</td>
+            tbody.innerHTML = list.map(p => {
+                const isActive = (p.is_active !== undefined && p.is_active !== null) ? Number(p.is_active) === 1 : true;
+                const statusBadge = isActive
+                    ? '<span class="table-badge active">Activo</span>'
+                    : '<span class="table-badge inactive" style="background:#fee2e2;color:#b91c1c;">Anulado</span>';
+                const formattedDate = p.payment_date ? new Date(p.payment_date).toLocaleDateString('es-CO') : 'Reciente';
+
+                return `
+                <tr style="${!isActive ? 'opacity: 0.65; background: #fafafa;' : ''}">
+                    <td style="font-size: 0.82rem; color: var(--text-muted);">${formattedDate}</td>
+                    <td>
+                        <div style="font-weight: 600; color: #003366;">${p.student_name || 'Estudiante'}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">${p.student_email || ''}</div>
+                    </td>
                     <td style="font-family: monospace; font-size: 0.8rem;">${p.receipt_number || 'S/N'}</td>
-                    <td style="font-weight: 700; color: #15803d; font-size: 0.92rem;">${this.formatCOP(p.amount)}</td>
-                    <td>${methodBadges[p.payment_method] || p.payment_method}</td>
-                    <td style="font-size: 0.8rem; color: var(--text-muted);">${p.payment_date ? new Date(p.payment_date).toLocaleDateString('es-CO') : 'Reciente'}</td>
-                    <td style="font-size: 0.8rem; color: var(--text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.notes || ''}">${p.notes || '—'}</td>
-                </tr>
-            `).join('');
+                    <td>${methodBadges[p.payment_method] || `<span class="badge badge-info" style="font-size: 0.72rem;">${p.payment_method}</span>`}</td>
+                    <td style="font-weight: 700; color: ${isActive ? '#15803d' : '#94a3b8'}; font-size: 0.92rem; text-decoration: ${!isActive ? 'line-through' : 'none'};">
+                        ${this.formatCOP(p.amount)}
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <div style="display: inline-flex; gap: 4px; justify-content: flex-end;">
+                            <button class="tbl-action-btn view" title="Ver comprobante"
+                                onclick="AdminPanel.openPaymentDetailModal('${p.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #003366; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                👁️ Ver
+                            </button>
+                            <button class="tbl-action-btn edit" title="Editar abono"
+                                onclick="AdminPanel.openPaymentEditModal('${p.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                ✏️ Editar
+                            </button>
+                            <button class="tbl-action-btn delete" title="${isActive ? 'Anular/Deshabilitar abono' : 'Reactivar abono'}"
+                                onclick="AdminPanel.togglePaymentActive('${p.id}', ${isActive ? 1 : 0})" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: ${isActive ? '#ef4444' : '#10b981'}; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                                ${isActive ? '🚫 Anular' : '🔄 Reactivar'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
         } catch (err) {
             console.error('Error cargando abonos:', err);
             tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: #ef4444;">Error al cargar abonos: ${err.message}</td></tr>`;
+        }
+    },
+
+    async openPaymentDetailModal(paymentId) {
+        const modal = document.getElementById('payment-detail-modal');
+        const content = document.getElementById('modal-payment-detail-content');
+        const actions = document.getElementById('modal-payment-detail-actions');
+        if (!content) return;
+
+        content.innerHTML = `<div style="text-align: center; padding: 24px;">Cargando comprobante de pago... ⏳</div>`;
+        if (actions) actions.innerHTML = '';
+        this.openModal('payment-detail-modal');
+
+        try {
+            const res = await API.getAdminPayment(paymentId);
+            const p = res && res.data ? res.data : null;
+            if (!p) {
+                content.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Abono no encontrado.</div>`;
+                return;
+            }
+
+            const isActive = (p.is_active !== undefined && p.is_active !== null) ? Number(p.is_active) === 1 : true;
+            const dateStr = p.payment_date ? new Date(p.payment_date).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+
+            content.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Comprobante de Abono Oficial</div>
+                    <div style="font-size: 2rem; font-weight: 800; color: ${isActive ? '#15803d' : '#94a3b8'}; margin: 6px 0; text-decoration: ${!isActive ? 'line-through' : 'none'};">
+                        ${this.formatCOP(p.amount)}
+                    </div>
+                    <span class="table-badge ${isActive ? 'active' : 'inactive'}">
+                        ${isActive ? '✅ Pago Válido y Activo' : '🚫 Abono Anulado / Deshabilitado'}
+                    </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+                    <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Estudiante</div>
+                        <div style="font-weight: 700; color: #003366; font-size: 0.95rem;">${p.student_name || '—'}</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">${p.student_email || ''}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Recibo / Referencia</div>
+                        <div style="font-family: monospace; font-weight: 700; font-size: 1rem; color: #1e293b;">${p.receipt_number || 'S/N'}</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">${dateStr}</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+                    <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Método de Pago</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">${p.payment_method || 'Transferencia'}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Registrado Por</div>
+                        <div style="font-weight: 600; font-size: 0.9rem;">${p.registered_by_name || 'Administración'}</div>
+                    </div>
+                </div>
+
+                <div style="background: #f8fafc; padding: 12px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Concepto / Observaciones</div>
+                    <div style="font-size: 0.88rem; color: #334155; margin-top: 2px;">${p.notes || 'Abono registrado en plataforma'}</div>
+                </div>
+            `;
+
+            if (actions) {
+                actions.innerHTML = `
+                    <button type="button" class="admin-action-btn" style="padding: 6px 14px; font-size: 0.8rem; background: #003366;" onclick="AdminPanel.closeModal('payment-detail-modal'); AdminPanel.openPaymentEditModal('${p.id}');">
+                        ✏️ Editar Abono
+                    </button>
+                    <button type="button" class="admin-action-btn" style="padding: 6px 14px; font-size: 0.8rem; background: ${isActive ? '#fee2e2; color: #b91c1c; border: 1px solid #fca5a5;' : '#f0fdf4; color: #15803d; border: 1px solid #86efac;'}" onclick="AdminPanel.togglePaymentActive('${p.id}', ${isActive ? 1 : 0}); AdminPanel.closeModal('payment-detail-modal');">
+                        ${isActive ? '🚫 Anular / Deshabilitar' : '🔄 Reactivar Abono'}
+                    </button>
+                `;
+            }
+        } catch (e) {
+            content.innerHTML = `<div style="color: #ef4444; padding: 16px; text-align: center;">Error al cargar comprobante: ${e.message}</div>`;
+        }
+    },
+
+    async openPaymentEditModal(paymentId) {
+        try {
+            const res = await API.getAdminPayment(paymentId);
+            const p = res && res.data ? res.data : null;
+            if (!p) {
+                App.showToast('No se encontró el comprobante de pago', 'error');
+                return;
+            }
+
+            document.getElementById('edit-pay-id').value = p.id || '';
+            document.getElementById('edit-pay-student-name').value = `${p.student_name || 'Estudiante'} (${p.student_email || ''})`;
+            document.getElementById('edit-pay-amount').value = p.amount || '';
+            document.getElementById('edit-pay-date').value = (p.payment_date || '').substr(0, 10);
+            document.getElementById('edit-pay-method').value = p.payment_method || 'Transferencia Bancaria';
+            document.getElementById('edit-pay-receipt').value = p.receipt_number || '';
+            document.getElementById('edit-pay-notes').value = p.notes || '';
+            document.getElementById('edit-pay-status').value = (p.is_active !== undefined && p.is_active !== null) ? p.is_active : '1';
+
+            this.openModal('payment-edit-modal');
+        } catch (e) {
+            App.showToast('Error al preparar edición del abono: ' + e.message, 'error');
+        }
+    },
+
+    async handleSavePaymentEdit(e) {
+        if (e) e.preventDefault();
+        const payId = document.getElementById('edit-pay-id').value;
+        const amount = parseFloat(document.getElementById('edit-pay-amount').value);
+        const date = document.getElementById('edit-pay-date').value;
+        const method = document.getElementById('edit-pay-method').value;
+        const receipt = document.getElementById('edit-pay-receipt').value.trim();
+        const notes = document.getElementById('edit-pay-notes').value.trim();
+        const isActive = Number(document.getElementById('edit-pay-status').value);
+
+        if (isNaN(amount) || amount <= 0) {
+            App.showToast('Ingresa un monto válido mayor a cero', 'warning');
+            return;
+        }
+
+        const btn = document.getElementById('btn-save-payment-edit');
+        if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+        try {
+            await API.updateAdminPayment(payId, {
+                amount: amount,
+                payment_date: date,
+                payment_method: method,
+                receipt_number: receipt,
+                notes: notes,
+                is_active: isActive
+            });
+            App.showToast('Abono actualizado exitosamente ✅', 'success');
+            this.closeModal('payment-edit-modal');
+            await this.loadAdminPaymentsData();
+            await this.renderKPIs();
+        } catch (err) {
+            App.showToast(err.message || 'Error al actualizar abono', 'error');
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar Cambios'; }
+        }
+    },
+
+    async togglePaymentActive(paymentId, currentActive) {
+        const confirmMsg = currentActive
+            ? '¿Deseas anular / deshabilitar este abono?\n\nEl monto ya no sumará a los ingresos ni al saldo del estudiante, pero se conservará en el historial contable.'
+            : '¿Deseas reactivar este abono? El monto volverá a computarse en ingresos.';
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const newStatus = currentActive ? 0 : 1;
+            await API.toggleAdminPaymentStatus(paymentId, newStatus);
+            App.showToast(newStatus === 1 ? 'Abono reactivado exitosamente' : 'Abono anulado exitosamente', 'success');
+            await this.loadAdminPaymentsData();
+            await this.renderKPIs();
+        } catch (e) {
+            App.showToast('Error al modificar abono: ' + e.message, 'error');
         }
     },
 
@@ -1321,7 +1790,8 @@ const AdminPanel = {
             'SIGNED': '<span style="background: #e0e7ff; color: #4338ca; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">FIRMADA</span>',
             'APPROVED': '<span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">APROBADA</span>',
             'REJECTED': '<span style="background: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">RECHAZADA</span>',
-            'DOCUMENTS_PENDING': '<span style="background: #ffedd5; color: #c2410c; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">CORRECCIONES</span>'
+            'DOCUMENTS_PENDING': '<span style="background: #ffedd5; color: #c2410c; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">CORRECCIONES</span>',
+            'CANCELLED': '<span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">CANCELADA</span>'
         };
 
         const levelShort = {
@@ -1330,8 +1800,15 @@ const AdminPanel = {
             'BACHILLERATO_CICLOS': 'Ciclos'
         };
 
-        tbody.innerHTML = rows.map(r => `
-            <tr>
+        tbody.innerHTML = rows.map(r => {
+            const isActive = r.is_active !== undefined ? (Number(r.is_active) === 1) : (r.status !== 'CANCELLED');
+            let badgeStatus = statusBadges[r.status] || `<span class="table-badge">${r.status}</span>`;
+            if (!isActive) {
+                badgeStatus += ' <span style="background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; margin-left: 4px;">DESHABILITADA</span>';
+            }
+
+            return `
+            <tr style="${!isActive ? 'opacity: 0.65; background-color: #f8fafc;' : ''}">
                 <td><strong>${r.code}</strong></td>
                 <td>
                     <div style="font-weight: 600;">${r.student_first_name || ''} ${r.student_last_name || ''}</div>
@@ -1346,34 +1823,29 @@ const AdminPanel = {
                     <span style="font-size: 0.75rem; color: #64748b;">${r.guardian_relationship || ''}</span>
                 </td>
                 <td>${r.guardian_phone || 'N/A'}</td>
-                <td>${statusBadges[r.status] || r.status}</td>
+                <td>${badgeStatus}</td>
                 <td>
                     <span style="font-size: 0.8rem; font-weight: 600; color: #003366;">
                         📑 ${r.documents_count || 0} docs
                     </span>
                     ${r.signatures_count > 0 ? '<span title="Firmado digitalmente" style="color: #16a34a; margin-left: 4px;">✔</span>' : ''}
                 </td>
-                <td style="text-align: right;">
-                    <button class="tbl-action-btn view btn-view-matricula" data-id="${r.id}" title="Revisar expediente completo" onclick="AdminPanel.viewMatriculaDetail('${r.id}')" style="padding: 4px 10px; font-size: 0.8rem; background: #003366; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                        🔍 Revisar
-                    </button>
+                <td style="text-align: right; white-space: nowrap;">
+                    <div style="display: inline-flex; gap: 4px; justify-content: flex-end;">
+                        <button class="tbl-action-btn view" title="Revisar expediente completo" onclick="AdminPanel.viewMatriculaDetail('${r.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #003366; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                            🔍 Ver
+                        </button>
+                        <button class="tbl-action-btn edit" title="Editar expediente" onclick="AdminPanel.openEditMatriculaModal('${r.id}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                            ✏️ Editar
+                        </button>
+                        <button class="tbl-action-btn ${isActive ? 'delete' : 'view'}" title="${isActive ? 'Deshabilitar matrícula' : 'Reactivar matrícula'}" onclick="AdminPanel.toggleMatriculaActive('${r.id}', ${isActive ? 1 : 0}, '${r.code || ''}')" style="width: auto; padding: 4px 8px; font-size: 0.78rem; background: ${isActive ? '#ef4444' : '#10b981'}; color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;">
+                            ${isActive ? '🚫 Deshabilitar' : '🔄 Reactivar'}
+                        </button>
+                    </div>
                 </td>
             </tr>
-        `).join('');
-
-        tbody.querySelectorAll('.btn-view-matricula').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                if (id) {
-                    if (window.AdminPanel && window.AdminPanel.viewMatriculaDetail) {
-                        window.AdminPanel.viewMatriculaDetail(id);
-                    } else {
-                        AdminPanel.viewMatriculaDetail(id);
-                    }
-                }
-            });
-        });
+            `;
+        }).join('');
     },
 
     async viewMatriculaDetail(enrollmentId) {
@@ -1412,6 +1884,25 @@ const AdminPanel = {
             if (actionStatus) actionStatus.value = e.status === 'APPROVED' ? 'APPROVED' : (e.status === 'REJECTED' ? 'REJECTED' : (e.status === 'DOCUMENTS_PENDING' ? 'DOCUMENTS_PENDING' : 'APPROVED'));
             const actionObs = document.getElementById('modal-mat-action-obs');
             if (actionObs) actionObs.value = e.observations || '';
+
+            // Configurar botones de editar y deshabilitar en el modal de detalle
+            const btnMatEdit = document.getElementById('btn-modal-mat-edit');
+            if (btnMatEdit) {
+                btnMatEdit.onclick = () => {
+                    this.closeModal('matricula-detail-modal');
+                    this.openEditMatriculaModal(enrollmentId);
+                };
+            }
+            const btnMatToggle = document.getElementById('btn-modal-mat-toggle');
+            if (btnMatToggle) {
+                const isMatActive = e.is_active !== undefined ? (Number(e.is_active) === 1) : (e.status !== 'CANCELLED');
+                btnMatToggle.textContent = isMatActive ? '🚫 Deshabilitar Matrícula' : '🔄 Reactivar Matrícula';
+                btnMatToggle.style.background = isMatActive ? '#fee2e2' : '#dcfce7';
+                btnMatToggle.style.color = isMatActive ? '#991b1b' : '#166534';
+                btnMatToggle.onclick = () => {
+                    this.toggleMatriculaActive(enrollmentId, isMatActive ? 1 : 0, e.code);
+                };
+            }
 
             const fmt = (n) => '$' + Number(n || 0).toLocaleString('es-CO');
 
@@ -1535,6 +2026,162 @@ const AdminPanel = {
             `;
         } catch (err) {
             content.innerHTML = `<div style="color: red; padding: 20px;">Error al cargar detalle: ${err.message}</div>`;
+        }
+    },
+
+    async openEditMatriculaModal(enrollmentId) {
+        try {
+            const res = await API.getAdminEnrollmentDetail(enrollmentId);
+            if (!res || !res.success || !res.data) {
+                App.showToast('Error al cargar datos de la matrícula', 'error');
+                return;
+            }
+            const d = res.data;
+            const e = d.enrollment || {};
+            const s = d.student || {};
+            const g = d.guardian || {};
+            const ec = d.economics || {};
+
+            const idInput = document.getElementById('edit-mat-id');
+            if (idInput) idInput.value = e.id || enrollmentId;
+            const codeBadge = document.getElementById('edit-mat-code-badge');
+            if (codeBadge) codeBadge.textContent = e.code || 'MAT-2026';
+
+            // Student
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val !== null && val !== undefined ? val : '';
+            };
+
+            setVal('edit-mat-st-firstname', s.first_name);
+            setVal('edit-mat-st-lastname', s.last_name);
+            setVal('edit-mat-st-doctype', s.doc_type || 'TI');
+            setVal('edit-mat-st-docnum', s.doc_number);
+            setVal('edit-mat-st-docplace', s.doc_issue_place);
+            setVal('edit-mat-st-birthdate', s.birth_date);
+            setVal('edit-mat-st-birthplace', s.birth_place);
+            setVal('edit-mat-st-age', s.age);
+            setVal('edit-mat-st-rh', s.rh);
+            setVal('edit-mat-st-eps', s.eps);
+            setVal('edit-mat-st-phone', s.phone);
+            setVal('edit-mat-st-email', s.email);
+            setVal('edit-mat-st-address', s.address);
+
+            // Guardian
+            setVal('edit-mat-gd-name', g.full_name);
+            setVal('edit-mat-gd-rel', g.relationship);
+            setVal('edit-mat-gd-doctype', g.doc_type || 'CC');
+            setVal('edit-mat-gd-docnum', g.doc_number);
+            setVal('edit-mat-gd-phone', g.phone);
+            setVal('edit-mat-gd-email', g.email);
+
+            // Academic & financial
+            setVal('edit-mat-level', e.enrollment_type || 'PREESCOLAR');
+            setVal('edit-mat-grade', e.target_grade);
+            const isActive = e.is_active !== undefined ? (Number(e.is_active) === 1 ? '1' : '0') : (e.status === 'CANCELLED' ? '0' : '1');
+            setVal('edit-mat-active', isActive);
+
+            setVal('edit-mat-fee', ec.enrollment_fee || 180000);
+            setVal('edit-mat-monthly', ec.monthly_fee || 150000);
+            setVal('edit-mat-total', ec.total_tuition || 1680000);
+            setVal('edit-mat-obs', e.observations);
+
+            this.openModal('matricula-edit-modal');
+        } catch (err) {
+            console.error('Error al abrir modal de edición de matrícula:', err);
+            App.showToast(err.message || 'Error al cargar datos', 'error');
+        }
+    },
+
+    async handleSaveMatriculaEdit(e) {
+        e.preventDefault();
+        const id = document.getElementById('edit-mat-id')?.value;
+        if (!id) return;
+
+        const getVal = (elId) => document.getElementById(elId)?.value?.trim() || '';
+
+        const payload = {
+            student: {
+                first_name: getVal('edit-mat-st-firstname'),
+                last_name: getVal('edit-mat-st-lastname'),
+                doc_type: document.getElementById('edit-mat-st-doctype')?.value || 'TI',
+                doc_number: getVal('edit-mat-st-docnum'),
+                doc_issue_place: getVal('edit-mat-st-docplace'),
+                birth_date: document.getElementById('edit-mat-st-birthdate')?.value || null,
+                birth_place: getVal('edit-mat-st-birthplace'),
+                age: document.getElementById('edit-mat-st-age')?.value ? parseInt(document.getElementById('edit-mat-st-age').value, 10) : null,
+                rh: getVal('edit-mat-st-rh'),
+                eps: getVal('edit-mat-st-eps'),
+                phone: getVal('edit-mat-st-phone'),
+                email: getVal('edit-mat-st-email'),
+                address: getVal('edit-mat-st-address')
+            },
+            guardian: {
+                full_name: getVal('edit-mat-gd-name'),
+                relationship: getVal('edit-mat-gd-rel'),
+                doc_type: document.getElementById('edit-mat-gd-doctype')?.value || 'CC',
+                doc_number: getVal('edit-mat-gd-docnum'),
+                phone: getVal('edit-mat-gd-phone'),
+                email: getVal('edit-mat-gd-email')
+            },
+            enrollment: {
+                enrollment_type: document.getElementById('edit-mat-level')?.value || 'PREESCOLAR',
+                target_grade: getVal('edit-mat-grade'),
+                is_active: parseInt(document.getElementById('edit-mat-active')?.value || '1', 10),
+                observations: getVal('edit-mat-obs')
+            },
+            economics: {
+                enrollment_fee: parseFloat(document.getElementById('edit-mat-fee')?.value) || 0,
+                monthly_fee: parseFloat(document.getElementById('edit-mat-monthly')?.value) || 0,
+                total_tuition: parseFloat(document.getElementById('edit-mat-total')?.value) || 0
+            }
+        };
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const origText = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando... ⏳';
+        }
+
+        try {
+            const res = await API.updateAdminEnrollmentData(id, payload);
+            if (res && res.success) {
+                App.showToast(res.message || 'Expediente actualizado exitosamente', 'success');
+                this.closeModal('matricula-edit-modal');
+                this.loadMatriculasData();
+            } else {
+                throw new Error(res.message || 'Error al actualizar expediente');
+            }
+        } catch (err) {
+            App.showToast(err.message || 'Error al guardar cambios', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = origText;
+            }
+        }
+    },
+
+    async toggleMatriculaActive(enrollmentId, currentActive, code) {
+        const actionWord = currentActive ? 'deshabilitar' : 'reactivar';
+        const confirmMsg = currentActive
+            ? `¿Estás seguro de deshabilitar la matrícula ${code || ''}? La matrícula pasará a estado inactivo y cancelado sin eliminar sus documentos ni firmas.`
+            : `¿Deseas reactivar la matrícula ${code || ''}?`;
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const res = await API.toggleAdminEnrollmentStatus(enrollmentId);
+            if (res && res.success) {
+                App.showToast(res.message || `Matrícula ${actionWord}da exitosamente`, 'success');
+                this.closeModal('matricula-detail-modal');
+                this.loadMatriculasData();
+            } else {
+                throw new Error(res.message || `Error al ${actionWord} la matrícula`);
+            }
+        } catch (err) {
+            App.showToast(err.message || `Error al ${actionWord} matrícula`, 'error');
         }
     },
 

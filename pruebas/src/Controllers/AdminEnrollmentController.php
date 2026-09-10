@@ -24,6 +24,9 @@ class AdminEnrollmentController {
             require_once __DIR__ . '/../../config/database.php';
             $this->pdo = getDBConnection($this->config);
         }
+        try {
+            \App\Services\DatabaseSeeder::ensureColumnsExist($this->pdo);
+        } catch (\Throwable $e) {}
         $this->pdfService = new PdfDocumentService($this->pdo, $this->config);
         $this->emailService = new EmailService($this->config);
     }
@@ -145,6 +148,18 @@ class AdminEnrollmentController {
             $params[':search'] = "%{$search}%";
         }
 
+        $hasIsActive = true;
+        try {
+            $cols = $this->pdo->query('DESCRIBE school_enrollments')->fetchAll(PDO::FETCH_COLUMN);
+            $hasIsActive = in_array('is_active', $cols);
+        } catch (\Throwable $e) {}
+
+        $isActive = $_GET['is_active'] ?? '';
+        if ($hasIsActive && $isActive !== '') {
+            $where[] = "e.is_active = :is_active";
+            $params[':is_active'] = (int)$isActive;
+        }
+
         $whereSql = implode(' AND ', $where);
 
         // Conteo total
@@ -158,10 +173,13 @@ class AdminEnrollmentController {
         $countStmt->execute($params);
         $totalRows = (int)$countStmt->fetchColumn();
 
+        $colActiveSql = $hasIsActive ? "COALESCE(e.is_active, 1) as is_active," : "1 as is_active,";
+
         // Consulta paginada
         $sql = "
             SELECT 
-                e.id, e.code, e.enrollment_type, e.target_grade, e.school_year, e.status, e.current_step,
+                e.id, e.code, e.enrollment_type, e.target_grade, e.school_year, e.status, 
+                {$colActiveSql} e.current_step,
                 e.submitted_at, e.approved_at, e.created_at, e.updated_at,
                 s.first_name AS student_first_name, s.last_name AS student_last_name, 
                 s.doc_type AS student_doc_type, s.doc_number AS student_doc_number,
@@ -325,5 +343,201 @@ class AdminEnrollmentController {
         } catch (Exception $e) {
             Router::json(500, false, 'Error al regenerar documentos: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Actualiza información administrativa del expediente de matrícula.
+     * PUT /api/v1/admin/enrollments/{id}
+     */
+    public function updateEnrollmentDetail(array|string $params): void {
+        $id = is_array($params) ? ($params['id'] ?? '') : $params;
+        $user = AuthMiddleware::authenticate($this->config, 'admin');
+        $adminId = $user['user_id'] ?? $user['id'] ?? '';
+
+        $data = $this->pdfService->getEnrollmentFullData($id);
+        if (!$data) {
+            Router::json(404, false, 'Matrícula no encontrada');
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $body = json_decode($raw, true) ?: [];
+
+        $now = date('Y-m-d H:i:s');
+        $this->pdo->beginTransaction();
+
+        try {
+            // 1. Actualizar estudiante
+            if (!empty($body['student']) && is_array($body['student']) && !empty($data['enrollment']['student_id'])) {
+                $st = $body['student'];
+                $stId = $data['enrollment']['student_id'];
+                $stFields = [];
+                $stParams = [];
+
+                $allowedStudentFields = [
+                    'first_name', 'last_name', 'birth_date', 'birth_place', 'age',
+                    'doc_type', 'doc_number', 'doc_issue_place', 'eps', 'rh',
+                    'lives_with_parents', 'lives_with_whom', 'address', 'phone', 'email'
+                ];
+                foreach ($allowedStudentFields as $f) {
+                    if (array_key_exists($f, $st)) {
+                        $stFields[] = "{$f} = ?";
+                        $stParams[] = $st[$f];
+                    }
+                }
+                if (!empty($stFields)) {
+                    $stFields[] = "updated_at = ?";
+                    $stParams[] = $now;
+                    $stParams[] = $stId;
+                    $this->pdo->prepare("UPDATE students SET " . implode(', ', $stFields) . " WHERE id = ?")
+                              ->execute($stParams);
+                }
+            }
+
+            // 2. Actualizar acudiente
+            if (!empty($body['guardian']) && is_array($body['guardian']) && !empty($data['enrollment']['guardian_id'])) {
+                $g = $body['guardian'];
+                $gId = $data['enrollment']['guardian_id'];
+                $gFields = [];
+                $gParams = [];
+
+                $allowedGuardianFields = [
+                    'full_name', 'doc_type', 'doc_number', 'doc_issue_place',
+                    'relationship', 'phone', 'email', 'address', 'occupation', 'is_parent'
+                ];
+                foreach ($allowedGuardianFields as $f) {
+                    if (array_key_exists($f, $g)) {
+                        $gFields[] = "{$f} = ?";
+                        $gParams[] = $g[$f];
+                    }
+                }
+                if (!empty($gFields)) {
+                    $gFields[] = "updated_at = ?";
+                    $gParams[] = $now;
+                    $gParams[] = $gId;
+                    $this->pdo->prepare("UPDATE guardians SET " . implode(', ', $gFields) . " WHERE id = ?")
+                              ->execute($gParams);
+                }
+            }
+
+            // 3. Actualizar economía
+            if (!empty($body['economics']) && is_array($body['economics'])) {
+                $ec = $body['economics'];
+                $ecFields = [];
+                $ecParams = [];
+
+                $allowedEcoFields = [
+                    'enrollment_fee', 'monthly_fee', 'installments_count',
+                    'total_tuition', 'payment_method', 'notes'
+                ];
+                foreach ($allowedEcoFields as $f) {
+                    if (array_key_exists($f, $ec)) {
+                        $ecFields[] = "{$f} = ?";
+                        $ecParams[] = $ec[$f];
+                    }
+                }
+                if (!empty($ecFields)) {
+                    $ecFields[] = "updated_at = ?";
+                    $ecParams[] = $now;
+                    $ecParams[] = $id;
+                    $this->pdo->prepare("UPDATE enrollment_economics SET " . implode(', ', $ecFields) . " WHERE enrollment_id = ?")
+                              ->execute($ecParams);
+                }
+            }
+
+            // 4. Actualizar enrollment base (grado, tipo, observaciones, status, is_active)
+            $enFields = [];
+            $enParams = [];
+            $allowedEnrollFields = ['target_grade', 'enrollment_type', 'observations', 'status', 'is_active'];
+            $enInput = $body['enrollment'] ?? $body;
+            foreach ($allowedEnrollFields as $f) {
+                if (array_key_exists($f, $enInput)) {
+                    $enFields[] = "{$f} = ?";
+                    $enParams[] = $enInput[$f];
+                }
+            }
+            if (!empty($enFields)) {
+                $enFields[] = "updated_at = ?";
+                $enParams[] = $now;
+                $enParams[] = $id;
+                $this->pdo->prepare("UPDATE school_enrollments SET " . implode(', ', $enFields) . " WHERE id = ?")
+                          ->execute($enParams);
+            }
+
+            Enrollment::logAudit($this->pdo, $id, 'ADMIN_UPDATE_DATA', null, null, $adminId, 'Actualización de datos por administrador');
+            $this->pdo->commit();
+
+            $updatedData = $this->pdfService->getEnrollmentFullData($id);
+            Router::json(200, true, 'Expediente de matrícula actualizado exitosamente', $updatedData);
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            Router::json(500, false, 'Error al actualizar matrícula: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Deshabilita una matrícula (Soft delete, no borra de BD).
+     * DELETE /api/v1/admin/enrollments/{id}
+     */
+    public function disableEnrollment(array|string $params): void {
+        $id = is_array($params) ? ($params['id'] ?? '') : $params;
+        $user = AuthMiddleware::authenticate($this->config, 'admin');
+        $adminId = $user['user_id'] ?? $user['id'] ?? '';
+
+        $stmtCheck = $this->pdo->prepare("SELECT id, status, is_active FROM school_enrollments WHERE id = ?");
+        $stmtCheck->execute([$id]);
+        $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            Router::json(404, false, 'Matrícula no encontrada');
+            return;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->pdo->prepare("UPDATE school_enrollments SET is_active = 0, status = 'CANCELLED', updated_at = ? WHERE id = ?")
+                  ->execute([$now, $id]);
+
+        Enrollment::logAudit($this->pdo, $id, 'ADMIN_DISABLE_ENROLLMENT', $row['status'], 'CANCELLED', $adminId, 'Matrícula deshabilitada / anulada');
+
+        Router::json(200, true, 'Matrícula deshabilitada exitosamente (soft delete)', [
+            'id' => $id,
+            'is_active' => 0,
+            'status' => 'CANCELLED'
+        ]);
+    }
+
+    /**
+     * Alterna estado habilitado/deshabilitado de la matrícula.
+     * PUT /api/v1/admin/enrollments/{id}/toggle-status
+     */
+    public function toggleEnrollmentStatus(array|string $params): void {
+        $id = is_array($params) ? ($params['id'] ?? '') : $params;
+        $user = AuthMiddleware::authenticate($this->config, 'admin');
+        $adminId = $user['user_id'] ?? $user['id'] ?? '';
+
+        $stmtCheck = $this->pdo->prepare("SELECT id, status, is_active FROM school_enrollments WHERE id = ?");
+        $stmtCheck->execute([$id]);
+        $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            Router::json(404, false, 'Matrícula no encontrada');
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $body = json_decode($raw, true) ?: [];
+
+        $currentActive = (int)($row['is_active'] ?? 1);
+        $newActive = isset($body['is_active']) ? (int)(bool)$body['is_active'] : ($currentActive === 1 ? 0 : 1);
+        $newStatus = ($newActive === 1) ? ($row['status'] === 'CANCELLED' ? 'PENDING_REVIEW' : $row['status']) : 'CANCELLED';
+
+        $now = date('Y-m-d H:i:s');
+        $this->pdo->prepare("UPDATE school_enrollments SET is_active = ?, status = ?, updated_at = ? WHERE id = ?")
+                  ->execute([$newActive, $newStatus, $now, $id]);
+
+        Enrollment::logAudit($this->pdo, $id, 'ADMIN_TOGGLE_ACTIVE', $row['status'], $newStatus, $adminId, "Estado de activación cambiado a: {$newActive}");
+
+        $updatedData = $this->pdfService->getEnrollmentFullData($id);
+        Router::json(200, true, $newActive === 1 ? 'Matrícula habilitada exitosamente' : 'Matrícula deshabilitada exitosamente', $updatedData);
     }
 }

@@ -342,45 +342,7 @@ class DatabaseSeeder {
         ");
 
         // Auto-migraciones para columnas añadidas
-        try {
-            $colsQ = $pdo->query('DESCRIBE questions')->fetchAll(PDO::FETCH_COLUMN);
-            if (!in_array('question_type', $colsQ)) {
-                $pdo->exec("ALTER TABLE questions ADD COLUMN question_type VARCHAR(30) NOT NULL DEFAULT 'multiple_choice' AFTER statement");
-            }
-            if (!in_array('score_type', $colsQ)) {
-                $pdo->exec("ALTER TABLE questions ADD COLUMN score_type VARCHAR(20) NOT NULL DEFAULT 'points' AFTER explanation");
-            }
-            if (!in_array('time_limit_seconds', $colsQ)) {
-                $pdo->exec("ALTER TABLE questions ADD COLUMN time_limit_seconds INT NOT NULL DEFAULT 0 AFTER score_weight");
-            }
-            if (!in_array('correct_answer_text', $colsQ)) {
-                $pdo->exec("ALTER TABLE questions ADD COLUMN correct_answer_text TEXT DEFAULT NULL AFTER correct_option");
-            }
-            if (!in_array('difficulty', $colsQ)) {
-                $pdo->exec("ALTER TABLE questions ADD COLUMN difficulty VARCHAR(20) NOT NULL DEFAULT 'medium' AFTER time_limit_seconds");
-            }
-
-            $colsE = $pdo->query('DESCRIBE exams')->fetchAll(PDO::FETCH_COLUMN);
-            if (!in_array('scoring_mode', $colsE)) {
-                $pdo->exec("ALTER TABLE exams ADD COLUMN scoring_mode VARCHAR(20) NOT NULL DEFAULT 'points' AFTER duration_minutes");
-            }
-            if (!in_array('timer_mode', $colsE)) {
-                $pdo->exec("ALTER TABLE exams ADD COLUMN timer_mode VARCHAR(20) NOT NULL DEFAULT 'exam' AFTER scoring_mode");
-            }
-            if (!in_array('time_per_question_seconds', $colsE)) {
-                $pdo->exec("ALTER TABLE exams ADD COLUMN time_per_question_seconds INT NOT NULL DEFAULT 60 AFTER timer_mode");
-            }
-
-            $colsA = $pdo->query('DESCRIBE student_answers')->fetchAll(PDO::FETCH_COLUMN);
-            if (!in_array('answer_text', $colsA)) {
-                $pdo->exec("ALTER TABLE student_answers ADD COLUMN answer_text TEXT DEFAULT NULL AFTER selected_option");
-            }
-
-            // Asegurar que las opciones de preguntas puedan ser nulas para tipo verdadero/falso y respuesta abierta
-            $pdo->exec("ALTER TABLE questions MODIFY option_a TEXT NULL, MODIFY option_b TEXT NULL, MODIFY option_c TEXT NULL, MODIFY option_d TEXT NULL, MODIFY correct_option VARCHAR(2) NULL");
-        } catch (\Exception $e) {
-            // Si ya existen las columnas o no es necesario, continuar
-        }
+        self::ensureColumnsExist($pdo);
 
         $now = date('Y-m-d H:i:s');
 
@@ -488,6 +450,86 @@ class DatabaseSeeder {
             $stmt->execute([self::uuid(), $examId, $q1Id, 1]);
             $stmt->execute([self::uuid(), $examId, $q2Id, 2]);
         }
+    }
+
+    public static function ensureColumnsExist(PDO $pdo): array {
+        $changes = [];
+
+        // 1. users.is_active
+        try {
+            $colsU = $pdo->query('DESCRIBE users')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('is_active', $colsU)) {
+                $pdo->exec("ALTER TABLE users ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER role");
+                $changes[] = 'users.is_active agregada';
+            }
+        } catch (\Throwable $e) {}
+
+        // 2. payments.is_active
+        try {
+            $colsP = $pdo->query('DESCRIBE payments')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('is_active', $colsP)) {
+                $pdo->exec("ALTER TABLE payments ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1");
+                $changes[] = 'payments.is_active agregada';
+            }
+        } catch (\Throwable $e) {}
+
+        // 3. school_enrollments.is_active
+        try {
+            $colsSE = $pdo->query('DESCRIBE school_enrollments')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('is_active', $colsSE)) {
+                $pdo->exec("ALTER TABLE school_enrollments ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER status");
+                $changes[] = 'school_enrollments.is_active agregada';
+            }
+        } catch (\Throwable $e) {}
+
+        // 4. Questions & exams auto-migrations
+        try {
+            $colsQ = $pdo->query('DESCRIBE questions')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('question_type', $colsQ)) {
+                $pdo->exec("ALTER TABLE questions ADD COLUMN question_type VARCHAR(30) NOT NULL DEFAULT 'multiple_choice' AFTER statement");
+                $changes[] = 'questions.question_type agregada';
+            }
+            if (!in_array('score_type', $colsQ)) {
+                $pdo->exec("ALTER TABLE questions ADD COLUMN score_type VARCHAR(20) NOT NULL DEFAULT 'points' AFTER explanation");
+                $changes[] = 'questions.score_type agregada';
+            }
+            if (!in_array('time_limit_seconds', $colsQ)) {
+                $pdo->exec("ALTER TABLE questions ADD COLUMN time_limit_seconds INT NOT NULL DEFAULT 0 AFTER score_weight");
+                $changes[] = 'questions.time_limit_seconds agregada';
+            }
+            if (!in_array('correct_answer_text', $colsQ)) {
+                $pdo->exec("ALTER TABLE questions ADD COLUMN correct_answer_text TEXT DEFAULT NULL AFTER correct_option");
+                $changes[] = 'questions.correct_answer_text agregada';
+            }
+            if (!in_array('difficulty', $colsQ)) {
+                $pdo->exec("ALTER TABLE questions ADD COLUMN difficulty VARCHAR(20) NOT NULL DEFAULT 'medium' AFTER time_limit_seconds");
+                $changes[] = 'questions.difficulty agregada';
+            }
+
+            $colsE = $pdo->query('DESCRIBE exams')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('scoring_mode', $colsE)) {
+                $pdo->exec("ALTER TABLE exams ADD COLUMN scoring_mode VARCHAR(20) NOT NULL DEFAULT 'points' AFTER duration_minutes");
+                $changes[] = 'exams.scoring_mode agregada';
+            }
+            if (!in_array('timer_mode', $colsE)) {
+                $pdo->exec("ALTER TABLE exams ADD COLUMN timer_mode VARCHAR(20) NOT NULL DEFAULT 'exam' AFTER scoring_mode");
+                $changes[] = 'exams.timer_mode agregada';
+            }
+            if (!in_array('time_per_question_seconds', $colsE)) {
+                $pdo->exec("ALTER TABLE exams ADD COLUMN time_per_question_seconds INT NOT NULL DEFAULT 60 AFTER timer_mode");
+                $changes[] = 'exams.time_per_question_seconds agregada';
+            }
+
+            $colsA = $pdo->query('DESCRIBE student_answers')->fetchAll(PDO::FETCH_COLUMN);
+            if (!in_array('answer_text', $colsA)) {
+                $pdo->exec("ALTER TABLE student_answers ADD COLUMN answer_text TEXT DEFAULT NULL AFTER selected_option");
+                $changes[] = 'student_answers.answer_text agregada';
+            }
+
+            $pdo->exec("ALTER TABLE questions MODIFY option_a TEXT NULL, MODIFY option_b TEXT NULL, MODIFY option_c TEXT NULL, MODIFY option_d TEXT NULL, MODIFY correct_option VARCHAR(2) NULL");
+        } catch (\Throwable $e) {}
+
+        return $changes;
     }
 
     public static function uuid(): string {

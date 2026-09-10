@@ -1,6 +1,6 @@
 <?php
 
-// Script directo de migración para navegador o CLI
+// Script directo de migración y sincronización de esquema para navegador o CLI
 header('Content-Type: application/json; charset=utf-8');
 
 $config = require __DIR__ . '/config/config.php';
@@ -13,26 +13,47 @@ try {
     $pdo = new PDO($dsn, $db['user'], $db['pass'], [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_TIMEOUT => 10,
+        PDO::ATTR_TIMEOUT => 15,
     ]);
 
-    // Ejecutar migración y semillero
+    // 1. Ejecutar migración base y semillero
     App\Services\DatabaseSeeder::run($pdo, $config);
 
-    // Listar las tablas creadas
+    // 2. Ejecutar auto-migración de columnas requeridas
+    $changes = App\Services\DatabaseSeeder::ensureColumnsExist($pdo);
+
+    // 3. Verificación de columnas clave
+    $verifiedColumns = [];
+    
+    $checkCols = function($table, $col) use ($pdo) {
+        try {
+            $cols = $pdo->query("DESCRIBE {$table}")->fetchAll(PDO::FETCH_COLUMN);
+            return in_array($col, $cols);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    };
+
+    $verifiedColumns['users.is_active'] = $checkCols('users', 'is_active');
+    $verifiedColumns['payments.is_active'] = $checkCols('payments', 'is_active');
+    $verifiedColumns['school_enrollments.is_active'] = $checkCols('school_enrollments', 'is_active');
+
+    // 4. Listar todas las tablas existentes
     $stmt = $pdo->query("SHOW TABLES");
     $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     echo json_encode([
         'success' => true,
-        'message' => '¡Migración completada exitosamente en MySQL de Hostinger!',
+        'message' => '¡Migración y sincronización de columnas completada exitosamente en Hostinger!',
         'database' => $db['name'],
+        'columns_migrated' => $changes,
+        'verified_columns' => $verifiedColumns,
+        'total_tables' => count($tables),
         'tables_created' => $tables,
         'initial_data' => [
-            'admin_user' => 'admin@icfes.com',
+            'admin_user' => $config['initial_admin_email'] ?? 'admin@icfes.com',
             'course'     => 'Curso de Preparación Académica ICFES Saber 11° ($700.000)',
-            'subjects'   => 'Matemáticas, Lectura Crítica, Ciencias Naturales, Sociales, Inglés',
-            'diagnostic_exam' => 'Simulacro Diagnóstico inicial con 2 preguntas de prueba'
+            'matriculas_system' => 'IE Jean Piaget School 2026'
         ]
     ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 

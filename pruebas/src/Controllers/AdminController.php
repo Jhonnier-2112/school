@@ -16,6 +16,9 @@ class AdminController {
         $this->config = require __DIR__ . '/../../config/config.php';
         require_once __DIR__ . '/../../config/database.php';
         $this->db = getDBConnection($this->config);
+        try {
+            DatabaseSeeder::ensureColumnsExist($this->db);
+        } catch (\Throwable $e) {}
     }
 
     /**
@@ -101,9 +104,9 @@ class AdminController {
             ->query("SELECT COUNT(*) FROM users WHERE role = 'student'")
             ->fetchColumn();
 
-        // Total de ingresos recibidos (sum de todos los pagos)
+        // Total de ingresos recibidos (solo pagos activos)
         $totalRevenue = (float)$this->db
-            ->query("SELECT COALESCE(SUM(amount), 0) FROM payments")
+            ->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE is_active = 1")
             ->fetchColumn();
 
         // Pagos pendientes: precio_curso × estudiantes activos − ingresos recibidos
@@ -136,30 +139,48 @@ class AdminController {
         AuthMiddleware::authenticate($this->config, 'admin');
 
         $search = trim($_GET['search'] ?? '');
-        $limit  = max(1, (int)($_GET['limit'] ?? 20));
+        $role   = trim($_GET['role'] ?? '');
+        $status = trim($_GET['status'] ?? '');
+        $limit  = max(1, (int)($_GET['limit'] ?? 50));
         $offset = max(0, (int)($_GET['offset'] ?? 0));
 
-        $sql = "SELECT id, full_name, email, phone, role, is_active, created_at FROM users WHERE role = 'student'";
+        $where = [];
         $params = [];
 
-        if ($search !== '') {
-            $sql .= " AND (full_name LIKE ? OR email LIKE ? OR phone LIKE ?)";
-            $s = "%$search%";
-            $params = [$s, $s, $s];
+        if ($role !== '' && $role !== 'all') {
+            $where[] = "role = ?";
+            $params[] = $role;
         }
 
-        $countSql = str_replace("SELECT id, full_name, email, phone, role, is_active, created_at", "SELECT COUNT(*)", $sql);
+        if ($status === 'active') {
+            $where[] = "is_active = 1";
+        } elseif ($status === 'inactive' || $status === 'disabled') {
+            $where[] = "is_active = 0";
+        }
+
+        if ($search !== '') {
+            $where[] = "(full_name LIKE ? OR email LIKE ? OR phone LIKE ?)";
+            $s = "%$search%";
+            $params[] = $s;
+            $params[] = $s;
+            $params[] = $s;
+        }
+
+        $whereSql = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
+
+        $countSql = "SELECT COUNT(*) FROM users $whereSql";
         $stmtCount = $this->db->prepare($countSql);
         $stmtCount->execute($params);
         $total = (int)$stmtCount->fetchColumn();
 
-        $sql .= " ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT id, full_name, email, phone, role, is_active, created_at, updated_at FROM users $whereSql ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         $students = $stmt->fetchAll();
 
-        Router::json(200, true, 'Estudiantes obtenidos', [
+        Router::json(200, true, 'Usuarios obtenidos', [
             'students' => $students,
+            'users'    => $students,
             'total'    => $total,
             'limit'    => $limit,
             'offset'   => $offset
@@ -167,56 +188,213 @@ class AdminController {
     }
 
     public function getStudentDetail(array $params): void {
+        $this->getUserDetail($params);
+    }
+
+    public function getUserDetail(array $params): void {
         AuthMiddleware::authenticate($this->config, 'admin');
-        $studentId = $params['id'] ?? '';
+        $userId = $params['id'] ?? '';
 
-        $stmt = $this->db->prepare("SELECT id, full_name, email, phone, role, is_active, created_at FROM users WHERE id = ? AND role = 'student'");
-        $stmt->execute([$studentId]);
-        $student = $stmt->fetch();
+        $user = null;
+        try {
+            $stmt = $this->db->prepare("SELECT id, full_name, email, phone, role, is_active, created_at, updated_at FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch();
+        } catch (\Throwable $e) {
+            try {
+                $stmt = $this->db->prepare("SELECT id, full_name, email, phone, role, 1 as is_active, created_at, updated_at FROM users WHERE id = ?");
+                $stmt->execute([$userId]);
+                $user = $stmt->fetch();
+            } catch (\Throwable $e2) {}
+        }
 
-        if (!$student) {
-            Router::json(404, false, 'Estudiante no encontrado');
+        if (!$user) {
+            Router::json(404, false, 'Usuario no encontrado');
         }
 
         // Get course summary
-        $stmtEnroll = $this->db->prepare("
-            SELECT e.*, c.total_price 
-            FROM enrollments e 
-            JOIN courses c ON e.course_id = c.id 
-            WHERE e.user_id = ? 
-            ORDER BY e.created_at DESC LIMIT 1
-        ");
-        $stmtEnroll->execute([$studentId]);
-        $enrollment = $stmtEnroll->fetch();
+        $enrollment = null;
+        try {
+            $stmtEnroll = $this->db->prepare("
+                SELECT e.*, c.name as course_name, c.total_price 
+                FROM enrollments e 
+                JOIN courses c ON e.course_id = c.id 
+                WHERE e.user_id = ? 
+                ORDER BY e.created_at DESC LIMIT 1
+            ");
+            $stmtEnroll->execute([$userId]);
+            $enrollment = $stmtEnroll->fetch();
+        } catch (\Throwable $e) {}
 
         $coursePrice = $enrollment ? (float)$enrollment['total_price'] : (float)$this->config['course_price'];
 
-        $stmtPay = $this->db->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC");
-        $stmtPay->execute([$studentId]);
-        $payments = $stmtPay->fetchAll();
+        $payments = [];
+        try {
+            $stmtPay = $this->db->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC");
+            $stmtPay->execute([$userId]);
+            $payments = $stmtPay->fetchAll() ?: [];
+        } catch (\Throwable $e) {}
 
         $totalPaid = 0.0;
         foreach ($payments as $p) {
-            $totalPaid += (float)$p['amount'];
+            if ((int)($p['is_active'] ?? 1) === 1) {
+                $totalPaid += (float)$p['amount'];
+            }
         }
         $remaining = max(0.0, $coursePrice - $totalPaid);
         $percentage = $coursePrice > 0 ? round(($totalPaid / $coursePrice) * 100, 2) : 0.0;
 
-        // Get document
-        $stmtDoc = $this->db->prepare("SELECT * FROM identification_documents WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
-        $stmtDoc->execute([$studentId]);
-        $document = $stmtDoc->fetch();
+        // Get identification document
+        $document = null;
+        try {
+            $stmtDoc = $this->db->prepare("SELECT * FROM identification_documents WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+            $stmtDoc->execute([$userId]);
+            $document = $stmtDoc->fetch();
+        } catch (\Throwable $e) {}
 
-        Router::json(200, true, 'Detalle del estudiante', [
-            'student' => $student,
-            'payment_summary' => [
+        // Get digital matricula if exists
+        $schoolMatricula = null;
+        try {
+            $stmtMat = $this->db->prepare("SELECT id, code, target_grade, enrollment_type, status, created_at FROM school_enrollments WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+            $stmtMat->execute([$userId]);
+            $schoolMatricula = $stmtMat->fetch();
+        } catch (\Throwable $e) {
+            $schoolMatricula = null;
+        }
+
+        Router::json(200, true, 'Detalle del usuario obtenido', [
+            'user'             => $user,
+            'student'          => $user,
+            'payment_summary'  => [
                 'course_price'     => $coursePrice,
                 'total_paid'       => $totalPaid,
                 'remaining_amount' => $remaining,
                 'percentage_paid'  => $percentage,
                 'payments'         => $payments
             ],
-            'document' => $document ?: null
+            'document'         => $document ?: null,
+            'school_matricula' => $schoolMatricula ?: null
+        ]);
+    }
+
+    public function updateUser(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $userId = $params['id'] ?? '';
+        $input  = Router::getJsonInput();
+
+        $fullName = trim($input['full_name'] ?? '');
+        $email    = strtolower(trim($input['email'] ?? ''));
+        $phone    = trim($input['phone'] ?? '');
+        $role     = trim($input['role'] ?? '');
+        $isActive = isset($input['is_active']) ? (int)(bool)$input['is_active'] : null;
+        $password = trim($input['password'] ?? '');
+
+        if (empty($fullName) || empty($email)) {
+            Router::json(400, false, 'El nombre completo y el correo electrónico son obligatorios');
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Router::json(400, false, 'El formato de correo electrónico no es válido');
+        }
+
+        // Verificar que el usuario exista
+        $stmt = $this->db->prepare("SELECT id, role, is_active FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $existing = $stmt->fetch();
+        if (!$existing) {
+            Router::json(404, false, 'Usuario no encontrado');
+        }
+
+        // Verificar email duplicado en otro usuario
+        $stmtDup = $this->db->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+        $stmtDup->execute([$email, $userId]);
+        if ($stmtDup->fetch()) {
+            Router::json(409, false, "El correo '$email' ya pertenece a otro usuario registrado");
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $fields = [
+            'full_name = ?',
+            'email = ?',
+            'phone = ?',
+            'updated_at = ?'
+        ];
+        $values = [$fullName, $email, $phone, $now];
+
+        if (in_array($role, ['student', 'admin'], true)) {
+            $fields[] = 'role = ?';
+            $values[] = $role;
+        }
+
+        if ($isActive !== null) {
+            $fields[] = 'is_active = ?';
+            $values[] = $isActive;
+        }
+
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                Router::json(400, false, 'La nueva contraseña debe tener mínimo 6 caracteres');
+            }
+            $fields[] = 'password_hash = ?';
+            $values[] = password_hash($password, PASSWORD_BCRYPT);
+        }
+
+        $values[] = $userId;
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
+        $this->db->prepare($sql)->execute($values);
+
+        // Retornar usuario actualizado
+        $stmtUpdated = $this->db->prepare("SELECT id, full_name, email, phone, role, is_active, updated_at FROM users WHERE id = ?");
+        $stmtUpdated->execute([$userId]);
+        $updatedUser = $stmtUpdated->fetch();
+
+        Router::json(200, true, 'Usuario actualizado exitosamente', $updatedUser);
+    }
+
+    public function disableUser(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $userId = $params['id'] ?? '';
+
+        $stmt = $this->db->prepare("SELECT id, full_name, email, is_active FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            Router::json(404, false, 'Usuario no encontrado');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->db->prepare("UPDATE users SET is_active = 0, updated_at = ? WHERE id = ?")
+                 ->execute([$now, $userId]);
+
+        Router::json(200, true, 'Usuario deshabilitado exitosamente (soft delete)', [
+            'id'        => $userId,
+            'is_active' => 0
+        ]);
+    }
+
+    public function toggleUserStatus(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $userId = $params['id'] ?? '';
+        $input  = Router::getJsonInput();
+
+        $stmt = $this->db->prepare("SELECT id, is_active FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            Router::json(404, false, 'Usuario no encontrado');
+        }
+
+        $newStatus = isset($input['is_active']) ? (int)(bool)$input['is_active'] : ((int)$user['is_active'] === 1 ? 0 : 1);
+        $now = date('Y-m-d H:i:s');
+
+        $this->db->prepare("UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?")
+                 ->execute([$newStatus, $now, $userId]);
+
+        Router::json(200, true, $newStatus === 1 ? 'Usuario habilitado exitosamente' : 'Usuario deshabilitado exitosamente', [
+            'id'        => $userId,
+            'is_active' => $newStatus
         ]);
     }
 
@@ -274,9 +452,25 @@ class AdminController {
         $limit  = max(1, min(100, (int)($_GET['limit'] ?? 50)));
         $offset = max(0, (int)($_GET['offset'] ?? 0));
         $search = trim($_GET['search'] ?? '');
+        $status = trim($_GET['status'] ?? '');
 
         $where = [];
         $params = [];
+
+        $hasIsActive = true;
+        try {
+            $cols = $this->db->query('DESCRIBE payments')->fetchAll(\PDO::FETCH_COLUMN);
+            $hasIsActive = in_array('is_active', $cols);
+        } catch (\Throwable $e) {}
+
+        if ($hasIsActive) {
+            if ($status === 'active') {
+                $where[] = "p.is_active = 1";
+            } elseif ($status === 'disabled' || $status === 'cancelled' || $status === 'inactive') {
+                $where[] = "p.is_active = 0";
+            }
+        }
+
         if ($search !== '') {
             $where[] = "(u.full_name LIKE ? OR u.email LIKE ? OR p.receipt_number LIKE ?)";
             $params[] = "%$search%";
@@ -302,6 +496,117 @@ class AdminController {
         $payments = $stmt->fetchAll();
 
         Router::json(200, true, 'Lista de abonos', $payments);
+    }
+
+    public function getPaymentDetail(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $paymentId = $params['id'] ?? '';
+
+        $stmt = $this->db->prepare("
+            SELECT p.*, u.full_name as student_name, u.email as student_email, u.phone as student_phone,
+                   reg.full_name as registered_by_name
+            FROM payments p
+            JOIN users u ON p.user_id = u.id
+            LEFT JOIN users reg ON p.registered_by = reg.id
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$paymentId]);
+        $payment = $stmt->fetch();
+
+        if (!$payment) {
+            Router::json(404, false, 'Abono no encontrado');
+        }
+
+        Router::json(200, true, 'Detalle de abono obtenido', $payment);
+    }
+
+    public function updatePayment(array $params): void {
+        $admin = AuthMiddleware::authenticate($this->config, 'admin');
+        $paymentId = $params['id'] ?? '';
+        $input = Router::getJsonInput();
+
+        $stmt = $this->db->prepare("SELECT * FROM payments WHERE id = ?");
+        $stmt->execute([$paymentId]);
+        $existing = $stmt->fetch();
+
+        if (!$existing) {
+            Router::json(404, false, 'Abono no encontrado');
+        }
+
+        $amount   = isset($input['amount']) ? (float)$input['amount'] : (float)$existing['amount'];
+        $date     = !empty($input['payment_date']) ? $input['payment_date'] : $existing['payment_date'];
+        $method   = !empty($input['payment_method']) ? $input['payment_method'] : $existing['payment_method'];
+        $receipt  = isset($input['receipt_number']) ? trim($input['receipt_number']) : $existing['receipt_number'];
+        $notes    = isset($input['notes']) ? trim($input['notes']) : $existing['notes'];
+        $isActive = isset($input['is_active']) ? (int)(bool)$input['is_active'] : (int)($existing['is_active'] ?? 1);
+
+        if ($amount <= 0) {
+            Router::json(400, false, 'El monto del abono debe ser mayor a 0');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->db->prepare("
+            UPDATE payments 
+            SET amount = ?, payment_date = ?, payment_method = ?, receipt_number = ?, notes = ?, is_active = ?, updated_at = ?
+            WHERE id = ?
+        ")->execute([$amount, $date, $method, $receipt, $notes, $isActive, $now, $paymentId]);
+
+        $stmtUpdated = $this->db->prepare("
+            SELECT p.*, u.full_name as student_name, u.email as student_email
+            FROM payments p
+            JOIN users u ON p.user_id = u.id
+            WHERE p.id = ?
+        ");
+        $stmtUpdated->execute([$paymentId]);
+        $updated = $stmtUpdated->fetch();
+
+        Router::json(200, true, 'Abono actualizado exitosamente', $updated);
+    }
+
+    public function disablePayment(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $paymentId = $params['id'] ?? '';
+
+        $stmt = $this->db->prepare("SELECT id FROM payments WHERE id = ?");
+        $stmt->execute([$paymentId]);
+        if (!$stmt->fetch()) {
+            Router::json(404, false, 'Abono no encontrado');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->db->prepare("UPDATE payments SET is_active = 0, updated_at = ? WHERE id = ?")
+                 ->execute([$now, $paymentId]);
+
+        Router::json(200, true, 'Abono deshabilitado/anulado exitosamente (soft delete)', [
+            'id'        => $paymentId,
+            'is_active' => 0
+        ]);
+    }
+
+    public function togglePaymentStatus(array $params): void {
+        AuthMiddleware::authenticate($this->config, 'admin');
+        $paymentId = $params['id'] ?? '';
+        $input = Router::getJsonInput();
+
+        $stmt = $this->db->prepare("SELECT id, is_active FROM payments WHERE id = ?");
+        $stmt->execute([$paymentId]);
+        $existing = $stmt->fetch();
+
+        if (!$existing) {
+            Router::json(404, false, 'Abono no encontrado');
+        }
+
+        $current = (int)($existing['is_active'] ?? 1);
+        $newStatus = isset($input['is_active']) ? (int)(bool)$input['is_active'] : ($current === 1 ? 0 : 1);
+        $now = date('Y-m-d H:i:s');
+
+        $this->db->prepare("UPDATE payments SET is_active = ?, updated_at = ? WHERE id = ?")
+                 ->execute([$newStatus, $now, $paymentId]);
+
+        Router::json(200, true, $newStatus === 1 ? 'Abono reactivado exitosamente' : 'Abono anulado/deshabilitado exitosamente', [
+            'id'        => $paymentId,
+            'is_active' => $newStatus
+        ]);
     }
 
     public function listPendingDocuments(): void {

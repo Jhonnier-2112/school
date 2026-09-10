@@ -192,8 +192,20 @@ $router->get('/api/v1/admin/dashboard', [AdminController::class, 'getDashboard']
 $router->get('/api/v1/admin/students', [AdminController::class, 'listStudents']);
 $router->get('/api/v1/admin/students/{id}', [AdminController::class, 'getStudentDetail']);
 
+// Gestión completa de usuarios
+$router->get('/api/v1/admin/users', [AdminController::class, 'listStudents']);
+$router->get('/api/v1/admin/users/{id}', [AdminController::class, 'getUserDetail']);
+$router->put('/api/v1/admin/users/{id}', [AdminController::class, 'updateUser']);
+$router->delete('/api/v1/admin/users/{id}', [AdminController::class, 'disableUser']);
+$router->put('/api/v1/admin/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus']);
+
+// Gestión de pagos y abonos
 $router->post('/api/v1/admin/payments', [AdminController::class, 'registerPayment']);
 $router->get('/api/v1/admin/payments', [AdminController::class, 'listPayments']);
+$router->get('/api/v1/admin/payments/{id}', [AdminController::class, 'getPaymentDetail']);
+$router->put('/api/v1/admin/payments/{id}', [AdminController::class, 'updatePayment']);
+$router->delete('/api/v1/admin/payments/{id}', [AdminController::class, 'disablePayment']);
+$router->put('/api/v1/admin/payments/{id}/toggle-status', [AdminController::class, 'togglePaymentStatus']);
 
 $router->get('/api/v1/admin/documents/pending', [AdminController::class, 'listPendingDocuments']);
 $router->post('/api/v1/admin/documents/{id}/review', [AdminController::class, 'reviewDocument']);
@@ -255,6 +267,9 @@ $router->get('/api/v1/enrollments/{id}/status', [EnrollmentController::class, 'g
 $router->get('/api/v1/admin/enrollments/statistics', [AdminEnrollmentController::class, 'getStatistics']);
 $router->get('/api/v1/admin/enrollments', [AdminEnrollmentController::class, 'listEnrollments']);
 $router->get('/api/v1/admin/enrollments/{id}', [AdminEnrollmentController::class, 'getEnrollmentDetail']);
+$router->put('/api/v1/admin/enrollments/{id}', [AdminEnrollmentController::class, 'updateEnrollmentDetail']);
+$router->delete('/api/v1/admin/enrollments/{id}', [AdminEnrollmentController::class, 'disableEnrollment']);
+$router->put('/api/v1/admin/enrollments/{id}/toggle-status', [AdminEnrollmentController::class, 'toggleEnrollmentStatus']);
 $router->put('/api/v1/admin/enrollments/{id}/status', [AdminEnrollmentController::class, 'updateStatus']);
 $router->post('/api/v1/admin/enrollments/{id}/documents/regenerate', [AdminEnrollmentController::class, 'regenerateDocuments']);
 

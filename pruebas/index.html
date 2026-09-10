@@ -12,10 +12,10 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Hojas de Estilo con Cache Buster -->
-  <link rel="stylesheet" href="css/style.css?v=20260908_1">
-  <link rel="stylesheet" href="css/mobile-app.css?v=20260908_1">
-  <link rel="stylesheet" href="css/admin-panel.css?v=20260908_1">
-  <link rel="stylesheet" href="css/auth-portal.css?v=20260908_1">
+  <link rel="stylesheet" href="css/style.css?v=20260910_v5">
+  <link rel="stylesheet" href="css/mobile-app.css?v=20260910_v5">
+  <link rel="stylesheet" href="css/admin-panel.css?v=20260910_v5">
+  <link rel="stylesheet" href="css/auth-portal.css?v=20260910_v5">
 
   <!-- Estilos Críticos en Línea: Portal de Autenticación Institucional -->
   <style id="auth-portal-critical-styles">
@@ -580,465 +580,75 @@
         
         <!-- Header de la sección con resumen de propuesta -->
         <div class="showcase-header">
-          <div class="showcase-badge">Propuesta de Desarrollo • MVP en 3 días</div>
-          <h2>Experiencia del Estudiante (App móvil)</h2>
-          <p>Interactúa con las 7 pantallas completas del flujo de preparación académica para el estudiante.</p>
+          <div class="showcase-badge" style="background: linear-gradient(135deg, #003366, #002244); color: white;">App Móvil Oficial • Plataforma Estudiantil</div>
+          <h2>Experiencia del Estudiante (App Real)</h2>
+          <p>Aplicación web móvil real y totalmente operativa para los estudiantes: simulacros ICFES en vivo, contratos digitales, pagos y seguimiento de progreso.</p>
         </div>
 
-        <!-- Indicador interactivo de los 7 pasos -->
+        <!-- Botones de Acción de la App Real -->
+        <div style="display: flex; justify-content: center; gap: 12px; margin: 10px auto 20px; flex-wrap: wrap;">
+          <a href="app/index.html" target="_blank" class="admin-action-btn" style="background: #003366; color: white; padding: 10px 22px; font-size: 0.88rem; font-weight: 700; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,51,102,0.25);">
+            <span>🚀</span> Abrir App en Pantalla Completa
+          </a>
+          <button type="button" onclick="const f=document.getElementById('real-student-app-frame'); if(f) f.src='app/index.html';" class="admin-action-btn" style="background: #ffffff; color: #003366; border: 1px solid #cbd5e1; padding: 10px 18px; font-size: 0.88rem; font-weight: 700; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <span>🔄</span> Reiniciar App
+          </button>
+        </div>
+
+        <!-- Indicador interactivo de los pasos conectado a la App Real -->
         <div class="student-steps-tracker" role="navigation" aria-label="Pasos de la app móvil">
-          <button class="step-indicator active" data-step="1">
+          <button type="button" class="step-indicator active" onclick="switchStudentAppView('view-auth', this)">
             <span class="step-num">1</span>
-            <span>Registro</span>
+            <span>Registro / Login</span>
           </button>
-          <button class="step-indicator" data-step="2">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-contract', this)">
             <span class="step-num">2</span>
-            <span>Contrato</span>
+            <span>Contrato Digital</span>
           </button>
-          <button class="step-indicator" data-step="3">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-home', this)">
             <span class="step-num">3</span>
-            <span>Resumen</span>
+            <span>Dashboard</span>
           </button>
-          <button class="step-indicator" data-step="4">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-payments', this)">
             <span class="step-num">4</span>
-            <span>Mis pagos</span>
+            <span>Mis Pagos</span>
           </button>
-          <button class="step-indicator" data-step="5">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-doc', this)">
             <span class="step-num">5</span>
-            <span>Subir cédula</span>
+            <span>Subir Cédula</span>
           </button>
-          <button class="step-indicator" data-step="6">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-exams', this)">
             <span class="step-num">6</span>
-            <span>Simulacro ICFES</span>
+            <span>Simulacros</span>
           </button>
-          <button class="step-indicator" data-step="7">
+          <button type="button" class="step-indicator" onclick="switchStudentAppView('view-results', this)">
             <span class="step-num">7</span>
             <span>Resultados</span>
           </button>
         </div>
 
-        <!-- Grid: Beneficios a la izquierda + Mockup iPhone al centro + Cronograma a la derecha -->
-        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; width: 100%; align-items: start; max-width: 1350px;">
-          
-          <!-- Columna Izquierda: Información de Propuesta -->
-          <div style="background: var(--bg-surface); padding: 28px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 6px;">
-              Plataforma de Cursos (MVP)
-            </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2;">
-              Todo lo que el estudiante necesita en una sola app
-            </h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-              Plataforma optimizada y ligera diseñada para garantizar la máxima retención y preparación de los aspirantes ICFES.
-            </p>
-
-            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Registro e inicio de sesión
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Aceptación de contrato digital
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Visualización del costo del curso
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Historial y progreso de pagos
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Subida de documento (cédula)
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Simulacros tipo ICFES por materia
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Resultados y estadísticas
-              </li>
-              <li style="display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:600;">
-                <span style="color:var(--primary); font-size:1.1rem;">✔</span> Notificaciones importantes
-              </li>
-            </ul>
-
-            <div style="border-top: 1px solid var(--border-light); padding-top: 16px;">
-              <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Disponible en:</div>
-              <div style="display:flex; gap:10px;">
-                <div style="background:#000; color:#fff; padding:6px 14px; border-radius:8px; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:6px;">
-                  <span>▶</span> Google Play
-                </div>
-                <div style="background:#000; color:#fff; padding:6px 14px; border-radius:8px; font-size:0.75rem; font-weight:700; display:flex; align-items:center; gap:6px;">
-                  <span></span> App Store
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Columna Centro: Mockup Interactivo de iPhone -->
-          <div class="phone-mockup">
-            <div class="phone-screen">
+        <!-- Contenedor del Mockup Centrado -->
+        <div style="display: flex; justify-content: center; width: 100%; padding: 10px 0 20px;">
+          <!-- Mockup iPhone -->
+          <div class="phone-mockup" style="width: 390px; height: 820px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.5), 0 0 0 8px #1e293b; border-radius: 54px; padding: 10px; background: #0f172a; position: relative;">
+            <div class="phone-screen" style="border-radius: 44px; overflow: hidden; height: 100%; display: flex; flex-direction: column; background: #F8FAFC; position: relative;">
               
               <!-- Barra Superior de Estado -->
-              <div class="phone-status-bar">
+              <div class="phone-status-bar" style="background: #ffffff; z-index: 10; border-bottom: 1px solid #e2e8f0; height: 38px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: #0f172a;">
                 <span>9:41</span>
-                <div class="phone-notch"></div>
-                <div class="phone-status-icons">
+                <div class="phone-notch" style="width: 110px; height: 20px; background: #0f172a; border-radius: 20px; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);"></div>
+                <div class="phone-status-icons" style="display: flex; gap: 6px; align-items: center;">
                   <span>📶</span>
                   <span>🔋</span>
                 </div>
               </div>
-
-              <!-- Contenido Interno de la App -->
-              <div class="phone-content">
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 1: REGISTRO                               -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-1" class="mobile-step active">
-                  <div class="mobile-header">
-                    <h3>Crear cuenta</h3>
-                  </div>
-
-                  <div style="margin-bottom: 20px;">
-                    <h4 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; color: var(--text-main);">¡Bienvenido!</h4>
-                    <p style="font-size: 0.8rem; color: var(--text-muted);">Crea tu cuenta para comenzar tu preparación.</p>
-                  </div>
-
-                  <form id="mobile-register-form">
-                    <div class="mobile-form-group">
-                      <label class="mobile-label" for="reg-name">Nombres completos</label>
-                      <input type="text" id="reg-name" class="mobile-input" placeholder="Ej: María García" value="María García" required>
-                    </div>
-
-                    <div class="mobile-form-group">
-                      <label class="mobile-label" for="reg-email">Correo electrónico</label>
-                      <input type="email" id="reg-email" class="mobile-input" placeholder="correo@ejemplo.com" value="maria@gmail.com" required>
-                    </div>
-
-                    <div class="mobile-form-group">
-                      <label class="mobile-label" for="reg-phone">Número de celular</label>
-                      <input type="tel" id="reg-phone" class="mobile-input" placeholder="300 123 4567" value="300 123 4567" required>
-                    </div>
-
-                    <div class="mobile-form-group">
-                      <label class="mobile-label" for="reg-pass">Contraseña</label>
-                      <input type="password" id="reg-pass" class="mobile-input" placeholder="••••••••" value="password123" required>
-                    </div>
-
-                    <button type="submit" id="btn-register-submit" class="mobile-btn">
-                      Registrarme
-                    </button>
-                  </form>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 2: CONTRATO                               -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-2" class="mobile-step">
-                  <div class="mobile-header">
-                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(1)">‹</button>
-                    <h3>Contrato del curso</h3>
-                  </div>
-
-                  <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase;">
-                    Contrato de Prestación de Servicios Educativos
-                  </div>
-
-                  <div id="contract-body-text" class="contract-scroll-box">
-El presente contrato regula los términos y condiciones de la preparación académica para la prueba Saber 11° ICFES.
-
-1. OBJETO: El estudiante adquiere acceso integral al programa académico incluyendo simulacros interactivos, banco de preguntas con retroalimentación, material descargable y asesoría pedagógica continua.
-
-2. CONDICIONES DE PAGO: El costo total del curso es de setecientos mil pesos m/cte ($700.000 COP), pagaderos según el cronograma acordado de abonos.
-
-3. DOCUMENTACIÓN: El estudiante se compromete a subir copia legible de su documento de identidad (cédula de ciudadanía o tarjeta de identidad) para validación oficial.
-
-4. DERECHOS Y DEBERES: El acceso a la plataforma es personal e intransferible. El uso indebido de los contenidos será causal de suspensión.
-                  </div>
-
-                  <label class="checkbox-label" for="contract-agree-check">
-                    <input type="checkbox" id="contract-agree-check">
-                    <span>He leído y acepto el contrato</span>
-                  </label>
-
-                  <button type="button" id="accept-contract-btn" class="mobile-btn" disabled>
-                    Aceptar contrato
-                  </button>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 3: RESUMEN DEL CURSO                      -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-3" class="mobile-step">
-                  <div class="mobile-header">
-                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(2)">‹</button>
-                    <h3>Resumen del curso</h3>
-                  </div>
-
-                  <div class="course-promo-card">
-                    <span class="promo-tag">Plan Completo</span>
-                    <h4>Curso Preparación ICFES Completo</h4>
-                    <div class="course-price-label">Precio del curso</div>
-                    <div class="course-price-val">$700.000</div>
-                  </div>
-
-                  <ul class="course-benefits-list">
-                    <li><span>✔</span> Acceso a todos los simulacros</li>
-                    <li><span>✔</span> Material de estudio especializado</li>
-                    <li><span>✔</span> Reportes de rendimiento</li>
-                    <li><span>✔</span> Acompañamiento académico</li>
-                  </ul>
-
-                  <button type="button" id="course-continue-btn" class="mobile-btn">
-                    Aceptar y continuar
-                  </button>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 4: MIS PAGOS                              -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-4" class="mobile-step">
-                  <div class="mobile-header">
-                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(3)">‹</button>
-                    <h3>Mis pagos</h3>
-                  </div>
-
-                  <div class="donut-chart-container">
-                    <div class="donut-chart">
-                      <svg viewBox="0 0 120 120">
-                        <circle class="donut-circle-bg" cx="60" cy="60" r="50"></circle>
-                        <circle id="donut-circle-bar" class="donut-circle-val" cx="60" cy="60" r="50" style="stroke-dasharray: 314.159; stroke-dashoffset: 188.495;"></circle>
-                      </svg>
-                      <div class="donut-center-text">
-                        <div id="donut-percent-num" class="percent">40%</div>
-                        <div class="desc">Progreso</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="payment-split-cards">
-                    <div class="split-card paid">
-                      <div class="lbl">Pagado</div>
-                      <div id="paid-amount-label" class="val">$0</div>
-                    </div>
-                    <div class="split-card pending">
-                      <div class="lbl">Pendiente</div>
-                      <div id="pending-amount-label" class="val">$700.000</div>
-                    </div>
-                  </div>
-
-                  <div class="payment-history-title">Historial de pagos</div>
-                  <div id="mobile-payment-history-list" style="background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px 14px; margin-bottom: 20px;">
-                    <div style="text-align: center; padding: 12px; font-size: 0.78rem; color: var(--text-muted);">
-                      Consultando historial de abonos...
-                    </div>
-                  </div>
-
-                  <button type="button" id="payments-continue-btn" class="mobile-btn">
-                    Continuar a subir cédula
-                  </button>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 5: SUBIR CÉDULA                           -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-5" class="mobile-step">
-                  <div class="mobile-header">
-                    <button class="mobile-back-btn" onclick="MobileApp.goToStep(4)">‹</button>
-                    <h3>Subir documento</h3>
-                  </div>
-
-                  <p class="upload-instruction">
-                    Por favor sube una foto clara de tu cédula (frente) para verificación académica.
-                  </p>
-
-                  <div id="doc-preview-area" class="id-card-preview-graphic">
-                    <input type="file" id="doc-file-input" accept="image/*,.pdf" style="display:none;">
-                    <div id="doc-preview-container" class="id-graphic-img">
-                      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='90' viewBox='0 0 140 90'><rect width='140' height='90' rx='6' fill='%23EEF2FF'/><rect x='10' y='15' width='35' height='45' rx='4' fill='%23C7D2FE'/><circle cx='27' cy='32' r='10' fill='%23818CF8'/><path d='M15 55 C15 45 40 45 40 55 Z' fill='%23818CF8'/><rect x='52' y='20' width='75' height='6' rx='3' fill='%23CBD5E1'/><rect x='52' y='32' width='60' height='5' rx='2.5' fill='%23E2E8F0'/><rect x='52' y='42' width='68' height='5' rx='2.5' fill='%23E2E8F0'/><rect x='52' y='52' width='50' height='5' rx='2.5' fill='%23E2E8F0'/></svg>" alt="Cédula">
-                    </div>
-                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 2px;">
-                      Toca para seleccionar
-                    </div>
-                    <div id="doc-upload-placeholder-text" style="font-size: 0.7rem; color: var(--text-muted);">
-                      o arrastra tu archivo aquí (JPG, PNG, PDF. Máx 5MB)
-                    </div>
-                  </div>
-
-                  <button type="button" id="upload-doc-btn" class="mobile-btn">
-                    Guardar documento
-                  </button>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 6: SIMULACRO ICFES                        -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-6" class="mobile-step">
-                  <div class="exam-top-bar">
-                    <div id="exam-subject-title" class="exam-subject-badge">Matemáticas</div>
-                    <div id="exam-timer-clock" class="exam-timer-pill">⏱ 00:44:48</div>
-                  </div>
-
-                  <div id="question-counter" class="question-progress-num">Pregunta 1 de 3</div>
-                  <div id="question-statement" class="question-statement-text">
-                    En la figura mostrada, ¿cuál es el valor de x?
-                  </div>
-
-                  <!-- Diagrama geométrico ICFES -->
-                  <div id="question-diagram-box" class="question-diagram"></div>
-
-                  <!-- Lista de 4 opciones A, B, C, D -->
-                  <div id="exam-options-container" class="exam-options-list"></div>
-
-                  <!-- Navegación Preguntas -->
-                  <div class="exam-nav-btns">
-                    <button type="button" id="exam-prev-btn" class="exam-prev-btn">Anterior</button>
-                    <button type="button" id="exam-next-btn" class="exam-next-btn">Siguiente</button>
-                  </div>
-                </div>
-
-                <!-- -------------------------------------------------- -->
-                <!-- PANTALLA 7: RESULTADOS DEL SIMULACRO               -->
-                <!-- -------------------------------------------------- -->
-                <div id="mobile-step-7" class="mobile-step">
-                  <div class="mobile-header">
-                    <h3>Resultados</h3>
-                  </div>
-
-                  <div style="text-align: center; margin-bottom: 12px;">
-                    <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);">Simulacro Matemáticas</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted);">18 Mayo 2024</div>
-                  </div>
-
-                  <!-- Donut de Puntaje -->
-                  <div class="results-score-circle">
-                    <div class="donut-chart" style="width: 110px; height: 110px;">
-                      <svg viewBox="0 0 120 120">
-                        <circle class="donut-circle-bg" cx="60" cy="60" r="50"></circle>
-                        <circle class="donut-circle-val" cx="60" cy="60" r="50" style="stroke: #10B981; stroke-dasharray: 314.159; stroke-dashoffset: 69;"></circle>
-                      </svg>
-                      <div class="donut-center-text">
-                        <div id="res-score-percent" class="percent" style="color: #10B981;">78%</div>
-                        <div class="desc">Tu puntaje</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Resumen Aciertos / Errores / Sin responder -->
-                  <div class="results-stats-row">
-                    <div class="res-stat-card correct">
-                      <div id="res-correct-num" class="val">39</div>
-                      <div class="lbl">Aciertos</div>
-                    </div>
-                    <div class="res-stat-card wrong">
-                      <div id="res-wrong-num" class="val">11</div>
-                      <div class="lbl">Errores</div>
-                    </div>
-                    <div class="res-stat-card blank">
-                      <div id="res-blank-num" class="val">0</div>
-                      <div class="lbl">Sin responder</div>
-                    </div>
-                  </div>
-
-                  <!-- Desempeño por tema -->
-                  <div class="subject-bars-section">
-                    <h5>Desempeño por tema</h5>
-                    <div class="subject-bar-item">
-                      <div class="subject-bar-header">
-                        <span>Aritmética</span>
-                        <span>85%</span>
-                      </div>
-                      <div class="progress-track"><div class="progress-fill" style="width: 85%;"></div></div>
-                    </div>
-                    <div class="subject-bar-item">
-                      <div class="subject-bar-header">
-                        <span>Geometría</span>
-                        <span>72%</span>
-                      </div>
-                      <div class="progress-track"><div class="progress-fill" style="width: 72%;"></div></div>
-                    </div>
-                    <div class="subject-bar-item">
-                      <div class="subject-bar-header">
-                        <span>Álgebra</span>
-                        <span>75%</span>
-                      </div>
-                      <div class="progress-track"><div class="progress-fill" style="width: 75%;"></div></div>
-                    </div>
-                    <div class="subject-bar-item">
-                      <div class="subject-bar-header">
-                        <span>Estadística</span>
-                        <span>80%</span>
-                      </div>
-                      <div class="progress-track"><div class="progress-fill" style="width: 80%;"></div></div>
-                    </div>
-                  </div>
-
-                  <button type="button" id="restart-exam-btn" class="mobile-btn">
-                    Repetir simulacro
-                  </button>
-                </div>
-
-              </div> <!-- .phone-content -->
+              <!-- Aplicación Móvil Real Jean Piaget en Vivo -->
+              <div style="flex: 1; width: 100%; height: calc(100% - 38px); position: relative; overflow: hidden; background: #ffffff;">
+                <iframe id="real-student-app-frame" src="app/index.html" title="App Móvil del Estudiante Jean Piaget" style="width: 100%; height: 100%; border: none; display: block; overflow: auto;"></iframe>
+              </div>
             </div> <!-- .phone-screen -->
           </div> <!-- .phone-mockup -->
-
-          <!-- Columna Derecha: Cronograma y Alcance Integral -->
-          <div style="background: var(--bg-surface); padding: 28px; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 6px;">
-              Plan de Ejecución Institucional 2026
-            </div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; line-height: 1.2;">
-              Cronograma & Alcance
-            </h3>
-
-            <!-- Cronograma de Fases -->
-            <div style="margin-bottom: 24px;">
-              <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); display: flex; justify-content: space-between;">
-                <span>Cronograma de Entrega</span>
-                <span style="color: var(--success); font-size: 0.78rem;">100% Implementado</span>
-              </h4>
-              <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
-                <tr style="border-bottom: 1px solid var(--border-light);">
-                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary); width: 60px;">Fase 1</td>
-                  <td style="padding: 7px 0;">
-                    <strong>Base de Datos y Seguridad:</strong> Arquitectura institucional, base de datos relacional y autenticación segura con roles.
-                  </td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border-light);">
-                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 2</td>
-                  <td style="padding: 7px 0;">
-                    <strong>Matrícula Digital Jean Piaget:</strong> Flujo 10 pasos, 4 PDFs legales, firma electrónica Ley 527.
-                  </td>
-                </tr>
-                <tr style="border-bottom: 1px solid var(--border-light);">
-                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 3</td>
-                  <td style="padding: 7px 0;">
-                    <strong>App Móvil & Estudiantes:</strong> Experiencia interactiva, simulacros cronometrados y pagos.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 7px 0; font-weight: 700; color: var(--primary);">Fase 4</td>
-                  <td style="padding: 7px 0;">
-                    <strong>Panel Administrativo:</strong> KPIs en tiempo real, revisión de expedientes, aprobación y auditoría.
-                  </td>
-                </tr>
-              </table>
-            </div>
-
-            <!-- Alcance Integral de la Plataforma -->
-            <div>
-              <h4 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main);">Alcance Integral del Sistema</h4>
-              <ul style="list-style: none; display: flex; flex-direction: column; gap: 7px; font-size: 0.8rem; color: var(--text-muted);">
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Matrícula Digital 2026:</strong> Preescolar, Primaria y Ciclos</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Documentos Oficiales:</strong> Ficha, Contrato, Pagaré y Carta</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Firma Electrónica:</strong> Trazabilidad, IP y Hashes SHA-256</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Generación PDF Automática:</strong> Motor Dompdf oficial</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>App Móvil y Web:</strong> Simulacros ICFES por materias</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Gestión de Pagos:</strong> Matrícula + 10 mensualidades</li>
-                <li><span style="color: var(--success); font-weight: bold;">✔</span> <strong>Panel Administrativo:</strong> Control total y auditoría</li>
-              </ul>
-            </div>
-          </div>
-
-        </div> <!-- grid -->
+        </div> <!-- Contenedor del Mockup Centrado -->
 
       </div> <!-- .mobile-showcase-wrapper -->
     </section>
@@ -1235,10 +845,39 @@ El presente contrato regula los términos y condiciones de la preparación acad�
             <div class="admin-header-row">
               <div>
                 <h2>Gestión de usuarios</h2>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">Crear, editar y dar seguimiento a los estudiantes inscritos.</p>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Crear, editar, consultar información detallada y administrar cuentas del sistema.</p>
               </div>
-              <button id="btn-new-user" class="admin-action-btn">
-                <span>➕</span> Nuevo usuario
+              <div style="display: flex; gap: 8px;">
+                <button type="button" id="btn-refresh-users" class="admin-action-btn" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
+                  🔄 Actualizar
+                </button>
+                <button id="btn-new-user" class="admin-action-btn">
+                  <span>➕</span> Nuevo usuario
+                </button>
+              </div>
+            </div>
+
+            <!-- Filtros de usuarios -->
+            <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+              <div style="flex: 2; min-width: 220px;">
+                <input type="text" id="filter-user-search" class="mobile-input" style="margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem;" placeholder="🔍 Buscar por nombre, correo o teléfono...">
+              </div>
+              <div style="flex: 1; min-width: 140px;">
+                <select id="filter-user-role" class="mobile-input" style="margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem;">
+                  <option value="">Todos los roles</option>
+                  <option value="student">Estudiantes</option>
+                  <option value="admin">Administradores</option>
+                </select>
+              </div>
+              <div style="flex: 1; min-width: 140px;">
+                <select id="filter-user-status" class="mobile-input" style="margin-bottom: 0; padding: 8px 12px; font-size: 0.85rem;">
+                  <option value="">Todos los estados</option>
+                  <option value="active">Activos</option>
+                  <option value="disabled">Deshabilitados</option>
+                </select>
+              </div>
+              <button type="button" id="btn-apply-filter-users" class="admin-action-btn" style="padding: 8px 16px; font-size: 0.85rem; background: #003366;">
+                Filtrar
               </button>
             </div>
 
@@ -1249,9 +888,9 @@ El presente contrato regula los términos y condiciones de la preparación acad�
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Teléfono</th>
-                    <th>Plataformas</th>
+                    <th>Rol / Acceso</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
+                    <th style="text-align: right;">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="tbody-users">
@@ -1324,14 +963,16 @@ El presente contrato regula los términos y condiciones de la preparación acad�
                       <tr>
                         <th>Fecha</th>
                         <th>Estudiante</th>
+                        <th>Recibo / Ref</th>
                         <th>Método</th>
-                        <th>Concepto</th>
-                        <th style="text-align: right;">Monto</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                        <th style="text-align: right;">Acciones</th>
                       </tr>
                     </thead>
                     <tbody id="admin-payments-table-body">
                       <tr>
-                        <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">Cargando abonos... ⏳</td>
+                        <td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">Cargando abonos... ⏳</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1988,6 +1629,342 @@ El presente contrato regula los términos y condiciones de la preparación acad�
     </div>
   </div>
 
+  <!-- MODAL: DETALLE DE USUARIO -->
+  <div id="user-detail-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #002244, #003366); color: white;">
+        <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>👤</span> Detalle del Usuario
+        </h3>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-user-detail-content" style="padding: 24px;">
+        <!-- Contenido dinámico inyectado por JS -->
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 22px; border-top: 1px solid #E2E8F0;">
+        <div id="modal-user-detail-actions" style="display: flex; gap: 8px;">
+          <!-- Botones dinámicos: Editar / Deshabilitar -->
+        </div>
+        <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 18px;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR USUARIO -->
+  <div id="user-edit-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #1e293b, #334155); color: white;">
+        <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>✏️</span> Editar Información de Usuario
+        </h3>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <form id="form-edit-user">
+        <input type="hidden" id="edit-user-id" value="">
+        <div class="modal-body" style="padding: 22px;">
+          <div class="mobile-form-group">
+            <label class="mobile-label">Nombre Completo <span style="color:#EF4444;">*</span></label>
+            <input id="edit-user-name" type="text" class="mobile-input" required>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Correo Electrónico <span style="color:#EF4444;">*</span></label>
+            <input id="edit-user-email" type="email" class="mobile-input" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Teléfono / Celular</label>
+              <input id="edit-user-phone" type="tel" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Rol en Plataforma</label>
+              <select id="edit-user-role" class="mobile-input">
+                <option value="student">Estudiante</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Estado de la Cuenta</label>
+              <select id="edit-user-status" class="mobile-input">
+                <option value="1">✅ Activo (Habilitado)</option>
+                <option value="0">🚫 Deshabilitado (Inactivo)</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Cambiar Contraseña (opcional)</label>
+              <input id="edit-user-password" type="password" class="mobile-input" placeholder="Dejar en blanco para conservar">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid #E2E8F0;">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 16px;">Cancelar</button>
+          <button id="btn-save-user-edit" type="submit" class="admin-action-btn" style="background: #003366;">💾 Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLE DE ABONO / PAGO -->
+  <div id="payment-detail-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #065f46, #047857); color: white;">
+        <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>💳</span> Comprobante Oficial de Abono
+        </h3>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-payment-detail-content" style="padding: 24px;">
+        <!-- Contenido dinámico -->
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 22px; border-top: 1px solid #E2E8F0;">
+        <div id="modal-payment-detail-actions" style="display: flex; gap: 8px;">
+          <!-- Botones dinámicos: Editar / Deshabilitar -->
+        </div>
+        <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 18px;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR ABONO / PAGO -->
+  <div id="payment-edit-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 550px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #1e293b, #334155); color: white;">
+        <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span>✏️</span> Editar Abono / Pago
+        </h3>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <form id="form-edit-payment">
+        <input type="hidden" id="edit-pay-id" value="">
+        <div class="modal-body" style="padding: 22px;">
+          <div class="mobile-form-group">
+            <label class="mobile-label">Estudiante Asociado</label>
+            <input id="edit-pay-student-name" type="text" class="mobile-input" readonly style="background:#f8fafc; font-weight:600;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Valor del Abono (COP) <span style="color:#EF4444;">*</span></label>
+              <input id="edit-pay-amount" type="number" step="1000" min="1000" class="mobile-input" required>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Fecha del Pago <span style="color:#EF4444;">*</span></label>
+              <input id="edit-pay-date" type="date" class="mobile-input" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Método de Pago</label>
+              <select id="edit-pay-method" class="mobile-input">
+                <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                <option value="Nequi">Nequi</option>
+                <option value="Daviplata">Daviplata</option>
+                <option value="Efectivo">Efectivo en Secretaría</option>
+                <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Número de Recibo / Ref</label>
+              <input id="edit-pay-receipt" type="text" class="mobile-input" placeholder="Ej: REC-2026-001">
+            </div>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Concepto / Notas</label>
+            <input id="edit-pay-notes" type="text" class="mobile-input" placeholder="Observación del abono">
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Estado del Abono</label>
+            <select id="edit-pay-status" class="mobile-input">
+              <option value="1">✅ Activo / Válido (Suma a los ingresos)</option>
+              <option value="0">🚫 Anulado / Deshabilitado (No suma ingresos)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid #E2E8F0;">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 16px;">Cancelar</button>
+          <button id="btn-save-payment-edit" type="submit" class="admin-action-btn" style="background: #003366;">💾 Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR EXPEDIENTE DE MATRÍCULA -->
+  <div id="matricula-edit-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 820px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #002244, #003366); color: white;">
+        <div>
+          <h3 style="color: white; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span>✏️</span> Editar Expediente de Matrícula
+          </h3>
+          <div id="edit-mat-code-badge" style="font-size: 0.78rem; color: #6ee7b7; font-weight: 700; margin-top: 2px;">MAT-2026</div>
+        </div>
+        <button class="modal-close-btn" style="color: white;">&times;</button>
+      </div>
+      <form id="form-edit-matricula">
+        <input type="hidden" id="edit-mat-id" value="">
+        <div class="modal-body" style="padding: 24px;">
+
+          <!-- SECCIÓN 1: DATOS DEL ESTUDIANTE -->
+          <div style="font-weight: 700; color: #003366; font-size: 0.95rem; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <span>👦</span> Datos del Estudiante
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Nombres <span style="color:#EF4444;">*</span></label>
+              <input id="edit-mat-st-firstname" type="text" class="mobile-input" required>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Apellidos <span style="color:#EF4444;">*</span></label>
+              <input id="edit-mat-st-lastname" type="text" class="mobile-input" required>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 120px 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Tipo Doc.</label>
+              <select id="edit-mat-st-doctype" class="mobile-input">
+                <option value="TI">TI</option>
+                <option value="RC">RC</option>
+                <option value="CC">CC</option>
+                <option value="CE">CE</option>
+                <option value="PEP">PEP</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Número de Documento <span style="color:#EF4444;">*</span></label>
+              <input id="edit-mat-st-docnum" type="text" class="mobile-input" required>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Lugar de Expedición</label>
+              <input id="edit-mat-st-docplace" type="text" class="mobile-input">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 90px 90px; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Fecha Nacimiento</label>
+              <input id="edit-mat-st-birthdate" type="date" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Lugar Nacimiento</label>
+              <input id="edit-mat-st-birthplace" type="text" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Edad</label>
+              <input id="edit-mat-st-age" type="number" min="1" max="100" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">RH</label>
+              <input id="edit-mat-st-rh" type="text" class="mobile-input" placeholder="O+">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">EPS</label>
+              <input id="edit-mat-st-eps" type="text" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Teléfono</label>
+              <input id="edit-mat-st-phone" type="tel" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Correo Estudiante</label>
+              <input id="edit-mat-st-email" type="email" class="mobile-input">
+            </div>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Dirección de Residencia</label>
+            <input id="edit-mat-st-address" type="text" class="mobile-input">
+          </div>
+
+          <!-- SECCIÓN 2: DATOS DEL ACUDIENTE -->
+          <div style="font-weight: 700; color: #003366; font-size: 0.95rem; margin-top: 18px; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <span>👨‍👩‍👧</span> Datos del Acudiente Principal
+          </div>
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Nombre Completo Acudiente <span style="color:#EF4444;">*</span></label>
+              <input id="edit-mat-gd-name" type="text" class="mobile-input" required>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Parentesco</label>
+              <input id="edit-mat-gd-rel" type="text" class="mobile-input" placeholder="Ej: Madre / Padre / Tío(a)">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 120px 1fr 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Tipo Doc.</label>
+              <select id="edit-mat-gd-doctype" class="mobile-input">
+                <option value="CC">CC</option>
+                <option value="CE">CE</option>
+                <option value="PEP">PEP</option>
+                <option value="Pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Número Documento</label>
+              <input id="edit-mat-gd-docnum" type="text" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Celular Acudiente <span style="color:#EF4444;">*</span></label>
+              <input id="edit-mat-gd-phone" type="tel" class="mobile-input" required>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Correo Acudiente</label>
+              <input id="edit-mat-gd-email" type="email" class="mobile-input">
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3: GRADO, COSTOS Y ESTADO -->
+          <div style="font-weight: 700; color: #003366; font-size: 0.95rem; margin-top: 18px; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <span>🎓</span> Asignación Académica & Finanzas
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Nivel de Educación</label>
+              <select id="edit-mat-level" class="mobile-input">
+                <option value="PREESCOLAR">Preescolar</option>
+                <option value="BASICA_PRIMARIA">Básica Primaria</option>
+                <option value="BACHILLERATO_CICLOS">Bachillerato por Ciclos</option>
+              </select>
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Grado Asignado</label>
+              <input id="edit-mat-grade" type="text" class="mobile-input" placeholder="Ej: Transición / Quinto">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Estado de la Matrícula</label>
+              <select id="edit-mat-active" class="mobile-input">
+                <option value="1">✅ Habilitada</option>
+                <option value="0">🚫 Deshabilitada / Cancelada</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div class="mobile-form-group">
+              <label class="mobile-label">Costo Matrícula (COP)</label>
+              <input id="edit-mat-fee" type="number" step="1000" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Mensualidad Pensión (COP)</label>
+              <input id="edit-mat-monthly" type="number" step="1000" class="mobile-input">
+            </div>
+            <div class="mobile-form-group">
+              <label class="mobile-label">Total Matrícula + Pensión (COP)</label>
+              <input id="edit-mat-total" type="number" step="1000" class="mobile-input">
+            </div>
+          </div>
+          <div class="mobile-form-group">
+            <label class="mobile-label">Observaciones Administrativas</label>
+            <textarea id="edit-mat-obs" class="mobile-input" rows="2" placeholder="Anotaciones internas sobre el expediente"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid #E2E8F0;">
+          <button type="button" class="modal-cancel-btn tbl-action-btn" style="width: auto; padding: 8px 16px;">Cancelar</button>
+          <button id="btn-save-mat-edit" type="submit" class="admin-action-btn" style="background: #003366;">💾 Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: GESTIÓN DE PREGUNTA (CREAR / EDITAR) -->
   <div id="question-modal" class="modal-overlay">
     <div class="modal-card" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
@@ -2359,11 +2336,21 @@ El presente contrato regula los términos y condiciones de la preparación acad�
               <input type="text" id="modal-mat-action-obs" class="mobile-input" placeholder="Ej: Cumple con todos los requisitos / Adjuntar certificado..." style="width: 100%; padding: 8px 12px;">
             </div>
           </div>
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button type="button" class="modal-cancel-btn" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer;">Cerrar</button>
-            <button type="button" id="btn-save-mat-decision" class="admin-action-btn" style="background: #15803d; padding: 10px 22px;">
-              💾 Guardar y Notificar por Correo
-            </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 8px;">
+              <button type="button" id="btn-modal-mat-edit" class="admin-action-btn" style="background: #003366; padding: 8px 16px; font-size: 0.85rem;">
+                ✏️ Editar Expediente
+              </button>
+              <button type="button" id="btn-modal-mat-toggle" class="admin-action-btn" style="background: #e2e8f0; color: #334155; padding: 8px 16px; font-size: 0.85rem;">
+                🚫 Deshabilitar Matrícula
+              </button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="modal-cancel-btn" style="padding: 10px 18px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer;">Cerrar</button>
+              <button type="button" id="btn-save-mat-decision" class="admin-action-btn" style="background: #15803d; padding: 10px 22px;">
+                💾 Guardar y Notificar por Correo
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -2537,11 +2524,27 @@ El presente contrato regula los términos y condiciones de la preparación acad�
   <!-- CONTENEDOR TOASTS -->
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
+  <!-- CONTROL DE LA APP DEL ESTUDIANTE -->
+  <script>
+    function switchStudentAppView(viewId, btn) {
+      try {
+        const frame = document.getElementById('real-student-app-frame');
+        if (frame && frame.contentWindow && frame.contentWindow.App && typeof frame.contentWindow.App.switchView === 'function') {
+          frame.contentWindow.App.switchView(viewId);
+        }
+      } catch (err) {
+        console.warn('Could not switch student app iframe view:', err);
+      }
+      document.querySelectorAll('.student-steps-tracker .step-indicator').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+  </script>
+
   <!-- SCRIPTS CON CACHE-BUSTER -->
-  <script src="js/config.js?v=20260909_4"></script>
-  <script src="js/api.js?v=20260909_4"></script>
-  <script src="js/mobile-app.js?v=20260909_4"></script>
-  <script src="js/admin-panel.js?v=20260909_4"></script>
-  <script src="js/app.js?v=20260909_4"></script>
+  <script src="js/config.js?v=20260910_v5"></script>
+  <script src="js/api.js?v=20260910_v5"></script>
+  <script src="js/mobile-app.js?v=20260910_v5"></script>
+  <script src="js/admin-panel.js?v=20260910_v5"></script>
+  <script src="js/app.js?v=20260910_v5"></script>
 </body>
 </html>

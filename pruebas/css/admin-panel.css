@@ -273,6 +273,7 @@
 
 .table-badge.active { background: var(--success-light); color: #047857; }
 .table-badge.inactive { background: var(--danger-light); color: #B91C1C; }
+.table-badge.disabled { background: #F1F5F9; color: #64748B; border: 1px solid #CBD5E1; }
 .table-badge.pending { background: var(--warning-light); color: #B45309; }
 
 .table-actions {
@@ -299,6 +300,12 @@
   background: var(--primary-light);
   color: var(--primary);
   border-color: var(--primary);
+}
+
+.tbl-action-btn.edit:hover {
+  background: #FEF3C7;
+  color: #B45309;
+  border-color: #F59E0B;
 }
 
 .tbl-action-btn.delete:hover {

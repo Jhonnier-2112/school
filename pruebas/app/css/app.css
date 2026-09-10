@@ -692,3 +692,18 @@ html, body {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+/* Modo Embebido dentro del Mockup / iframe */
+@media (max-width: 600px) {
+  html, body {
+    background-color: var(--bg-app) !important;
+    background-image: none !important;
+  }
+  .app-container {
+    min-height: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
